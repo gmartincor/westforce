@@ -5,10 +5,11 @@ from .base import *
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'zentoerp.com',
-    'www.zentoerp.com',
-    'manager.zentoerp.com',
-    'zentoerp-web.onrender.com',
+    'westforce.com',
+    'www.westforce.com',
+    'manager.westforce.com',
+    '*.westforce.com',
+    'westforce-web.onrender.com',
     'localhost',
     '127.0.0.1',
 ]
@@ -87,7 +88,7 @@ EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@zentoerp.com')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@westforce.com')
 
 # Cache configuration
 CACHES = {

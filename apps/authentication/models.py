@@ -30,6 +30,12 @@ class User(AbstractUser):
         verbose_name="Position/Title"
     )
     
+    company_name = models.CharField(
+        max_length=200,
+        default="Westforce Moving Company",
+        verbose_name="Company name"
+    )
+    
     is_active = models.BooleanField(
         default=True,
         verbose_name="Active"
@@ -40,11 +46,11 @@ class User(AbstractUser):
 
     class Meta:
         db_table = 'users'
-        verbose_name = "User"
-        verbose_name_plural = "Users"
+        verbose_name = "Manager User"
+        verbose_name_plural = "Manager Users"
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.username})"
+        return f"{self.get_display_name()} - {self.company_name}"
 
     @property
     def full_name(self):
@@ -52,3 +58,10 @@ class User(AbstractUser):
 
     def get_display_name(self):
         return self.full_name or self.username
+
+    @classmethod
+    def get_manager(cls):
+        try:
+            return cls.objects.filter(is_active=True).first()
+        except cls.DoesNotExist:
+            return None

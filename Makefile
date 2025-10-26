@@ -1,147 +1,89 @@
 # =============================================================================
-# Makefile - Westforce Commands (Fases 1-4)
+# Westforce - Clean Architecture Commands
 # =============================================================================
 
-.PHONY: help dev full-dev prod build clean test logs deploy verify-prod
+.PHONY: help dev prod build clean test logs status restart migrate makemigrations shell superuser
 
-# Variables
 COMPOSE_FILE := docker-compose.yml
-PROJECT_NAME := westforce
+ENV_FILE_DEV := .env.dev-with-prod-db
 
-# =============================================================================
-# HELP
-# =============================================================================
-help: ## Mostrar ayuda
-	@echo "🐳 Westforce - Comandos disponibles:"
+help: ## Show available commands
+	@echo "🐳 Westforce Commands:"
 	@echo ""
-	@echo "DESARROLLO:"
-	@echo "  dev          - Desarrollo normal (con BD de producción)"
-	@echo "  dev-empty    - Desarrollo con BD vacía (solo si necesitas empezar de cero)"
-	@echo "  full-dev     - Desarrollo completo (PostgreSQL + Redis + App)"
-	@echo "  build        - Rebuild imágenes"
-	@echo "  clean        - Limpiar containers y volúmenes"
-	@echo "  test         - Ejecutar tests"
-	@echo "  logs         - Ver logs"
+	@echo "DEVELOPMENT:"
+	@echo "  dev          - Start development environment"
+	@echo "  build        - Rebuild images"
+	@echo "  clean        - Clean containers and volumes"
+	@echo "  restart      - Restart services"
 	@echo ""
-	@echo "SINCRONIZACIÓN BD:"
-	@echo "  backup-local - Backup BD local actual"
+	@echo "DATABASE:"
+	@echo "  migrate      - Run migrations"
+	@echo "  makemigrations - Create new migrations"
+	@echo "  shell        - Open Django shell"
+	@echo "  superuser    - Create superuser"
 	@echo ""
-	@echo "PRODUCCIÓN:"
-	@echo "  verify-prod  - Verificar configuración de producción"
-	@echo "  deploy       - Deploy a Render"
-	@echo ""
-	@echo "  clean        - Limpiar contenedores"
-	@echo "  test         - Ejecutar tests"
-	@echo "  logs         - Ver logs"
-	@echo "  setup        - Configurar entorno inicial"
+	@echo "UTILS:"
+	@echo "  test         - Run tests"
+	@echo "  logs         - Show logs"
+	@echo "  status       - Show container status"
 	@echo ""
 
-# =============================================================================
-# DEVELOPMENT
-# =============================================================================
-dev: ## Desarrollo normal (con BD de producción)
-	@echo "🚀 Iniciando desarrollo con BD de producción..."
-	@echo "💡 BD con todos los datos reales de producción"
-	@docker-compose --env-file .env.dev-with-prod-db --profile dev-synced up --remove-orphans
+dev: ## Start development environment
+	@echo "🚀 Starting development environment..."
+	@docker-compose --env-file $(ENV_FILE_DEV) up --remove-orphans
 
-dev-empty: ## Desarrollo con BD vacía (solo si necesitas empezar de cero)
-	@echo "🚀 Iniciando desarrollo con BD vacía..."
-	@echo "⚠️  Solo usar si necesitas BD completamente nueva"
-	@docker-compose --profile dev up --remove-orphans
+migrate: ## Run migrations
+	@echo "� Running migrations..."
+	@docker exec westforce-web-1 python manage.py migrate --verbosity=2
 
-full-dev: ## Desarrollo completo
-	@echo "🚀 Iniciando desarrollo completo..."
-	@docker-compose --profile full-dev up --remove-orphans
+setup: ## Complete setup (migrate + load data)
+	@echo "⚙️ Setting up application..."
+	@$(MAKE) migrate
+	@echo "📊 Loading initial data..."
+	@docker exec westforce-web-1 python manage.py loaddata fixtures.json || true
+	@echo "✅ Setup complete"
 
-# =============================================================================
-# PRODUCTION
-# =============================================================================
-prod: ## Producción
-	@echo "🏭 Iniciando producción..."
-	@docker-compose --profile prod up --remove-orphans
+prod: ## Start production environment
+	@echo "🏭 Starting production environment..."
+	@DJANGO_SETTINGS_MODULE=config.settings.production docker-compose up --remove-orphans
 
-# =============================================================================
-# BUILD & MAINTENANCE
-# =============================================================================
-build: ## Rebuild imágenes
-	@echo "🔨 Rebuilding imágenes..."
+build: ## Rebuild images
+	@echo "🔨 Rebuilding images..."
 	@docker-compose build --no-cache
 
-clean: ## Limpiar contenedores
-	@echo "🧹 Limpiando contenedores..."
+clean: ## Clean containers and volumes
+	@echo "🧹 Cleaning containers and volumes..."
 	@docker-compose down -v --remove-orphans
+	@docker system prune -f
 
-# =============================================================================
-# TESTING
-# =============================================================================
-test: ## Ejecutar tests
-	@echo "🧪 Ejecutando tests..."
-	@docker-compose --profile dev run --rm app-dev python manage.py test
+restart: ## Restart services
+	@echo "🔄 Restarting services..."
+	@docker-compose restart
 
-test-charts: ## Verificar configuración de charts
-	@echo "📊 Verificando configuración de charts..."
-	@./scripts/test-charts.sh
+test: ## Run tests
+	@echo "🧪 Running tests..."
+	@docker-compose exec web python manage.py test
 
-# =============================================================================
-# UTILS
-# =============================================================================
-logs: ## Ver logs
-	@docker-compose logs -f app-dev
+logs: ## Show logs
+	@docker-compose logs -f web
 
-setup: ## Configurar entorno inicial
-	@echo "⚙️ Configurando entorno inicial..."
-	@./scripts/setup.sh
-
-# =============================================================================
-# SHORTCUTS & QUICK COMMANDS
-# =============================================================================
-up: dev ## Alias para 'dev'
-down: ## Parar servicios
-	@docker-compose down
-
-# Comandos rápidos para desarrollo diario
-migrate: ## Ejecutar migraciones
-	@echo "🔄 Ejecutando migraciones..."
-	@docker exec westforce_dev_synced_app_dev python manage.py migrate
-
-makemigrations: ## Crear nuevas migraciones
-	@echo "📝 Creando migraciones..."
-	@docker exec westforce_dev_synced_app_dev python manage.py makemigrations
-
-shell: ## Abrir shell de Django
-	@echo "🐍 Abriendo shell de Django..."
-	@docker exec -it westforce_dev_synced_app_dev python manage.py shell
-
-superuser: ## Crear superusuario de desarrollo
-	@echo "👑 Creando superusuario..."
-	@docker exec westforce_dev_synced_app_dev python manage.py create_single_user --force
-
-status: ## Ver estado de contenedores
-	@echo "📊 Estado de contenedores:"
+status: ## Show container status
 	@docker-compose ps
 
-restart: ## Reiniciar aplicación
-	@echo "🔄 Reiniciando aplicación..."
-	@docker-compose restart app-dev
+migrate: ## Run migrations
+	@echo "🔄 Running migrations..."
+	@docker exec westforce-web-1 python manage.py migrate --verbosity=2
 
-backup-local: ## Hacer backup de BD local
-	@echo "� Haciendo backup de BD local..."
-	@docker-compose exec postgres pg_dump -U guillermomartincorrea -d crm_nutricion_pro > "./backups/local_backup_$(date +'%Y%m%d_%H%M%S').sql"
+makemigrations: ## Create new migrations
+	@echo "📝 Creating migrations..."
+	@docker exec westforce-web-1 python manage.py makemigrations
 
-verify-prod: ## Verificar configuración de producción
-	@echo "🔍 Verificando configuración de producción..."
-	python manage.py check_production_ready
+shell: ## Open Django shell
+	@echo "🐍 Opening Django shell..."
+	@docker exec -it westforce-web-1 python manage.py shell
 
-deploy: ## Preparar para deploy en Render
-	@echo "🚀 Preparando deploy para Render..."
-	@echo "1. Verificando configuración..."
-	python manage.py check_production_ready
-	@echo "2. Ejecutando tests..."
-	python manage.py test --keepdb --parallel
-	@echo "3. Listo para deploy en Render"
-	@echo "   - Hacer push a branch 'production'"
-	@echo "   - Configurar variables de entorno en Render"
-	@echo "   - Activar deploy automático"
+superuser: ## Create superuser
+	@echo "👑 Creating superuser..."
+	@docker exec -it westforce-web-1 python manage.py createsuperuser
 
-# Default target
 .DEFAULT_GOAL := help

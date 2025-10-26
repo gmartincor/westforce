@@ -1,6 +1,24 @@
 from django.utils import timezone
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.urls import reverse_lazy
+from typing import Dict, Any, Optional
+
+
+class WestforceLoginRequiredMixin(LoginRequiredMixin):
+    login_url = reverse_lazy('authentication:login')
+
+
+class WestforceContextMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'app_name': 'Westforce',
+            'company_type': 'Moving Company',
+        })
+        return context
 
 
 class TemporalFilterMixin:
@@ -45,32 +63,7 @@ class TemporalFilterMixin:
         return context
 
 
-class BusinessLinePermissionMixin:
-    def get_allowed_business_lines(self):
-        from apps.business_lines.models import BusinessLine
-        return BusinessLine.objects.select_related('parent').all()
-    
-    def filter_business_lines_by_permission(self, queryset):
-        return queryset
-    
-    def check_business_line_permission(self, business_line):
-        return True
-    
-    def enforce_business_line_permission(self, business_line):
-        pass
-
-
-class CategoryNormalizationMixin:
-    @staticmethod
-    def normalize_category_for_url(category):
-        return category.lower() if category else None
-    
-    @staticmethod
-    def normalize_category_for_comparison(category):
-        return category.lower() if category else None
-
-
-class BusinessLineHierarchyMixin(CategoryNormalizationMixin):
+class BusinessLineHierarchyMixin:
     def resolve_business_line_from_path(self, line_path):
         from apps.business_lines.models import BusinessLine
         
@@ -123,7 +116,6 @@ class BusinessLineHierarchyMixin(CategoryNormalizationMixin):
         return path
     
     def get_breadcrumb_path(self, business_line, category=None):
-        """Build breadcrumb path for business line navigation"""
         breadcrumbs = []
         hierarchy = self.get_hierarchy_path(business_line)
         
@@ -142,83 +134,3 @@ class BusinessLineHierarchyMixin(CategoryNormalizationMixin):
             })
         
         return breadcrumbs
-    
-    def get_business_line_context(self, line_path=None, category=None):
-        context = {}
-        
-        if line_path:
-            business_line = self.resolve_business_line_from_path(line_path)
-            
-            if hasattr(self, 'check_business_line_permission'):
-                if not self.check_business_line_permission(business_line):
-                    return {
-                        'business_line': business_line,
-                        'line_path': line_path,
-                        'has_permission': False
-                    }
-            
-            context.update({
-                'business_line': business_line,
-                'hierarchy_path': self.get_hierarchy_path(business_line),
-                'breadcrumb_path': self.get_breadcrumb_path(business_line, category),
-                'current_category': self.normalize_category_for_url(category),
-                'line_path': line_path,
-                'has_permission': True
-            })
-        
-        return context
-
-
-class ServiceCategoryMixin(CategoryNormalizationMixin):
-    
-    def get_business_line_incomes(self, business_line):
-        from apps.accounting.models import Income
-        
-        descendant_ids = business_line.get_descendant_ids()
-        return Income.objects.filter(business_line__id__in=descendant_ids)
-    
-    def get_business_line_stats(self, business_line):
-        from django.db.models import Sum, Count, Avg
-        
-        incomes = self.get_business_line_incomes(business_line)
-        
-        stats = incomes.aggregate(
-            total_revenue=Sum('amount'),
-            income_count=Count('id'),
-            avg_revenue=Avg('amount')
-        )
-        
-        return {
-            'total_revenue': stats['total_revenue'] or 0,
-            'income_count': stats['income_count'] or 0,
-            'avg_revenue': stats['avg_revenue'] or 0,
-        }
-    
-    def get_service_type_breakdown(self, business_line):
-        from django.db.models import Sum, Count
-        from apps.accounting.models import ServiceTypeChoices
-        
-        incomes = self.get_business_line_incomes(business_line)
-        breakdown = {}
-        
-        for service_type, display_name in ServiceTypeChoices.choices:
-            type_stats = incomes.filter(service_type=service_type).aggregate(
-                total=Sum('amount'),
-                count=Count('id')
-            )
-            breakdown[service_type] = {
-                'name': display_name,
-                'total': type_stats['total'] or 0,
-                'count': type_stats['count'] or 0
-            }
-        
-        return breakdown
-    
-    def get_business_line_context(self, business_line):
-        stats = self.get_business_line_stats(business_line)
-        breakdown = self.get_service_type_breakdown(business_line)
-        
-        return {
-            'business_line_stats': stats,
-            'service_type_breakdown': breakdown,
-        }

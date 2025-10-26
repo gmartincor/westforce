@@ -1,9 +1,20 @@
 from django.shortcuts import render
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 def landing_page(request):
+    company_name = 'Westforce'
+    try:
+        manager = User.objects.filter(is_active=True).first()
+        if manager:
+            company_name = getattr(manager, 'company_name', 'Westforce')
+    except Exception:
+        pass
+    
     context = {
-        'company_name': 'Westforce',
+        'company_name': company_name,
         'company_tagline': 'Professional Australian Moving Company Management System',
         'features': [
             {

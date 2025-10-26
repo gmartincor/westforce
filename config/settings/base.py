@@ -25,7 +25,11 @@ allowed_hosts_str = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
 
 if DEBUG:
-    ALLOWED_HOSTS.append('*')
+    ALLOWED_HOSTS.extend(['*'])
+else:
+    ALLOWED_HOSTS.extend(['westforce.com', 'manager.westforce.com', 'www.westforce.com'])
+
+DOMAIN = config('DOMAIN', default='westforce.com')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -50,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'apps.core.middleware.InitialSetupMiddleware',
+    'apps.core.middleware.westforce_routing.WestforceRoutingMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -145,7 +149,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Authentication settings
 LOGIN_URL = 'authentication:login'
 LOGIN_REDIRECT_URL = 'dashboard:home'
-LOGOUT_REDIRECT_URL = 'authentication:login'
+LOGOUT_REDIRECT_URL = 'manager:home'
+
+COMPANY_NAME = config('COMPANY_NAME', default='Westforce Moving Company')
+COMPANY_TAGLINE = config('COMPANY_TAGLINE', default='Professional Australian Moving Company Management System')
 
 # Messages framework settings
 from django.contrib.messages import constants as messages
