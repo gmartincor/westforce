@@ -39,7 +39,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-westforce123}
       DB_HOST: postgres
       DB_PORT: 5432
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,*.localhost,web}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,westforce.com,www.westforce.com,web}
     ports:
       - "${APP_PORT_EXTERNAL:-8000}:8000"
     volumes:

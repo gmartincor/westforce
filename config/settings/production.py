@@ -7,21 +7,19 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'westforce.com',
     'www.westforce.com',
-    'manager.westforce.com',
-    '*.westforce.com',
     'westforce-web.onrender.com',
     'localhost',
     '127.0.0.1',
 ]
 
 additional_hosts = config('ADDITIONAL_ALLOWED_HOSTS', default='', cast=Csv())
-if additional_hosts:
+if additional_hosts and additional_hosts != ['']:
     ALLOWED_HOSTS.extend(additional_hosts)
 
 env_allowed_hosts = config('ALLOWED_HOSTS', default='', cast=Csv())
-if env_allowed_hosts:
+if env_allowed_hosts and env_allowed_hosts != ['']:
     for host in env_allowed_hosts:
-        if host not in ALLOWED_HOSTS:
+        if host and host not in ALLOWED_HOSTS:
             ALLOWED_HOSTS.append(host)
 
 # SSL and Security settings

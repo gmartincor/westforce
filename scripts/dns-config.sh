@@ -1,14 +1,18 @@
-ñ#!/bin/bash
+#!/bin/bash
 
 # =============================================================================
-# dns-config.sh - Configuración DNS para westforce.com.au
+# dns-config.sh - Configuración DNS simplificada para westforce.com
 # =============================================================================
-# Este script proporciona las configuraciones DNS necesarias para
-# configurar correctamente los dominios para westforce.com.au
 
 set -e
 
-echo "🌐 Configuración DNS para westforce.com.au"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+echo -e "${BLUE}🌐 Configuración DNS para westforce.com${NC}"
 echo "======================================"
 
 echo ""
@@ -16,21 +20,62 @@ echo "📋 CONFIGURACIÓN DNS REQUERIDA:"
 echo "-------------------------------"
 
 echo ""
-echo "1. 📍 DOMINIO PRINCIPAL (westforce.com.au):"
+echo "1. 📍 DOMINIO PRINCIPAL (westforce.com):"
 echo "   Tipo: A"
 echo "   Nombre: @"
 echo "   Valor: [IP_DE_RENDER] (se obtiene automáticamente)"
 echo "   TTL: 300"
 
 echo ""
-echo "2. 🔄 SUBDOMINIO WWW (www.westforce.com.au):"
+echo "2. 🔄 SUBDOMINIO WWW (www.westforce.com):"
 echo "   Tipo: CNAME"
 echo "   Nombre: www"
-echo "   Valor: westforce.com.au"
+echo "   Valor: westforce.com"
 echo "   TTL: 300"
 
 echo ""
-echo "3. 🏢 DOMINIO MANAGER (manager.westforce.com.au):"
+echo "📝 CONFIGURACIÓN SIMPLIFICADA:"
+echo "------------------------------"
+echo "• westforce.com              (Aplicación completa)"
+echo "• www.westforce.com          (Redirect a westforce.com)"
+
+echo ""
+echo "⚙️  CONFIGURACIÓN EN RENDER:"
+echo "----------------------------"
+echo "Repository: https://github.com/gmartincor/westforce"
+echo "Branch: main"
+echo "1. Agregar dominio personalizado: westforce.com"
+echo "2. Verificar configuración DNS"
+echo "3. Activar SSL automático"
+
+echo ""
+echo "🔧 COMANDOS ÚTILES PARA VERIFICAR DNS:"
+echo "--------------------------------------"
+echo "• dig westforce.com"
+echo "• dig www.westforce.com"
+echo "• nslookup westforce.com"
+
+echo ""
+echo "✅ CHECKLIST DE CONFIGURACIÓN:"
+echo "------------------------------"
+echo "□ Dominio principal configurado"
+echo "□ SSL/TLS activado"
+echo "□ Verificación DNS completada"
+
+echo ""
+echo "🎯 RUTAS DE LA APLICACIÓN:"
+echo "-------------------------"
+echo "• westforce.com/                 → Landing"
+echo "• westforce.com/auth/login/      → Login"
+echo "• westforce.com/dashboard/       → Dashboard"
+echo "• westforce.com/expenses/        → Expenses"
+echo "• westforce.com/accounting/      → Accounting"
+echo "• westforce.com/invoicing/       → Invoicing"
+echo "• westforce.com/admin/           → Admin"
+
+echo ""
+echo -e "${GREEN}✅ Configuración DNS simplificada completada${NC}"
+echo "==============================================="
 echo "   Tipo: CNAME"
 echo "   Nombre: manager"
 echo "   Valor: westforce.com.au"

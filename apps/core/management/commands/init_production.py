@@ -63,9 +63,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('✅ WESTFORCE INICIALIZADO CORRECTAMENTE'))
             self.stdout.write('='*50)
             self.stdout.write('📋 PRÓXIMOS PASOS:')
-            self.stdout.write('1. Configurar DNS para westforce.com.au y manager.westforce.com.au')
+            self.stdout.write('1. Configurar DNS para westforce.com')
             self.stdout.write('2. Crear usuario administrador')
-            self.stdout.write('3. Verificar funcionamiento en: https://manager.westforce.com.au')
+            self.stdout.write('3. Verificar funcionamiento en: https://westforce.com')
 
         except Exception as e:
             self.stdout.write(

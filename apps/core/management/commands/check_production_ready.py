@@ -52,7 +52,7 @@ class Command(BaseCommand):
             self.style.SUCCESS(
                 f'\n🎉 Configuración base lista para producción!\n'
                 f'   Dominio objetivo: westforce.com.au\n'
-                f'   Subdominios: manager.westforce.com.au\n'
+                f'   Dominio: westforce.com\n'
                 f'   Cache: Base de datos (sin Redis)\n'
                 f'\n📋 Pasos para producción:\n'
                 f'   1. Crear PostgreSQL en Render\n'
@@ -63,7 +63,7 @@ class Command(BaseCommand):
                 f'\n🔧 Variables críticas para Render:\n'
                 f'   - SECRET_KEY: Generar clave segura\n'
                 f'   - DEBUG: False\n'
-                f'   - ALLOWED_HOSTS: westforce.com.au,manager.westforce.com.au\n'
+                f'   - ALLOWED_HOSTS: westforce.com,www.westforce.com\n'
                 f'   - DB_* : Credenciales de PostgreSQL\n'
                 f'\n💰 Costo total: $14/mes (PostgreSQL + Web Service)\n'
                 f'   🚫 Redis omitido para ahorrar $7/mes\n'
