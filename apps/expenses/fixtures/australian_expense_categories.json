@@ -1,0 +1,236 @@
+[
+  {
+    "model": "expenses.expensecategory",
+    "pk": 1,
+    "fields": {
+      "name": "Office Rent",
+      "slug": "office-rent",
+      "description": "Monthly rental costs for office space",
+      "category_type": "FIXED",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 2,
+    "fields": {
+      "name": "Electricity",
+      "slug": "electricity",
+      "description": "Power bills for office and storage facilities",
+      "category_type": "FIXED",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 3,
+    "fields": {
+      "name": "Water & Utilities",
+      "slug": "water-utilities",
+      "description": "Water, gas and other utility bills",
+      "category_type": "FIXED",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 4,
+    "fields": {
+      "name": "Internet & Phone",
+      "slug": "internet-phone",
+      "description": "Telecommunications and internet services",
+      "category_type": "FIXED",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 5,
+    "fields": {
+      "name": "Insurance",
+      "slug": "insurance",
+      "description": "Public liability, vehicle and equipment insurance",
+      "category_type": "FIXED",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 6,
+    "fields": {
+      "name": "Vehicle Registration",
+      "slug": "vehicle-registration",
+      "description": "Annual vehicle registration fees",
+      "category_type": "FIXED",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 7,
+    "fields": {
+      "name": "Fuel",
+      "slug": "fuel",
+      "description": "Petrol and diesel for moving trucks and vehicles",
+      "category_type": "VARIABLE",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 8,
+    "fields": {
+      "name": "Vehicle Maintenance",
+      "slug": "vehicle-maintenance",
+      "description": "Truck servicing, repairs and maintenance",
+      "category_type": "VARIABLE",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 9,
+    "fields": {
+      "name": "Packing Materials",
+      "slug": "packing-materials",
+      "description": "Boxes, bubble wrap, tape and packing supplies",
+      "category_type": "VARIABLE",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 10,
+    "fields": {
+      "name": "Staff Wages",
+      "slug": "staff-wages",
+      "description": "Employee wages and casual staff payments",
+      "category_type": "VARIABLE",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 11,
+    "fields": {
+      "name": "Marketing & Advertising",
+      "slug": "marketing-advertising",
+      "description": "Online ads, flyers, website and promotional materials",
+      "category_type": "VARIABLE",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 12,
+    "fields": {
+      "name": "GST Payable",
+      "slug": "gst-payable",
+      "description": "Goods and Services Tax payments to ATO",
+      "category_type": "TAX",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 13,
+    "fields": {
+      "name": "PAYG Tax",
+      "slug": "payg-tax",
+      "description": "Pay As You Go tax payments",
+      "category_type": "TAX",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 14,
+    "fields": {
+      "name": "Superannuation",
+      "slug": "superannuation",
+      "description": "Compulsory superannuation contributions for employees",
+      "category_type": "TAX",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 15,
+    "fields": {
+      "name": "Equipment Purchase",
+      "slug": "equipment-purchase",
+      "description": "Dollies, straps, protective equipment and tools",
+      "category_type": "OCCASIONAL",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 16,
+    "fields": {
+      "name": "Professional Services",
+      "slug": "professional-services",
+      "description": "Accountant, legal and business advisory fees",
+      "category_type": "OCCASIONAL",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 17,
+    "fields": {
+      "name": "License & Permits",
+      "slug": "license-permits",
+      "description": "Business licenses and operating permits",
+      "category_type": "OCCASIONAL",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  },
+  {
+    "model": "expenses.expensecategory",
+    "pk": 18,
+    "fields": {
+      "name": "Training & Development",
+      "slug": "training-development",
+      "description": "Staff training courses and safety certifications",
+      "category_type": "OCCASIONAL",
+      "is_active": true,
+      "created": "2025-01-01T10:00:00.000Z",
+      "modified": "2025-01-01T10:00:00.000Z"
+    }
+  }
+]

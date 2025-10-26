@@ -1,0 +1,162 @@
+[
+  {
+    "model": "business_lines.businessline",
+    "pk": 1,
+    "fields": {
+      "name": "East Perth Operations",
+      "slug": "east-perth",
+      "level": 1,
+      "parent": null,
+      "description": "Moving services in East Perth and surrounding areas",
+      "location": "East Perth, WA",
+      "is_active": true,
+      "order": 1,
+      "created": "2025-01-01T09:00:00Z",
+      "modified": "2025-01-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 2,
+    "fields": {
+      "name": "West Perth Operations",
+      "slug": "west-perth",
+      "level": 1,
+      "parent": null,
+      "description": "Moving services in West Perth and surrounding areas",
+      "location": "West Perth, WA",
+      "is_active": true,
+      "order": 2,
+      "created": "2025-01-01T09:05:00Z",
+      "modified": "2025-01-01T09:05:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 3,
+    "fields": {
+      "name": "Fremantle Operations",
+      "slug": "fremantle",
+      "level": 1,
+      "parent": null,
+      "description": "Moving services in Fremantle and coastal areas",
+      "location": "Fremantle, WA",
+      "is_active": true,
+      "order": 3,
+      "created": "2025-01-01T09:10:00Z",
+      "modified": "2025-01-01T09:10:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 4,
+    "fields": {
+      "name": "Residential Moving",
+      "slug": "residential",
+      "level": 2,
+      "parent": 1,
+      "description": "Home and apartment moving services",
+      "location": "East Perth, WA",
+      "is_active": true,
+      "order": 1,
+      "created": "2025-01-01T09:15:00Z",
+      "modified": "2025-01-01T09:15:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 5,
+    "fields": {
+      "name": "Commercial Moving",
+      "slug": "commercial",
+      "level": 2,
+      "parent": 1,
+      "description": "Office and business relocations",
+      "location": "East Perth, WA",
+      "is_active": true,
+      "order": 2,
+      "created": "2025-01-01T09:20:00Z",
+      "modified": "2025-01-01T09:20:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 6,
+    "fields": {
+      "name": "Storage Services",
+      "slug": "storage",
+      "level": 2,
+      "parent": 2,
+      "description": "Temporary and long-term storage solutions",
+      "location": "West Perth, WA",
+      "is_active": true,
+      "order": 1,
+      "created": "2025-01-01T09:25:00Z",
+      "modified": "2025-01-01T09:25:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 7,
+    "fields": {
+      "name": "Interstate Moving",
+      "slug": "interstate",
+      "level": 2,
+      "parent": 3,
+      "description": "Moving services between states",
+      "location": "Fremantle, WA",
+      "is_active": true,
+      "order": 1,
+      "created": "2025-01-01T09:30:00Z",
+      "modified": "2025-01-01T09:30:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 8,
+    "fields": {
+      "name": "Packing Services",
+      "slug": "packing",
+      "level": 2,
+      "parent": 2,
+      "description": "Professional packing and unpacking services",
+      "location": "West Perth, WA",
+      "is_active": true,
+      "order": 2,
+      "created": "2025-01-01T09:35:00Z",
+      "modified": "2025-01-01T09:35:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 9,
+    "fields": {
+      "name": "Cleaning Services",
+      "slug": "cleaning",
+      "level": 2,
+      "parent": 3,
+      "description": "End of lease and post-move cleaning",
+      "location": "Fremantle, WA",
+      "is_active": true,
+      "order": 2,
+      "created": "2025-01-01T09:40:00Z",
+      "modified": "2025-01-01T09:40:00Z"
+    }
+  },
+  {
+    "model": "business_lines.businessline",
+    "pk": 10,
+    "fields": {
+      "name": "Furniture Assembly",
+      "slug": "furniture-assembly",
+      "level": 3,
+      "parent": 4,
+      "description": "Assembly and disassembly of furniture",
+      "location": "East Perth, WA",
+      "is_active": true,
+      "order": 1,
+      "created": "2025-01-01T09:45:00Z",
+      "modified": "2025-01-01T09:45:00Z"
+    }
+  }
+]

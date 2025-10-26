@@ -1,0 +1,162 @@
+[
+  {
+    "model": "accounting.income",
+    "pk": 1,
+    "fields": {
+      "business_line": 4,
+      "service_type": "local",
+      "amount": "450.00",
+      "date": "2025-01-15",
+      "payment_method": "CARD",
+      "client_name": "Sarah Johnson",
+      "pickup_address": "25 Murray Street, Perth WA 6000",
+      "delivery_address": "48 Beaufort Street, Mount Lawley WA 6050",
+      "description": "2-bedroom apartment move, includes packing materials",
+      "reference_number": "MOV-001-2025",
+      "accounting_year": 2025,
+      "accounting_month": 1,
+      "created": "2025-01-15T10:30:00Z",
+      "modified": "2025-01-15T10:30:00Z"
+    }
+  },
+  {
+    "model": "accounting.income",
+    "pk": 2,
+    "fields": {
+      "business_line": 5,
+      "service_type": "local",
+      "amount": "1250.00",
+      "date": "2025-01-16",
+      "payment_method": "BANK_TRANSFER",
+      "client_name": "Perth Legal Associates",
+      "pickup_address": "Level 3, 89 St Georges Terrace, Perth WA 6000",
+      "delivery_address": "Level 15, 140 St Georges Terrace, Perth WA 6000",
+      "description": "Office relocation - 50 desks, filing cabinets, IT equipment",
+      "reference_number": "MOV-002-2025",
+      "accounting_year": 2025,
+      "accounting_month": 1,
+      "created": "2025-01-16T14:15:00Z",
+      "modified": "2025-01-16T14:15:00Z"
+    }
+  },
+  {
+    "model": "accounting.income",
+    "pk": 3,
+    "fields": {
+      "business_line": 6,
+      "service_type": "storage",
+      "amount": "180.00",
+      "date": "2025-01-17",
+      "payment_method": "CARD",
+      "client_name": "Michael Chen",
+      "pickup_address": "12 Kings Park Road, West Perth WA 6005",
+      "delivery_address": "Storage Unit 45, West Perth Storage, WA 6005",
+      "description": "Temporary storage for 1 month - furniture and boxes",
+      "reference_number": "STO-001-2025",
+      "accounting_year": 2025,
+      "accounting_month": 1,
+      "created": "2025-01-17T09:45:00Z",
+      "modified": "2025-01-17T09:45:00Z"
+    }
+  },
+  {
+    "model": "accounting.income",
+    "pk": 4,
+    "fields": {
+      "business_line": 7,
+      "service_type": "interstate",
+      "amount": "2100.00",
+      "date": "2025-01-18",
+      "payment_method": "BANK_TRANSFER",
+      "client_name": "Emma Thompson",
+      "pickup_address": "15 South Terrace, Fremantle WA 6160",
+      "delivery_address": "256 Collins Street, Melbourne VIC 3000",
+      "description": "Interstate move Perth to Melbourne - 3-bedroom house",
+      "reference_number": "INT-001-2025",
+      "accounting_year": 2025,
+      "accounting_month": 1,
+      "created": "2025-01-18T11:20:00Z",
+      "modified": "2025-01-18T11:20:00Z"
+    }
+  },
+  {
+    "model": "accounting.income",
+    "pk": 5,
+    "fields": {
+      "business_line": 8,
+      "service_type": "packing",
+      "amount": "320.00",
+      "date": "2025-01-19",
+      "payment_method": "CASH",
+      "client_name": "Robert Wilson",
+      "pickup_address": "78 Rokeby Road, Subiaco WA 6008",
+      "delivery_address": "78 Rokeby Road, Subiaco WA 6008",
+      "description": "Professional packing service - fragile items and artwork",
+      "reference_number": "PAK-001-2025",
+      "accounting_year": 2025,
+      "accounting_month": 1,
+      "created": "2025-01-19T16:00:00Z",
+      "modified": "2025-01-19T16:00:00Z"
+    }
+  },
+  {
+    "model": "accounting.income",
+    "pk": 6,
+    "fields": {
+      "business_line": 9,
+      "service_type": "cleaning",
+      "amount": "280.00",
+      "date": "2025-01-20",
+      "payment_method": "EFTPOS",
+      "client_name": "Lisa Martinez",
+      "pickup_address": "32 Hampton Road, Fremantle WA 6160",
+      "delivery_address": "32 Hampton Road, Fremantle WA 6160",
+      "description": "End of lease cleaning - 2-bedroom apartment",
+      "reference_number": "CLN-001-2025",
+      "accounting_year": 2025,
+      "accounting_month": 1,
+      "created": "2025-01-20T13:30:00Z",
+      "modified": "2025-01-20T13:30:00Z"
+    }
+  },
+  {
+    "model": "accounting.income",
+    "pk": 7,
+    "fields": {
+      "business_line": 4,
+      "service_type": "local",
+      "amount": "680.00",
+      "date": "2025-01-21",
+      "payment_method": "CARD",
+      "client_name": "James Anderson",
+      "pickup_address": "155 Adelaide Terrace, East Perth WA 6004",
+      "delivery_address": "29 Labouchere Road, South Perth WA 6151",
+      "description": "3-bedroom house move with piano transport",
+      "reference_number": "MOV-003-2025",
+      "accounting_year": 2025,
+      "accounting_month": 1,
+      "created": "2025-01-21T08:15:00Z",
+      "modified": "2025-01-21T08:15:00Z"
+    }
+  },
+  {
+    "model": "accounting.income",
+    "pk": 8,
+    "fields": {
+      "business_line": 10,
+      "service_type": "other",
+      "amount": "150.00",
+      "date": "2025-01-22",
+      "payment_method": "CARD",
+      "client_name": "David Kumar",
+      "pickup_address": "67 Stirling Highway, Nedlands WA 6009",
+      "delivery_address": "67 Stirling Highway, Nedlands WA 6009",
+      "description": "Furniture assembly - bedroom and dining sets",
+      "reference_number": "ASM-001-2025",
+      "accounting_year": 2025,
+      "accounting_month": 1,
+      "created": "2025-01-22T15:45:00Z",
+      "modified": "2025-01-22T15:45:00Z"
+    }
+  }
+]

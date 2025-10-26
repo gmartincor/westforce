@@ -1,0 +1,25 @@
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <form method="get" class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+        <div class="flex flex-col lg:flex-row gap-4 flex-1">
+            <div>
+                <select name="period" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
+                    {% for period_value, period_label in available_periods %}
+                        <option value="{{ period_value }}" {% if period_value == period %}selected{% endif %}>
+                            {{ period_label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="flex gap-3 lg:ml-4">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                Apply Filters
+            </button>
+            <a href="{{ request.path }}" 
+               class="bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500 px-4 py-2 rounded-md transition-colors">
+                Clear
+            </a>
+        </div>
+    </form>
+</div>

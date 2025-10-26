@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: westforce_postgres
+    environment:
+      POSTGRES_DB: westforce_moving
+      POSTGRES_USER: westforce
+      POSTGRES_PASSWORD: westforce123
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - westforce_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U westforce -d westforce_moving"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: westforce_web
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.base
+      SECRET_KEY: django-insecure-development-key-westforce-moving
+      DEBUG: "True"
+      ENVIRONMENT: development
+      LOAD_TEST_DATA: "True"
+      DB_NAME: westforce_moving
+      DB_USER: westforce
+      DB_PASSWORD: westforce123
+      DB_HOST: postgres
+      DB_PORT: 5432
+      ALLOWED_HOSTS: localhost,127.0.0.1,*.localhost,web
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app:cached
+      - media_data:/app/media
+      - ./logs:/app/logs:cached
+    networks:
+      - westforce_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: westforce_postgres_data
+    driver: local
+  media_data:
+    name: westforce_media_data
+    driver: local
+
+networks:
+  westforce_network:
+    name: westforce_network
+    driver: bridge
