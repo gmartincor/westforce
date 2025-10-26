@@ -2,6 +2,7 @@ from django.http import HttpResponsePermanentRedirect
 from django.urls import set_urlconf
 from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import redirect
+from django.conf import settings
 
 
 class WestforceRoutingMiddleware(MiddlewareMixin):
@@ -27,7 +28,8 @@ class WestforceRoutingMiddleware(MiddlewareMixin):
         if ':' in host:
             host = host.split(':')[0]
         
-        is_manager_domain = self._is_manager_domain(host)
+        dev_mode = getattr(settings, 'DEV_FORCE_LANDING', False)
+        is_manager_domain = self._is_manager_domain(host, dev_mode)
         
         if host.startswith('www.') and not is_manager_domain:
             redirect_url = f"{request.scheme}://{host[4:]}{request.get_full_path()}"
@@ -48,7 +50,10 @@ class WestforceRoutingMiddleware(MiddlewareMixin):
         
         return self._handle_main_domain(request, host)
     
-    def _is_manager_domain(self, host):
+    def _is_manager_domain(self, host, dev_mode=False):
+        if dev_mode:
+            return False
+        
         return (
             host.startswith('manager.') or 
             host in ['localhost', '127.0.0.1'] or

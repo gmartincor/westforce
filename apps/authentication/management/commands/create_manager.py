@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.core.exceptions import ValidationError
 import getpass
 
 User = get_user_model()
@@ -15,12 +16,6 @@ class Command(BaseCommand):
         parser.add_argument('--company-name', type=str, help='Company name', default='Westforce Moving Company')
 
     def handle(self, *args, **options):
-        if User.objects.exists():
-            self.stdout.write(
-                self.style.WARNING('A user already exists. Delete existing users first if you want to create a new manager.')
-            )
-            return
-
         username = options.get('username') or input('Username: ')
         email = options.get('email') or input('Email: ')
         first_name = input('First name: ')
@@ -58,5 +53,7 @@ class Command(BaseCommand):
                     )
                 )
                 
+        except ValidationError as e:
+            self.stdout.write(self.style.ERROR(f'Validation error: {e}'))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'Error creating user: {e}'))

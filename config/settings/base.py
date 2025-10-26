@@ -31,6 +31,8 @@ else:
 
 DOMAIN = config('DOMAIN', default='westforce.com')
 
+DEV_FORCE_LANDING = config('DEV_FORCE_LANDING', default=False, cast=bool)
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class User(AbstractUser):
@@ -48,6 +49,19 @@ class User(AbstractUser):
         db_table = 'users'
         verbose_name = "Manager User"
         verbose_name_plural = "Manager Users"
+
+    def clean(self):
+        super().clean()
+        if not self.pk and User.objects.exists():
+            raise ValidationError("Only one manager user is allowed in the system.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        if not self.is_staff:
+            self.is_staff = True
+        if not self.is_superuser:
+            self.is_superuser = True
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.get_display_name()} - {self.company_name}"
