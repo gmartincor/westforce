@@ -21,17 +21,16 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-=s24s@s)2l@1-bg4+5%x(
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Security: Only allow specific hosts in production  
-allowed_hosts_str = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=str)
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
+allowed_hosts_str = config('ALLOWED_HOSTS', default='127.0.0.1,localhost')
+if isinstance(allowed_hosts_str, str):
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
+else:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 if DEBUG:
     ALLOWED_HOSTS.extend(['*'])
 else:
-    ALLOWED_HOSTS.extend(['westforce.com', 'manager.westforce.com', 'www.westforce.com'])
-
-DOMAIN = config('DOMAIN', default='westforce.com')
-
-DEV_FORCE_LANDING = config('DEV_FORCE_LANDING', default=False, cast=bool)
+    ALLOWED_HOSTS.extend(['westforce.com', 'www.westforce.com'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -56,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'apps.core.middleware.westforce_routing.WestforceRoutingMiddleware',
+    'apps.core.middleware.auth_redirect.AuthRedirectMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -151,7 +150,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Authentication settings
 LOGIN_URL = 'authentication:login'
 LOGIN_REDIRECT_URL = 'dashboard:home'
-LOGOUT_REDIRECT_URL = 'manager:home'
+LOGOUT_REDIRECT_URL = 'landing_page'
 
 COMPANY_NAME = config('COMPANY_NAME', default='Westforce Moving Company')
 COMPANY_TAGLINE = config('COMPANY_TAGLINE', default='Professional Australian Moving Company Management System')

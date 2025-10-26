@@ -1,6 +1,9 @@
+name: westforce
+
 services:
   postgres:
     image: postgres:15-alpine
+    container_name: westforce-postgres
     environment:
       POSTGRES_DB: ${DB_NAME:-westforce_moving}
       POSTGRES_USER: ${DB_USER:-westforce}
@@ -23,6 +26,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: westforce-web:latest
+    container_name: westforce-web
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.base
       SECRET_KEY: ${SECRET_KEY:-django-insecure-development-key}

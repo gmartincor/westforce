@@ -42,7 +42,7 @@ class WestforceLoginView(LoginView):
 
 
 class WestforceLogoutView(LogoutView):
-    next_page = reverse_lazy('manager:home')
+    next_page = reverse_lazy('landing_page')
     
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
