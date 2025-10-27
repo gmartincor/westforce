@@ -88,7 +88,7 @@ class InvoiceForm(forms.ModelForm):
 class InvoiceItemForm(forms.ModelForm):
     class Meta:
         model = InvoiceItem
-        fields = ['description', 'quantity', 'unit_price', 'gst_treatment', 'gst_rate']
+        fields = ['description', 'quantity', 'unit_price', 'gst_treatment']
         widgets = {
             'description': forms.Textarea(attrs={
                 'rows': 2,
@@ -98,7 +98,6 @@ class InvoiceItemForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={'class': FORM_CONTROL, 'min': '1', 'value': '1'}),
             'unit_price': forms.NumberInput(attrs={'step': '0.01', 'class': CURRENCY_INPUT, 'min': '0.01', 'placeholder': '0.00'}),
             'gst_treatment': forms.Select(attrs={'class': FORM_CONTROL}),
-            'gst_rate': forms.Select(attrs={'class': FORM_CONTROL}),
         }
 
 
@@ -130,7 +129,7 @@ InvoiceItemFormSet = inlineformset_factory(
     InvoiceItem,
     form=InvoiceItemForm,
     formset=BaseInvoiceItemFormSet,
-    fields=['description', 'quantity', 'unit_price', 'gst_treatment', 'gst_rate'],
+    fields=['description', 'quantity', 'unit_price', 'gst_treatment'],
     extra=0,
     min_num=0,
     validate_min=False,

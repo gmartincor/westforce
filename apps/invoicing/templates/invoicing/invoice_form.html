@@ -183,25 +183,17 @@
                                 </div>
                             </div>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {{ form.gst_treatment.label }}
-                                    </label>
-                                    {{ form.gst_treatment }}
-                                    {% if form.gst_treatment.errors %}
-                                        <p class="mt-1 text-sm text-red-600">{{ form.gst_treatment.errors.0 }}</p>
-                                    {% endif %}
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {{ form.gst_rate.label }}
-                                    </label>
-                                    {{ form.gst_rate }}
-                                    {% if form.gst_rate.errors %}
-                                        <p class="mt-1 text-sm text-red-600">{{ form.gst_rate.errors.0 }}</p>
-                                    {% endif %}
-                                </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    {{ form.gst_treatment.label }}
+                                </label>
+                                {{ form.gst_treatment }}
+                                {% if form.gst_treatment.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.gst_treatment.errors.0 }}</p>
+                                {% endif %}
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    GST rate applied automatically based on treatment
+                                </p>
                             </div>
                         </div>
                         

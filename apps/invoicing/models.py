@@ -8,7 +8,7 @@ from apps.core.models import TimeStampedModel
 from .constants import (
     LEGAL_FORMS, CLIENT_TYPES, INVOICE_STATUS, GST_RATE_CHOICES,
     AUSTRALIAN_STATES, GST_RATE, TAX_INVOICE_THRESHOLD, GST_TREATMENT,
-    RECORD_RETENTION_YEARS
+    RECORD_RETENTION_YEARS, GST_FREE_RATE
 )
 from .validators import (
     AustralianBusinessValidator, AustralianPostcodeValidator,
@@ -340,13 +340,10 @@ class InvoiceItem(models.Model):
         verbose_name="GST treatment",
         help_text='How GST applies to this item'
     )
-    gst_rate = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        default=GST_RATE,
-        choices=GST_RATE_CHOICES,
-        verbose_name="GST rate"
-    )
+    
+    @property
+    def gst_rate(self):
+        return GST_RATE if self.gst_treatment == 'TAXABLE' else GST_FREE_RATE
     
     @property
     def subtotal(self):
