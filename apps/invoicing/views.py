@@ -189,21 +189,23 @@ class InvoiceCreateView(CompanyMixin, CreateView):
         context = self.get_context_data()
         formset = context['formset']
         
-        if formset.is_valid():
-            with transaction.atomic():
-                form.instance.company = self.get_company()
-                self.object = form.save()
-                formset.instance = self.object
-                formset.save()
-                
-                logger.info(f"Invoice created: {self.object.reference or 'DRAFT'} for {self.object.client_name}")
-                messages.success(
-                    self.request,
-                    f'Invoice {self.object.reference or "draft"} created successfully.'
-                )
-                return redirect(self.get_success_url())
+        if not formset.is_valid():
+            logger.error(f"Formset validation failed: {formset.errors}")
+            return self.form_invalid(form)
         
-        return self.form_invalid(form)
+        with transaction.atomic():
+            form.instance.company = self.get_company()
+            self.object = form.save()
+            formset.instance = self.object
+            formset.save()
+            
+            logger.info(f"Invoice created: {self.object.reference or 'DRAFT'} for {self.object.client_name}")
+            messages.success(
+                self.request,
+                f'Invoice {self.object.reference or "draft"} created successfully.'
+            )
+        
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse_lazy('invoicing:invoice_detail', kwargs={'pk': self.object.pk})

@@ -32,7 +32,7 @@
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                     Basic Details
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             {{ form.issue_date.label }}
@@ -40,6 +40,15 @@
                         {{ form.issue_date }}
                         {% if form.issue_date.errors %}
                             <p class="mt-1 text-sm text-red-600">{{ form.issue_date.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {{ form.due_date.label }}
+                        </label>
+                        {{ form.due_date }}
+                        {% if form.due_date.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.due_date.errors.0 }}</p>
                         {% endif %}
                     </div>
                     <div>
@@ -53,14 +62,34 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {{ form.payment_terms.label }}
+                            {{ form.payment_date.label }}
                         </label>
-                        {{ form.payment_terms }}
-                        {% if form.payment_terms.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ form.payment_terms.errors.0 }}</p>
+                        {{ form.payment_date }}
+                        {% if form.payment_date.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.payment_date.errors.0 }}</p>
                         {% endif %}
                     </div>
                 </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ form.payment_terms.label }}
+                    </label>
+                    {{ form.payment_terms }}
+                    {% if form.payment_terms.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.payment_terms.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% if form.notes %}
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ form.notes.label }}
+                    </label>
+                    {{ form.notes }}
+                    {% if form.notes.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.notes.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
 
             <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
@@ -88,11 +117,11 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {{ form.client_tax_id.label }}
+                            {{ form.client_abn.label }}
                         </label>
-                        {{ form.client_tax_id }}
-                        {% if form.client_tax_id.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ form.client_tax_id.errors.0 }}</p>
+                        {{ form.client_abn }}
+                        {% if form.client_abn.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.client_abn.errors.0 }}</p>
                         {% endif %}
                     </div>
                     <div>
@@ -157,20 +186,20 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {{ form.vat_rate.label }}
+                                        {{ form.gst_treatment.label }}
                                     </label>
-                                    {{ form.vat_rate }}
-                                    {% if form.vat_rate.errors %}
-                                        <p class="mt-1 text-sm text-red-600">{{ form.vat_rate.errors.0 }}</p>
+                                    {{ form.gst_treatment }}
+                                    {% if form.gst_treatment.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.gst_treatment.errors.0 }}</p>
                                     {% endif %}
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {{ form.irpf_rate.label }}
+                                        {{ form.gst_rate.label }}
                                     </label>
-                                    {{ form.irpf_rate }}
-                                    {% if form.irpf_rate.errors %}
-                                        <p class="mt-1 text-sm text-red-600">{{ form.irpf_rate.errors.0 }}</p>
+                                    {{ form.gst_rate }}
+                                    {% if form.gst_rate.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.gst_rate.errors.0 }}</p>
                                     {% endif %}
                                 </div>
                             </div>
