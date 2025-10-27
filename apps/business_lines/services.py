@@ -21,6 +21,9 @@ class BusinessLineService(BaseService, ValidationMixin):
     def get_children(self, parent_id: int) -> QuerySet:
         return self.get_all(parent_id=parent_id, is_active=True)
     
+    def get_business_lines_tree(self) -> List[Dict]:
+        return self.get_hierarchy_tree()
+    
     def get_hierarchy_tree(self) -> List[Dict]:
         root_lines = self.get_root_business_lines().order_by('order', 'name')
         

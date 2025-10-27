@@ -11,11 +11,13 @@ class User(AbstractUser):
     
     first_name = models.CharField(
         max_length=150,
+        blank=True,
         verbose_name="First name"
     )
     
     last_name = models.CharField(
         max_length=150,
+        blank=True,
         verbose_name="Last name"
     )
     
@@ -43,7 +45,7 @@ class User(AbstractUser):
     )
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         db_table = 'users'
@@ -56,7 +58,8 @@ class User(AbstractUser):
             raise ValidationError("Only one manager user is allowed in the system.")
 
     def save(self, *args, **kwargs):
-        self.full_clean()
+        if self.pk is None:
+            self.full_clean()
         if not self.is_staff:
             self.is_staff = True
         if not self.is_superuser:

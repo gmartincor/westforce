@@ -2,8 +2,73 @@ from ..core.services.base import FinancialService, ValidationMixin
 from .models import Income, ServiceTypeChoices
 from ..business_lines.models import BusinessLine
 from typing import Dict, List, Optional
-from django.db.models import QuerySet, Sum, Q, Count
+from django.db.models import QuerySet, Sum, Count
+from django.utils import timezone
 from datetime import date
+from decimal import Decimal
+
+
+class AccountingService:
+    
+    def __init__(self):
+        self.income_service = IncomeService()
+    
+    def get_business_line_income_stats(self):
+        business_lines = BusinessLine.objects.filter(is_active=True)
+        stats = []
+        
+        for bl in business_lines:
+            total_income = bl.incomes.aggregate(total=Sum('amount'))['total'] or 0
+            income_count = bl.incomes.count()
+            
+            stats.append({
+                'business_line': bl,
+                'total_income': total_income,
+                'income_count': income_count,
+                'average_income': total_income / max(income_count, 1),
+            })
+        
+        return sorted(stats, key=lambda x: x['total_income'], reverse=True)
+    
+    def get_revenue_summary(self, category):
+        current_year = timezone.now().year
+        
+        revenue_data = Income.objects.filter(
+            accounting_year=current_year
+        ).aggregate(
+            total=Sum('amount'),
+            count=Count('id')
+        )
+        
+        return {
+            'category': category,
+            'year': current_year,
+            'total_revenue': revenue_data['total'] or 0,
+            'total_services': revenue_data['count'] or 0,
+        }
+    
+    def get_profit_summary(self, category):
+        from apps.expenses.models import Expense
+        
+        current_year = timezone.now().year
+        
+        revenue = Income.objects.filter(
+            accounting_year=current_year
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        expenses = Expense.objects.filter(
+            date__year=current_year,
+            service_category=category
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        return {
+            'category': category,
+            'year': current_year,
+            'revenue': revenue,
+            'expenses': expenses,
+            'profit': revenue - expenses,
+            'profit_margin': ((revenue - expenses) / revenue * 100) if revenue > 0 else 0,
+        }
 
 
 class IncomeService(FinancialService, ValidationMixin):
@@ -57,6 +122,8 @@ class IncomeService(FinancialService, ValidationMixin):
         return self.create(**data)
     
     def get_top_clients(self, limit: int = 10, year: Optional[int] = None) -> List[Dict]:
+        from django.db.models import Q
+        
         queryset = self.get_all()
         if year:
             queryset = queryset.filter(accounting_year=year)
