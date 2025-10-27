@@ -28,19 +28,25 @@ class TemporalFilterService:
     @staticmethod
     def get_context(year=None, month=None):
         now = timezone.now()
-        current_year = now.year
-        current_month = now.month
+        current_year = year or now.year
+        current_month = month or now.month
+        
+        month_names = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
+        
+        current_month_name = month_names[current_month - 1] if current_month else None
+        
+        available_years = list(range(2020, now.year + 2))
+        available_months = [(i, month_names[i - 1]) for i in range(1, 13)]
         
         return {
             'current_year': current_year,
             'current_month': current_month,
-            'selected_year': year or current_year,
-            'selected_month': month or current_month,
-            'years': list(range(current_year - 5, current_year + 1)),
-            'months': [
-                {'value': i, 'name': date(2000, i, 1).strftime('%B')}
-                for i in range(1, 13)
-            ]
+            'current_month_name': current_month_name,
+            'available_years': available_years,
+            'available_months': available_months,
         }
 
 

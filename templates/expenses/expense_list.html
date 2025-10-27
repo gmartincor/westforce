@@ -2,9 +2,9 @@
 
 {% block title %}
 {% if category_type_display %}
-    {{ service_category_display }} - {{ category_type_display }} - Gastos - Westforce
+    {{ category_type_display }} - Gastos - Westforce
 {% else %}
-    {{ service_category_display }} - Gastos - Westforce
+    Gastos - Westforce
 {% endif %}
 {% endblock %}
 
@@ -15,7 +15,7 @@
         <svg class="flex-shrink-0 w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
         </svg>
-        <a href="{% url 'expenses:categories' service_category %}" class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Gastos {{ service_category_display }}</a>
+        <a href="{% url 'expenses:categories' %}" class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Gastos</a>
     </div>
 </li>
 {% if category_type_display %}
@@ -45,9 +45,9 @@
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
                 {% if category_display %}
-                    {{ category_display }} - {{ service_category_display }}
+                    {{ category_display }}
                 {% else %}
-                    Gastos {{ service_category_display }}
+                    Gastos
                     {% if category_type_display %} - {{ category_type_display }}{% endif %}
                 {% endif %}
             </h1>
@@ -87,7 +87,7 @@
             <!-- Botones de acción -->
             <div class="flex space-x-2">
                 {% if category %}
-                <a href="{% url 'expenses:create' service_category %}?category={{ category.slug }}" 
+                <a href="{% url 'expenses:create' %}?category={{ category.slug }}" 
                    class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm">
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -95,7 +95,7 @@
                     Nuevo Gasto
                 </a>
                 {% elif category_type %}
-                <a href="{% url 'expenses:create-by-type' service_category category_type %}" 
+                <a href="{% url 'expenses:create-by-type' category_type %}" 
                    class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm">
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -103,7 +103,7 @@
                     Nuevo Gasto
                 </a>
                 {% else %}
-                <a href="{% url 'expenses:create' service_category %}" 
+                <a href="{% url 'expenses:create' %}" 
                    class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm">
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -111,7 +111,7 @@
                     Nuevo Gasto
                 </a>
                 {% endif %}
-                <a href="{% url 'expenses:categories' service_category %}{% if current_year %}?year={{ current_year }}{% endif %}{% if current_month %}&month={{ current_month }}{% endif %}" 
+                <a href="{% url 'expenses:categories' %}{% if current_year %}?year={{ current_year }}{% endif %}{% if current_month %}&month={{ current_month }}{% endif %}" 
                    class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg transition-colors font-medium text-sm">
                     Volver
                 </a>
@@ -230,7 +230,7 @@
         <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No hay gastos</h3>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Comienza agregando un nuevo gasto a esta categoría.</p>
         <div class="mt-6">
-            <a href="{% url 'expenses:create' service_category %}{% if category %}?category={{ category.slug }}{% endif %}" 
+            <a href="{% url 'expenses:create' %}{% if category %}?category={{ category.slug }}{% endif %}" 
                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>

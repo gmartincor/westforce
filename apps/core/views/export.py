@@ -127,9 +127,9 @@ def get_export_data():
                 'amount': str(expense.amount),
                 'date': expense.date.isoformat() if expense.date else None,
                 'category': expense.category.name if expense.category else None,
+                'category_type': expense.category.category_type if expense.category else None,
                 'description': expense.description,
                 'invoice_number': expense.invoice_number,
-                'service_category': expense.service_category,
             }
             for expense in expenses
         ]

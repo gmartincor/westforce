@@ -13,9 +13,6 @@ class ExpenseService(FinancialService, ValidationMixin):
     def get_by_category(self, category_id: int) -> QuerySet:
         return self.get_all(category_id=category_id)
     
-    def get_by_service_category(self, service_category: str) -> QuerySet:
-        return self.get_all(service_category=service_category)
-    
     def get_by_date_range(self, start_date: date, end_date: date) -> QuerySet:
         self.validate_date_range(start_date, end_date)
         return self.get_all(date__range=[start_date, end_date])

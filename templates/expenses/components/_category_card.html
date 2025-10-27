@@ -64,11 +64,11 @@
         <!-- Actions -->
         <div class="flex flex-col space-y-2{% if card_variant == 'compact' %} mt-6{% endif %}">
             <div class="flex space-x-2">
-                <a href="{% url 'expenses:by-category' service_category category.slug %}{% if current_year %}?year={{ current_year }}{% endif %}{% if current_month %}&month={{ current_month }}{% endif %}" 
+                <a href="{% url 'expenses:by-category' category.slug %}{% if current_year %}?year={{ current_year }}{% endif %}{% if current_month %}&month={{ current_month }}{% endif %}" 
                    class="flex-1 bg-primary-600 hover:bg-primary-700 text-white text-center py-2 px-4 rounded-lg transition-colors text-sm font-medium">
                     Ver Gastos
                 </a>
-                <a href="{% url 'expenses:create' service_category %}?category={{ category.slug }}" 
+                <a href="{% url 'expenses:create' %}?category={{ category.slug }}" 
                    class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
                     Agregar
                 </a>

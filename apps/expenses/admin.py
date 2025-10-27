@@ -12,8 +12,8 @@ class ExpenseCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ['description', 'amount', 'date', 'category', 'service_category']
-    list_filter = ['category', 'service_category', 'accounting_year', 'accounting_month']
+    list_display = ['description', 'amount', 'date', 'category']
+    list_filter = ['category', 'accounting_year', 'accounting_month']
     search_fields = ['description', 'invoice_number']
     date_hierarchy = 'date'
     list_per_page = 50

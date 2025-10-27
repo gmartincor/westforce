@@ -46,14 +46,12 @@ ACCOUNTING_ERROR_MESSAGES = {
     'INVALID_BUSINESS_LINE_PATH': 'Business line path "{path}" is not valid.',
     'BUSINESS_LINE_NOT_FOUND': 'Business line "{name}" not found.',
     'PERMISSION_DENIED_BUSINESS_LINE': 'You do not have permission to access business line "{name}".',
-    'INVALID_SERVICE_CATEGORY': 'Service category "{category}" is not valid. Must be RESIDENTIAL or COMMERCIAL.',
     'BALANCE_NOT_ALLOWED': 'Balances are not allowed for business line "{name}".',
     'INVALID_BALANCE_FIELD': 'Balance field "{field}" is not valid for business line "{name}".',
     'CLIENT_HAS_ACTIVE_SERVICES': (
         'Cannot delete customer "{name}" because they have active moving services. '
         'Please deactivate or delete all associated services first.'
     ),
-    'DUPLICATE_SERVICE': 'A "{category}" moving service already exists for this customer in this business line.',
 }
 
 ACCOUNTING_URL_PATTERNS = {
@@ -66,28 +64,6 @@ ACCOUNTING_URL_PATTERNS = {
     'SERVICE_DELETE': 'accounting:service-delete',
     'CLIENT_CREATE': 'accounting:client-create',
     'CLIENT_EDIT': 'accounting:client-edit',
-}
-
-SERVICE_CATEGORIES = {
-    'RESIDENTIAL': 'residential',
-    'COMMERCIAL': 'commercial',
-}
-
-SERVICE_CATEGORY_DISPLAY = {
-    'RESIDENTIAL': 'Residential Moving',
-    'COMMERCIAL': 'Commercial Moving',
-}
-
-EXPENSE_SERVICE_CATEGORIES = {
-    'RESIDENTIAL': 'residential',
-    'COMMERCIAL': 'commercial',
-    'SHARED': 'shared',
-}
-
-EXPENSE_SERVICE_CATEGORY_DISPLAY = {
-    'RESIDENTIAL': 'Residential',
-    'COMMERCIAL': 'Commercial',
-    'SHARED': 'Shared',
 }
 
 PAYMENT_METHOD_DISPLAY = {
