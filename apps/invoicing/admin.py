@@ -6,7 +6,7 @@ class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
     extra = 1
     min_num = 1
-    fields = ['description', 'quantity', 'unit_price', 'gst_rate']
+    fields = ['description', 'quantity', 'unit_price', 'gst_treatment', 'gst_rate']
 
 
 @admin.register(Company)
@@ -36,25 +36,32 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ['reference', 'client_name', 'issue_date', 'total_amount', 'status']
+    list_display = ['reference', 'client_name', 'issue_date', 'due_date', 'total_amount', 'status', 'payment_date']
     list_filter = ['status', 'client_type', 'issue_date']
-    search_fields = ['reference', 'client_name', 'client_abn']
-    readonly_fields = ['reference', 'subtotal', 'gst_amount', 'total_amount', 'is_tax_invoice']
+    search_fields = ['reference', 'client_name', 'client_abn', 'payment_reference']
+    readonly_fields = ['reference', 'payment_reference', 'subtotal', 'gst_amount', 'total_amount', 'is_tax_invoice', 'retention_date']
     date_hierarchy = 'issue_date'
     inlines = [InvoiceItemInline]
     
     fieldsets = (
         ('Invoice Information', {
-            'fields': ('reference', 'issue_date', 'status')
+            'fields': ('reference', 'issue_date', 'due_date', 'status')
         }),
         ('Client Details', {
             'fields': ('client_type', 'client_name', 'client_abn', 'client_address')
         }),
-        ('Payment Terms', {
-            'fields': ('payment_terms', 'notes')
+        ('Payment Information', {
+            'fields': ('payment_terms', 'payment_reference', 'payment_date')
+        }),
+        ('Additional Information', {
+            'fields': ('notes',)
         }),
         ('Totals', {
             'fields': ('subtotal', 'gst_amount', 'total_amount', 'is_tax_invoice'),
+            'classes': ('collapse',)
+        }),
+        ('Compliance', {
+            'fields': ('retention_date',),
             'classes': ('collapse',)
         }),
         ('PDF File', {

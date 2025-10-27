@@ -55,15 +55,21 @@ class CompanyForm(forms.ModelForm):
 class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
-        fields = ['client_type', 'client_name', 'client_abn', 'client_address', 'issue_date', 'payment_terms', 'status', 'notes']
+        fields = [
+            'client_type', 'client_name', 'client_abn', 'client_address', 
+            'issue_date', 'due_date', 'payment_terms', 'status', 
+            'payment_date', 'notes'
+        ]
         widgets = {
             'client_type': forms.Select(attrs={'class': FORM_CONTROL}),
             'client_name': forms.TextInput(attrs={'class': FORM_CONTROL, 'placeholder': 'Client name'}),
             'client_abn': forms.TextInput(attrs={'class': FORM_CONTROL, 'placeholder': 'XX XXX XXX XXX'}),
             'client_address': forms.Textarea(attrs={'rows': 3, 'class': FORM_CONTROL, 'placeholder': 'Full address including postcode'}),
             'issue_date': forms.DateInput(attrs={'type': 'date', 'class': FORM_CONTROL}),
+            'due_date': forms.DateInput(attrs={'type': 'date', 'class': FORM_CONTROL}),
             'payment_terms': forms.Textarea(attrs={'rows': 2, 'class': FORM_CONTROL}),
             'status': forms.Select(attrs={'class': FORM_CONTROL}),
+            'payment_date': forms.DateInput(attrs={'type': 'date', 'class': FORM_CONTROL}),
             'notes': forms.Textarea(attrs={'rows': 2, 'class': FORM_CONTROL, 'placeholder': 'Internal notes (optional)'}),
         }
 
@@ -82,7 +88,7 @@ class InvoiceForm(forms.ModelForm):
 class InvoiceItemForm(forms.ModelForm):
     class Meta:
         model = InvoiceItem
-        fields = ['description', 'quantity', 'unit_price', 'gst_rate']
+        fields = ['description', 'quantity', 'unit_price', 'gst_treatment', 'gst_rate']
         widgets = {
             'description': forms.Textarea(attrs={
                 'rows': 2,
@@ -91,6 +97,7 @@ class InvoiceItemForm(forms.ModelForm):
             }),
             'quantity': forms.NumberInput(attrs={'class': FORM_CONTROL, 'min': '1', 'value': '1'}),
             'unit_price': forms.NumberInput(attrs={'step': '0.01', 'class': CURRENCY_INPUT, 'min': '0.01', 'placeholder': '0.00'}),
+            'gst_treatment': forms.Select(attrs={'class': FORM_CONTROL}),
             'gst_rate': forms.Select(attrs={'class': FORM_CONTROL}),
         }
 
@@ -123,7 +130,7 @@ InvoiceItemFormSet = inlineformset_factory(
     InvoiceItem,
     form=InvoiceItemForm,
     formset=BaseInvoiceItemFormSet,
-    fields=['description', 'quantity', 'unit_price', 'gst_rate'],
+    fields=['description', 'quantity', 'unit_price', 'gst_treatment', 'gst_rate'],
     extra=0,
     min_num=0,
     validate_min=False,

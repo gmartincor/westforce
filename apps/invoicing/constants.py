@@ -4,6 +4,7 @@ from decimal import Decimal
 GST_RATE = Decimal('10.00')
 GST_FREE_RATE = Decimal('0.00')
 TAX_INVOICE_THRESHOLD = Decimal('82.50')
+RECORD_RETENTION_YEARS = 5
 
 
 LEGAL_FORMS = [
@@ -25,13 +26,21 @@ INVOICE_STATUS = [
     ('DRAFT', 'Draft'),
     ('SENT', 'Sent'),
     ('PAID', 'Paid'),
+    ('OVERDUE', 'Overdue'),
     ('CANCELLED', 'Cancelled'),
+]
+
+
+GST_TREATMENT = [
+    ('TAXABLE', 'Taxable (10% GST)'),
+    ('GST_FREE', 'GST-free (health, education, exports)'),
+    ('INPUT_TAXED', 'Input taxed (financial supplies, residential rent)'),
 ]
 
 
 GST_RATE_CHOICES = [
     (GST_RATE, '10% (Standard GST)'),
-    (GST_FREE_RATE, 'GST-free'),
+    (GST_FREE_RATE, '0% (GST-free)'),
 ]
 
 

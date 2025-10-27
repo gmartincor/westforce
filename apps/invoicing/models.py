@@ -7,7 +7,8 @@ from datetime import date
 from apps.core.models import TimeStampedModel
 from .constants import (
     LEGAL_FORMS, CLIENT_TYPES, INVOICE_STATUS, GST_RATE_CHOICES,
-    AUSTRALIAN_STATES, GST_RATE, TAX_INVOICE_THRESHOLD
+    AUSTRALIAN_STATES, GST_RATE, TAX_INVOICE_THRESHOLD, GST_TREATMENT,
+    RECORD_RETENTION_YEARS
 )
 from .validators import (
     AustralianBusinessValidator, AustralianPostcodeValidator,
@@ -142,6 +143,12 @@ class Invoice(TimeStampedModel):
         blank=True
     )
     issue_date = models.DateField(default=date.today, verbose_name="Issue date")
+    due_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Due date",
+        help_text='Calculated from issue date and payment terms'
+    )
     
     client_type = models.CharField(
         max_length=20,
@@ -167,12 +174,30 @@ class Invoice(TimeStampedModel):
         default="Payment due within 30 days",
         verbose_name="Payment terms"
     )
+    payment_reference = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Payment reference",
+        help_text='Generated reference for bank reconciliation'
+    )
+    payment_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Payment date"
+    )
     notes = models.TextField(
         blank=True,
         verbose_name="Additional notes",
         help_text='Internal notes (not shown on invoice)'
     )
     pdf_file = models.FileField(upload_to='invoices/pdfs/', blank=True)
+    retention_date = models.DateField(
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Retention until",
+        help_text=f'ATO requires {RECORD_RETENTION_YEARS} years retention'
+    )
 
     @property
     def subtotal(self):
@@ -205,6 +230,57 @@ class Invoice(TimeStampedModel):
     def assign_reference_if_needed(self):
         if not self.reference and self.status != 'DRAFT' and self.company:
             self.reference = self.generate_reference()
+    
+    def generate_payment_reference(self):
+        if not self.reference:
+            return ''
+        clean_ref = self.reference.replace('/', '').replace('-', '')
+        return f"{clean_ref[:8]}{self.client_name[:4].upper()}"
+    
+    def calculate_due_date(self):
+        if not self.issue_date:
+            return None
+        
+        import re
+        terms_lower = self.payment_terms.lower()
+        
+        if 'on receipt' in terms_lower or 'due on receipt' in terms_lower:
+            return self.issue_date
+        
+        days_match = re.search(r'(\d+)\s*days?', terms_lower)
+        if days_match:
+            from datetime import timedelta
+            days = int(days_match.group(1))
+            return self.issue_date + timedelta(days=days)
+        
+        if 'end of month' in terms_lower or 'eom' in terms_lower:
+            from datetime import timedelta
+            next_month = self.issue_date.replace(day=28) + timedelta(days=4)
+            return next_month.replace(day=1) - timedelta(days=1)
+        
+        from datetime import timedelta
+        return self.issue_date + timedelta(days=30)
+    
+    def calculate_retention_date(self):
+        if not self.issue_date:
+            return None
+        return date(
+            self.issue_date.year + RECORD_RETENTION_YEARS, 
+            self.issue_date.month, 
+            self.issue_date.day
+        )
+    
+    def mark_as_paid(self, payment_date=None):
+        self.status = 'PAID'
+        self.payment_date = payment_date or date.today()
+        self.save()
+    
+    def is_overdue(self):
+        if self.status in ['PAID', 'CANCELLED', 'DRAFT']:
+            return False
+        if not self.due_date:
+            return False
+        return date.today() > self.due_date
 
     def get_tax_invoice_note(self):
         if not self.company.gst_registered:
@@ -224,6 +300,19 @@ class Invoice(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         self.assign_reference_if_needed()
+        
+        if not self.payment_reference and self.reference:
+            self.payment_reference = self.generate_payment_reference()
+        
+        if not self.due_date:
+            self.due_date = self.calculate_due_date()
+        
+        if not self.retention_date:
+            self.retention_date = self.calculate_retention_date()
+        
+        if self.status == 'SENT' and self.is_overdue():
+            self.status = 'OVERDUE'
+        
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -249,6 +338,13 @@ class InvoiceItem(models.Model):
         validators=[MinValueValidator(Decimal('0.01'))],
         verbose_name="Unit price (ex GST)"
     )
+    gst_treatment = models.CharField(
+        max_length=20,
+        choices=GST_TREATMENT,
+        default='TAXABLE',
+        verbose_name="GST treatment",
+        help_text='How GST applies to this item'
+    )
     gst_rate = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -263,6 +359,8 @@ class InvoiceItem(models.Model):
     
     @property
     def gst_amount(self):
+        if self.gst_treatment != 'TAXABLE':
+            return Decimal('0.00')
         return self.subtotal * self.gst_rate / 100
     
     @property

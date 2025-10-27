@@ -40,7 +40,7 @@ class InvoicePeriodService:
         if status:
             queryset = queryset.filter(status=status)
         else:
-            queryset = queryset.filter(status__in=['SENT', 'PAID'])
+            queryset = queryset.filter(status__in=['SENT', 'PAID', 'OVERDUE'])
         
         return queryset.order_by('issue_date', 'reference')
     
