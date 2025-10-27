@@ -137,12 +137,15 @@ class InvoiceListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        now = timezone.now()
         context.update({
             'search': self.request.GET.get('search', ''),
             'status': self.request.GET.get('status', ''),
             'period': self.request.GET.get('period', 'current_month'),
             'has_company': Company.objects.exists(),
-            'current_year': timezone.now().year,
+            'current_year': now.year,
+            'current_month': now.month,
+            'current_quarter': (now.month - 1) // 3 + 1,
             'available_years': get_available_years(),
             'available_periods': [
                 ('current_month', 'Current month'),
@@ -278,78 +281,94 @@ def generate_pdf_view(request, pk):
 
 
 def bulk_download_monthly_view(request):
-    year = int(request.GET.get('year', timezone.now().year))
-    month = int(request.GET.get('month', timezone.now().month))
-    status = request.GET.get('status', None)
-    
-    try:
-        invoices = InvoicePeriodService.get_period_invoices('monthly', year=year, month=month, status=status)
-        
-        if not invoices.exists():
-            status_text = _get_status_text(status)
-            messages.warning(request, f'No{status_text} invoices found for {month:02d}/{year}')
-            return redirect('invoicing:invoice_list')
-        
-        zip_content, success_count, error_count = BulkPDFService.generate_bulk_pdfs_zip(
-            invoices,
-            f"invoices_{year}_{month:02d}"
-        )
-        
-        if not zip_content:
-            messages.error(request, 'Error generating ZIP file')
-            return redirect('invoicing:invoice_list')
-        
-        month_names = [
-            'january', 'february', 'march', 'april', 'may', 'june',
-            'july', 'august', 'september', 'october', 'november', 'december'
-        ]
-        
-        filename = f"invoices_{month_names[month-1]}_{year}.zip"
-        
-        _add_download_message(request, success_count, error_count, f'{month_names[month-1]} {year}')
-        logger.info(f"Bulk monthly download: {success_count} invoices for {month:02d}/{year}")
-        
-        return BulkPDFService.create_zip_response(zip_content, filename)
-        
-    except Exception as e:
-        logger.error(f"Error in bulk monthly download: {str(e)}")
-        messages.error(request, f'Error generating bulk download: {str(e)}')
-        return redirect('invoicing:invoice_list')
+    return _handle_bulk_download(
+        request=request,
+        period_type='monthly',
+        year=int(request.GET.get('year', timezone.now().year)),
+        month=int(request.GET.get('month', timezone.now().month)),
+        quarter=None,
+        status=request.GET.get('status', None)
+    )
 
 
 def bulk_download_quarterly_view(request):
-    year = int(request.GET.get('year', timezone.now().year))
-    quarter = int(request.GET.get('quarter', (timezone.now().month - 1) // 3 + 1))
-    status = request.GET.get('status', None)
-    
+    return _handle_bulk_download(
+        request=request,
+        period_type='quarterly',
+        year=int(request.GET.get('year', timezone.now().year)),
+        month=None,
+        quarter=int(request.GET.get('quarter', (timezone.now().month - 1) // 3 + 1)),
+        status=request.GET.get('status', None)
+    )
+
+
+def _handle_bulk_download(request, period_type, year, month, quarter, status):
     try:
-        invoices = InvoicePeriodService.get_period_invoices('quarterly', year=year, quarter=quarter, status=status)
+        invoices = InvoicePeriodService.get_period_invoices(
+            period_type=period_type,
+            year=year,
+            month=month,
+            quarter=quarter,
+            status=status
+        )
         
         if not invoices.exists():
+            period_label = _get_period_label(period_type, year, month, quarter)
             status_text = _get_status_text(status)
-            messages.warning(request, f'No{status_text} invoices found for Q{quarter}/{year}')
+            messages.warning(request, f'No{status_text} invoices found for {period_label}')
             return redirect('invoicing:invoice_list')
+        
+        zip_prefix, filename, period_label = _get_file_info(period_type, year, month, quarter)
         
         zip_content, success_count, error_count = BulkPDFService.generate_bulk_pdfs_zip(
             invoices,
-            f"invoices_{year}_Q{quarter}"
+            zip_prefix
         )
         
         if not zip_content:
             messages.error(request, 'Error generating ZIP file')
             return redirect('invoicing:invoice_list')
         
-        filename = f"invoices_Q{quarter}_{year}.zip"
-        
-        _add_download_message(request, success_count, error_count, f'Q{quarter} {year}')
-        logger.info(f"Bulk quarterly download: {success_count} invoices for Q{quarter}/{year}")
+        _add_download_message(request, success_count, error_count, period_label)
+        logger.info(f"Bulk {period_type} download: {success_count} invoices for {period_label}")
         
         return BulkPDFService.create_zip_response(zip_content, filename)
         
     except Exception as e:
-        logger.error(f"Error in bulk quarterly download: {str(e)}")
+        logger.error(f"Error in bulk {period_type} download: {str(e)}")
         messages.error(request, f'Error generating bulk download: {str(e)}')
         return redirect('invoicing:invoice_list')
+
+
+def _get_period_label(period_type, year, month, quarter):
+    if period_type == 'monthly':
+        month_names = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
+        return f'{month_names[month-1]} {year}'
+    else:
+        return f'Q{quarter} {year}'
+
+
+def _get_file_info(period_type, year, month, quarter):
+    if period_type == 'monthly':
+        month_names_lower = [
+            'january', 'february', 'march', 'april', 'may', 'june',
+            'july', 'august', 'september', 'october', 'november', 'december'
+        ]
+        month_name = month_names_lower[month-1]
+        return (
+            f"invoices_{year}_{month:02d}",
+            f"invoices_{month_name}_{year}.zip",
+            f"{month_name} {year}"
+        )
+    else:
+        return (
+            f"invoices_{year}_Q{quarter}",
+            f"invoices_Q{quarter}_{year}.zip",
+            f"Q{quarter} {year}"
+        )
 
 
 def bulk_preview_view(request):

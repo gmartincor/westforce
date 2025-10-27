@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Invoices - Westforce{% endblock %}
 
@@ -282,18 +283,18 @@
                         Month
                     </label>
                     <select name="month" onchange="updatePreview()" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
+                        <option value="1" {% if current_month == 1 %}selected{% endif %}>January</option>
+                        <option value="2" {% if current_month == 2 %}selected{% endif %}>February</option>
+                        <option value="3" {% if current_month == 3 %}selected{% endif %}>March</option>
+                        <option value="4" {% if current_month == 4 %}selected{% endif %}>April</option>
+                        <option value="5" {% if current_month == 5 %}selected{% endif %}>May</option>
+                        <option value="6" {% if current_month == 6 %}selected{% endif %}>June</option>
+                        <option value="7" {% if current_month == 7 %}selected{% endif %}>July</option>
+                        <option value="8" {% if current_month == 8 %}selected{% endif %}>August</option>
+                        <option value="9" {% if current_month == 9 %}selected{% endif %}>September</option>
+                        <option value="10" {% if current_month == 10 %}selected{% endif %}>October</option>
+                        <option value="11" {% if current_month == 11 %}selected{% endif %}>November</option>
+                        <option value="12" {% if current_month == 12 %}selected{% endif %}>December</option>
                     </select>
                 </div>
                 
@@ -302,10 +303,10 @@
                         Quarter
                     </label>
                     <select name="quarter" onchange="updatePreview()" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
-                        <option value="1">Q1 (January - March)</option>
-                        <option value="2">Q2 (April - June)</option>
-                        <option value="3">Q3 (July - September)</option>
-                        <option value="4">Q4 (October - December)</option>
+                        <option value="1" {% if current_quarter == 1 %}selected{% endif %}>Q1 (January - March)</option>
+                        <option value="2" {% if current_quarter == 2 %}selected{% endif %}>Q2 (April - June)</option>
+                        <option value="3" {% if current_quarter == 3 %}selected{% endif %}>Q3 (July - September)</option>
+                        <option value="4" {% if current_quarter == 4 %}selected{% endif %}>Q4 (October - December)</option>
                     </select>
                 </div>
                 
@@ -348,7 +349,16 @@
     </div>
 </div>
 
+<script src="{% static 'js/invoicing/bulk-download-modal.js' %}"></script>
 <script>
-// ... (script remains unchanged except for text in preview and modal)
+document.addEventListener('DOMContentLoaded', function() {
+    initializeBulkDownloadModal({
+        modalId: 'bulkDownloadModal',
+        formId: 'bulkDownloadForm',
+        previewUrl: '{% url "invoicing:bulk_preview" %}',
+        downloadUrlMonthly: '{% url "invoicing:bulk_download_monthly" %}',
+        downloadUrlQuarterly: '{% url "invoicing:bulk_download_quarterly" %}'
+    });
+});
 </script>
 {% endblock %}
