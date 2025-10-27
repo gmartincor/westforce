@@ -14,6 +14,9 @@ urlpatterns = [
     path('bulk/quarterly/', views.bulk_download_quarterly_view, name='bulk_download_quarterly'),
     path('bulk/preview/', views.bulk_preview_view, name='bulk_preview'),
     
+    path('bas/', views.bas_report_view, name='bas_report'),
+    path('bas/pdf/', views.bas_pdf_view, name='bas_pdf'),
+    
     path('company/setup/', views.CompanyCreateView.as_view(), name='company_create'),
     path('company/edit/', views.CompanyUpdateView.as_view(), name='company_edit'),
 ]

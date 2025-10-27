@@ -1,6 +1,7 @@
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.views.generic import CreateView, ListView, DetailView, UpdateView
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.http import HttpResponse, Http404, JsonResponse
 from django.db.models import Q
@@ -13,6 +14,7 @@ from .models import Company, Invoice, InvoiceItem
 from .forms import CompanyForm, InvoiceForm, InvoiceItemFormSet
 from .utils import generate_invoice_pdf
 from .services import BulkPDFService, InvoicePeriodService
+from .bas_service import BASReportingService
 from apps.core.services.temporal_service import get_available_years
 
 logger = logging.getLogger(__name__)
@@ -401,3 +403,161 @@ def _add_download_message(request, success_count, error_count, period):
             request,
             f'Download complete: {success_count} invoices for {period}'
         )
+
+
+@login_required
+def bas_report_view(request):
+    period_type = request.GET.get('type', 'quarterly')
+    year = int(request.GET.get('year', timezone.now().year))
+    month = None
+    quarter = None
+    
+    try:
+        if period_type == 'monthly':
+            month = int(request.GET.get('month', timezone.now().month))
+            report_data = BASReportingService.get_monthly_gst_report(year, month)
+        elif period_type == 'quarterly':
+            quarter = int(request.GET.get('quarter', (timezone.now().month - 1) // 3 + 1))
+            report_data = BASReportingService.get_quarterly_gst_report(year, quarter)
+        elif period_type == 'annual':
+            report_data = BASReportingService.get_annual_gst_summary(year)
+        else:
+            messages.error(request, 'Invalid period type')
+            return redirect('invoicing:invoice_list')
+        
+        context = {
+            'report_data': report_data,
+            'period_type': period_type,
+            'year': year,
+            'available_years': get_available_years(),
+            'current_year': timezone.now().year,
+            'current_quarter': (timezone.now().month - 1) // 3 + 1,
+            'current_month': timezone.now().month,
+        }
+        
+        if month is not None:
+            context['month'] = month
+        if quarter is not None:
+            context['quarter'] = quarter
+        
+        logger.info(f"BAS report generated: {period_type} for {year}")
+        return render(request, 'invoicing/bas_report.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error generating BAS report: {str(e)}")
+        messages.error(request, f'Error generating BAS report: {str(e)}')
+        return redirect('invoicing:invoice_list')
+
+
+@login_required
+def bas_pdf_view(request):
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import cm
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+    from io import BytesIO
+    
+    period_type = request.GET.get('type', 'quarterly')
+    year = int(request.GET.get('year', timezone.now().year))
+    
+    try:
+        if period_type == 'monthly':
+            month = int(request.GET.get('month', timezone.now().month))
+            report_data = BASReportingService.get_monthly_gst_report(year, month)
+        elif period_type == 'quarterly':
+            quarter = int(request.GET.get('quarter', (timezone.now().month - 1) // 3 + 1))
+            report_data = BASReportingService.get_quarterly_gst_report(year, quarter)
+        elif period_type == 'annual':
+            report_data = BASReportingService.get_annual_gst_summary(year)
+        else:
+            messages.error(request, 'Invalid period type')
+            return redirect('invoicing:bas_report')
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=2*cm, bottomMargin=2*cm)
+        
+        elements = []
+        styles = getSampleStyleSheet()
+        
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            textColor=colors.HexColor('#1e3a8a'),
+            alignment=TA_CENTER,
+            spaceAfter=20
+        )
+        
+        elements.append(Paragraph('Business Activity Statement (BAS)', title_style))
+        elements.append(Paragraph(f'Period: {report_data["period"]}', styles['Normal']))
+        elements.append(Spacer(1, 0.5*cm))
+        
+        company = Company.objects.first()
+        if company:
+            elements.append(Paragraph(f'<b>{company.business_name}</b>', styles['Normal']))
+            elements.append(Paragraph(f'ABN: {company.abn}', styles['Normal']))
+            elements.append(Spacer(1, 0.5*cm))
+        
+        bas_data = [
+            ['Field', 'Description', 'Amount (AUD)'],
+            ['G1', 'Total Sales (inc GST)', f"${report_data['G1_total_sales_inc_gst']:,.2f}"],
+            ['G2', 'Export Sales', f"${report_data['G2_export_sales']:,.2f}"],
+            ['G3', 'GST-Free Sales', f"${report_data['G3_gst_free_sales']:,.2f}"],
+            ['G4', 'Input Taxed Sales', f"${report_data.get('G4_input_taxed_sales', 0):,.2f}"],
+            ['1A', 'GST on Sales', f"${report_data['1A_gst_on_sales']:,.2f}"],
+        ]
+        
+        table = Table(bas_data, colWidths=[2*cm, 10*cm, 4*cm])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a8a')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+        ]))
+        
+        elements.append(table)
+        elements.append(Spacer(1, 0.5*cm))
+        
+        summary_data = [
+            ['Total Sales (ex GST)', f"${report_data.get('total_sales_ex_gst', 0):,.2f}"],
+            ['GST Collected', f"${report_data['1A_gst_on_sales']:,.2f}"],
+            ['Invoice Count', str(report_data['invoice_count'])],
+        ]
+        
+        summary_table = Table(summary_data, colWidths=[10*cm, 4*cm])
+        summary_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ]))
+        
+        elements.append(summary_table)
+        elements.append(Spacer(1, 1*cm))
+        
+        footer_style = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, textColor=colors.grey)
+        elements.append(Paragraph(f'Generated: {timezone.now().strftime("%d/%m/%Y %H:%M")}', footer_style))
+        
+        doc.build(elements)
+        pdf_content = buffer.getvalue()
+        buffer.close()
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        filename = f'BAS_{period_type}_{year}.pdf'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        logger.info(f"BAS PDF generated: {period_type} for {year}")
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error generating BAS PDF: {str(e)}")
+        messages.error(request, f'Error generating BAS PDF: {str(e)}')
+        return redirect('invoicing:bas_report')
