@@ -4,255 +4,192 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-            {% if object %}Edit Company Settings{% else %}Company Settings{% endif %}
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            {% if object %}Edit Company Settings{% else %}Company Setup{% endif %}
         </h1>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
-            Set up your company details for invoice issuing
+        <p class="text-gray-600 dark:text-gray-400 mb-8">
+            Configure your Australian business details for compliant tax invoicing
         </p>
         
-        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
-            <form method="post">
+        <div class="bg-white dark:text-gray-800 shadow-lg rounded-lg p-6">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Basic Information</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="{{ form.business_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.business_name.label }}
-                                </label>
-                                {{ form.business_name }}
-                                {% if form.business_name.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.business_name.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <div>
-                                <label for="{{ form.tax_id.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.tax_id.label }}
-                                </label>
-                                {{ form.tax_id }}
-                                {% if form.tax_id.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.tax_id.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label for="{{ form.legal_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.legal_name.label }}
-                                </label>
-                                {{ form.legal_name }}
-                                {% if form.legal_name.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.legal_name.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <div>
-                                <label for="{{ form.legal_form.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.legal_form.label }}
-                                </label>
-                                {{ form.legal_form }}
-                                {% if form.legal_form.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.legal_form.errors.0 }}</p>
-                                {% endif %}
-                                {% if form.legal_form.help_text %}
-                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ form.legal_form.help_text }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
+                {% if form.non_field_errors %}
+                    <div class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                        {% for error in form.non_field_errors %}
+                            <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                        {% endfor %}
                     </div>
+                {% endif %}
 
+                <div class="space-y-8">
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                            Additional Legal Information 
-                            <span class="text-sm font-normal text-gray-500">(Optional on invoices)</span>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Business Information
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="{{ form.mercantile_registry.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.mercantile_registry.label }}
-                                </label>
-                                {{ form.mercantile_registry }}
-                                {% if form.mercantile_registry.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.mercantile_registry.errors.0 }}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {% for field in form %}
+                                {% if field.name in 'legal_form,business_name,legal_name,abn,acn,gst_registered' %}
+                                    <div class="{% if field.name == 'legal_name' %}md:col-span-2{% endif %} {% if field.name == 'gst_registered' %}md:col-span-2{% endif %}">
+                                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            {{ field.label }}
+                                            {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                        </label>
+                                        {% if field.name == 'gst_registered' %}
+                                            <div class="flex items-center">
+                                                {{ field }}
+                                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ field.help_text }}</span>
+                                            </div>
+                                        {% else %}
+                                            {{ field }}
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ field.errors.0 }}</p>
+                                        {% elif field.help_text and field.name != 'gst_registered' %}
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                                {% if form.mercantile_registry.help_text %}
-                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ form.mercantile_registry.help_text }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <div>
-                                <label for="{{ form.share_capital.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.share_capital.label }} (AUD)
-                                </label>
-                                {{ form.share_capital }}
-                                {% if form.share_capital.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.share_capital.errors.0 }}</p>
-                                {% endif %}
-                                {% if form.share_capital.help_text %}
-                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ form.share_capital.help_text }}</p>
-                                {% endif %}
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
 
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Address</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Business Address
+                        </h3>
                         <div class="space-y-4">
-                            <div>
-                                <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.address.label }}
-                                </label>
-                                {{ form.address }}
-                                {% if form.address.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.address.errors.0 }}</p>
+                            {% for field in form %}
+                                {% if field.name in 'address,city,state,postal_code' %}
+                                    <div class="{% if field.name == 'address' %}col-span-full{% endif %}">
+                                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            {{ field.label }}
+                                            {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                        </label>
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ field.errors.0 }}</p>
+                                        {% elif field.help_text %}
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                            </div>
-                            
+                            {% endfor %}
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label for="{{ form.postal_code.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ form.postal_code.label }}
-                                    </label>
-                                    {{ form.postal_code }}
-                                    {% if form.postal_code.errors %}
-                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.postal_code.errors.0 }}</p>
+                                {% for field in form %}
+                                    {% if field.name == 'city' or field.name == 'state' or field.name == 'postal_code' %}
                                     {% endif %}
-                                </div>
-                                
-                                <div>
-                                    <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ form.city.label }}
-                                    </label>
-                                    {{ form.city }}
-                                    {% if form.city.errors %}
-                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.city.errors.0 }}</p>
-                                    {% endif %}
-                                </div>
-                                
-                                <div>
-                                    <label for="{{ form.province.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ form.province.label }}
-                                    </label>
-                                    {{ form.province }}
-                                    {% if form.province.errors %}
-                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.province.errors.0 }}</p>
-                                    {% endif %}
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Contact</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.phone.label }}
-                                </label>
-                                {{ form.phone }}
-                                {% if form.phone.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.phone.errors.0 }}</p>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Contact Information
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {% for field in form %}
+                                {% if field.name in 'phone,email,website' %}
+                                    <div>
+                                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            {{ field.label }}
+                                            {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                        </label>
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ field.errors.0 }}</p>
+                                        {% elif field.help_text %}
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                            </div>
-                            
-                            <div>
-                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.email.label }}
-                                </label>
-                                {{ form.email }}
-                                {% if form.email.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.email.errors.0 }}</p>
-                                {% endif %}
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
 
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Bank Details</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="{{ form.bank_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.bank_name.label }}
-                                </label>
-                                {{ form.bank_name }}
-                                {% if form.bank_name.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.bank_name.errors.0 }}</p>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Australian Banking Details
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {% for field in form %}
+                                {% if field.name in 'bank_name,bsb,account_number' %}
+                                    <div>
+                                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            {{ field.label }}
+                                            {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                        </label>
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ field.errors.0 }}</p>
+                                        {% elif field.help_text %}
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                            </div>
-                            
-                            <div>
-                                <label for="{{ form.iban.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.iban.label }}
-                                </label>
-                                {{ form.iban }}
-                                {% if form.iban.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.iban.errors.0 }}</p>
-                                {% endif %}
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
 
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Invoicing Settings</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
-                            <div>
-                                <label for="{{ form.invoice_prefix.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    {{ form.invoice_prefix.label }}
-                                </label>
-                                {{ form.invoice_prefix }}
-                                {% if form.invoice_prefix.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.invoice_prefix.errors.0 }}</p>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Invoice Configuration
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {% for field in form %}
+                                {% if field.name in 'invoice_prefix,logo' %}
+                                    <div>
+                                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            {{ field.label }}
+                                            {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                        </label>
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ field.errors.0 }}</p>
+                                        {% elif field.help_text %}
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                            </div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-8 flex justify-end space-x-3">
+                <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <a href="{% url 'invoicing:invoice_list' %}" 
-                       class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                       class="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         Cancel
                     </a>
                     <button type="submit" 
-                            class="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700">
-                        {% if object %}Update Settings{% else %}Save Settings{% endif %}
+                            class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 border border-transparent rounded-lg text-sm font-medium text-white transition-colors">
+                        {% if object %}Update Configuration{% else %}Save Configuration{% endif %}
                     </button>
                 </div>
             </form>
         </div>
         
         <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
+            <div class="flex items-start">
+                <svg class="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
                 <div class="ml-3">
                     <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
-                        Important information
+                        Australian Tax Invoice Requirements
                     </h3>
-                    <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li>This configuration will be used as the issuer on all invoices.</li>
-                            <li>The legal form determines automatic PAYG and other legal aspects.</li>
-                            <li>Only some fields are legally required on invoices (as per RD 1619/2012).</li>
-                            <li>Additional fields improve professionalism and transparency.</li>
-                            <li>You can update these settings at any time.</li>
-                        </ul>
+                    <div class="mt-2 text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                        <p>• ABN is mandatory for all Australian businesses issuing tax invoices</p>
+                        <p>• ACN is required for Pty Ltd and Public companies</p>
+                        <p>• GST registration is required for businesses with turnover ≥ $75,000</p>
+                        <p>• Tax invoices required for transactions ≥ $82.50 (inc GST)</p>
+                        <p>• BSB and account details will appear on invoices for client payments</p>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Additional help about legal fields -->
-        <div class="mt-4">
-            {% include 'invoicing/partials/legal_help.html' %}
         </div>
     </div>
 </div>

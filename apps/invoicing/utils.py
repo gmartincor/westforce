@@ -1,244 +1,244 @@
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm, mm
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
+from reportlab.lib.enums import TA_RIGHT, TA_CENTER
 from io import BytesIO
-import os
 
 
-def get_pdf_styles():
-    styles = getSampleStyleSheet()
-    return {
-        'company': ParagraphStyle('Company', parent=styles['Normal'], fontSize=10, spaceBefore=0, spaceAfter=0),
-        'invoice_title': ParagraphStyle('InvoiceTitle', parent=styles['Normal'], fontSize=16, alignment=TA_RIGHT, fontName='Helvetica-Bold'),
-        'invoice_data': ParagraphStyle('InvoiceData', parent=styles['Normal'], fontSize=10, alignment=TA_RIGHT),
-        'section_title': ParagraphStyle('SectionTitle', parent=styles['Normal'], fontSize=11, fontName='Helvetica-Bold', spaceBefore=8, spaceAfter=4),
-        'client': ParagraphStyle('Client', parent=styles['Normal'], fontSize=9),
-        'table_content': ParagraphStyle('TableContent', parent=styles['Normal'], fontSize=9),
-        'legal': ParagraphStyle('Legal', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, spaceBefore=3, spaceAfter=8),
-        'footer': ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER)
-    }
+class PDFStyles:
+    @staticmethod
+    def get_styles():
+        base = getSampleStyleSheet()
+        return {
+            'company': ParagraphStyle('Company', parent=base['Normal'], fontSize=10, spaceBefore=0, spaceAfter=0),
+            'invoice_data': ParagraphStyle('InvoiceData', parent=base['Normal'], fontSize=10, alignment=TA_RIGHT),
+            'client': ParagraphStyle('Client', parent=base['Normal'], fontSize=9),
+            'table_content': ParagraphStyle('TableContent', parent=base['Normal'], fontSize=9),
+            'legal': ParagraphStyle('Legal', parent=base['Normal'], fontSize=7, alignment=TA_CENTER, spaceBefore=3, spaceAfter=6),
+            'footer': ParagraphStyle('Footer', parent=base['Normal'], fontSize=8, alignment=TA_CENTER),
+            'tax_invoice': ParagraphStyle('TaxInvoice', parent=base['Normal'], fontSize=14, fontName='Helvetica-Bold', alignment=TA_RIGHT)
+        }
 
 
-def create_professional_header(invoice, styles):
-    company_info = [f"<b>{invoice.company.business_name}</b>"]
-    
-    if invoice.company.legal_name and invoice.company.legal_name != invoice.company.business_name:
-        company_info.append(invoice.company.legal_name)
-    
-    company_info.extend([
-        f"NIF/CIF: {invoice.company.tax_id}",
-        f"Régimen empresarial: {invoice.company.get_legal_form_display()}" if invoice.company.legal_form else "Régimen empresarial: Empresario Individual",
-        f"Dirección: {invoice.company.get_full_address()}"
-    ])
-    
-    if invoice.company.phone:
-        company_info.append(f"Tel: {invoice.company.phone}")
-    if invoice.company.email:
-        company_info.append(f"Email: {invoice.company.email}")
-    
-    invoice_info = [
-        f"<b>FACTURA {invoice.reference or 'BORRADOR'}</b>",
-        f"Fecha: {invoice.issue_date.strftime('%d/%m/%Y')}"
-    ]
-    
-    if hasattr(invoice, 'due_date') and invoice.due_date:
-        invoice_info.append(f"Vencimiento: {invoice.due_date.strftime('%d/%m/%Y')}")
-    
-    left_content = company_info
-    if invoice.company.logo and os.path.exists(invoice.company.logo.path):
-        left_content.insert(0, f'<img src="{invoice.company.logo.path}" width="60" height="30" valign="top"/>')
-    
-    header_data = [[
-        Paragraph("<br/>".join(left_content), styles['company']),
-        Paragraph("<br/>".join(invoice_info), styles['invoice_data'])
-    ]]
-    
-    header_table = Table(header_data, colWidths=[11*cm, 6*cm])
-    header_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 0),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-    ]))
-    
-    return header_table
+class InvoiceHeaderBuilder:
+    @staticmethod
+    def build(invoice, styles):
+        company_info = InvoiceHeaderBuilder._get_company_info(invoice.company)
+        invoice_info = InvoiceHeaderBuilder._get_invoice_info(invoice)
+        
+        header_data = [[
+            Paragraph("<br/>".join(company_info), styles['company']),
+            Paragraph("<br/>".join(invoice_info), styles['invoice_data'])
+        ]]
+        
+        header_table = Table(header_data, colWidths=[11*cm, 6*cm])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ]))
+        
+        return header_table
 
-
-def create_client_section(invoice, styles):
-    client_info = [
-        f"<b>FACTURAR A:</b>",
-        f"{invoice.client_name}",
-        f"Régimen empresarial: {invoice.get_client_type_display()}",
-        f"Dirección: {invoice.client_address}"
-    ]
-    
-    if invoice.client_tax_id:
-        client_info.append(f"NIF/CIF: {invoice.client_tax_id}")
-    
-    client_data = [[Paragraph("<br/>".join(client_info), styles['client'])]]
-    
-    client_table = Table(client_data, colWidths=[17*cm])
-    client_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 0),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-    ]))
-    
-    return client_table
-
-
-def format_percentage(rate):
-    if not rate:
-        return "0%"
-    percentage = rate if rate >= 1 else rate * 100
-    return f"{percentage:.0f}%"
-
-
-def create_services_section(invoice, styles):
-    headers = ['Description', 'Qty', 'Unit Price', 'GST', 'Withholding', 'Total']
-    service_data = [headers]
-    
-    for item in invoice.items.all():
-        service_data.append([
-            Paragraph(item.description.replace('\n', '<br/>'), styles['table_content']),
-            str(item.quantity),
-            format_currency(item.unit_price),
-            format_percentage(item.gst_rate),
-            format_percentage(item.withholding_rate),
-            format_currency(item.line_total)
+    @staticmethod
+    def _get_company_info(company):
+        info = [f"<b>{company.business_name}</b>"]
+        
+        if company.legal_name and company.legal_name != company.business_name:
+            info.append(company.legal_name)
+        
+        info.extend([
+            f"ABN: {company.get_formatted_abn()}",
+            f"{company.address}",
+            f"{company.city} {company.state} {company.postal_code}"
         ])
-    
-    service_table = Table(service_data, colWidths=[7*cm, 1*cm, 2*cm, 1.5*cm, 1.5*cm, 2*cm])
-    service_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-    ]))
-    
-    return service_table
+        
+        if company.acn:
+            info.append(f"ACN: {company.get_formatted_acn()}")
+        
+        if company.phone:
+            info.append(f"Phone: {company.phone}")
+        if company.email:
+            info.append(f"Email: {company.email}")
+        if company.website:
+            info.append(f"Web: {company.website}")
+        
+        return info
+
+    @staticmethod
+    def _get_invoice_info(invoice):
+        title = "<b>TAX INVOICE</b>" if invoice.is_tax_invoice else "<b>INVOICE</b>"
+        
+        info = [
+            title,
+            f"Number: {invoice.reference or 'DRAFT'}",
+            f"Date: {invoice.issue_date.strftime('%d/%m/%Y')}"
+        ]
+        
+        return info
 
 
-def create_totals_section(invoice, styles):
-    payment_info = []
-    if invoice.payment_terms:
-        payment_info.extend([
-            f"<b>FORMA DE PAGO</b>",
-            f"Condiciones: {invoice.payment_terms}",
-            ""
-        ])
-    
-    if invoice.company.bank_name and invoice.company.iban:
-        payment_info.extend([
-            "<b>Datos bancarios:</b>",
-            f"Banco: {invoice.company.bank_name}",
-            f"IBAN: {invoice.company.iban}"
-        ])
-    
-    totals_data = [
-        ["Subtotal (Base Amount)", format_currency(invoice.base_amount)]
-    ]
-    
-    if invoice.gst_amount > 0:
-        gst_rate = invoice.items.first().gst_rate if invoice.items.exists() else 0
-        totals_data.append([f"GST ({format_percentage(gst_rate)})", format_currency(invoice.gst_amount)])
-    
-    if invoice.withholding_amount > 0:
-        withholding_rate = invoice.items.first().withholding_rate if invoice.items.exists() else 0
-        totals_data.append([f"Withholding Tax ({format_percentage(withholding_rate)})", f"-{format_currency(invoice.withholding_amount)}"])
-    
-    totals_data.append(["TOTAL PAYABLE", format_currency(invoice.total_amount)])
-    
-    totals_table = Table(totals_data, colWidths=[4*cm, 2.5*cm])
-    totals_table.setStyle(TableStyle([
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-        ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
-        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-    ]))
-    
-    final_data = [[
-        Paragraph("<br/>".join(payment_info), styles['table_content']),
-        totals_table
-    ]]
-    
-    final_table = Table(final_data, colWidths=[10.5*cm, 6.5*cm])
-    final_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 0),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-    ]))
-    
-    return final_table
+class InvoiceClientSection:
+    @staticmethod
+    def build(invoice, styles):
+        client_info = [
+            "<b>BILL TO:</b>",
+            f"{invoice.client_name}",
+            f"{invoice.client_address}"
+        ]
+        
+        if invoice.client_abn:
+            client_info.append(f"ABN: {invoice.client_abn}")
+        
+        client_data = [[Paragraph("<br/>".join(client_info), styles['client'])]]
+        
+        client_table = Table(client_data, colWidths=[17*cm])
+        client_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ]))
+        
+        return client_table
 
 
-def format_currency(amount):
-    return f"${amount:.2f} AUD"
+class InvoiceItemsTable:
+    @staticmethod
+    def build(invoice, styles):
+        headers = ['Description', 'Qty', 'Unit Price', 'GST', 'Amount']
+        item_data = [headers]
+        
+        for item in invoice.items.all():
+            item_data.append([
+                Paragraph(item.description.replace('\n', '<br/>'), styles['table_content']),
+                str(item.quantity),
+                f"${item.unit_price:.2f}",
+                f"{item.gst_rate:.0f}%",
+                f"${item.total:.2f}"
+            ])
+        
+        items_table = Table(item_data, colWidths=[8*cm, 1.5*cm, 2*cm, 1.5*cm, 2*cm])
+        items_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ]))
+        
+        return items_table
+
+
+class InvoiceTotalsSection:
+    @staticmethod
+    def build(invoice, styles):
+        payment_info = InvoiceTotalsSection._get_payment_info(invoice)
+        totals_table = InvoiceTotalsSection._get_totals_table(invoice)
+        
+        final_data = [[
+            Paragraph("<br/>".join(payment_info), styles['table_content']),
+            totals_table
+        ]]
+        
+        final_table = Table(final_data, colWidths=[10.5*cm, 6.5*cm])
+        final_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ]))
+        
+        return final_table
+
+    @staticmethod
+    def _get_payment_info(invoice):
+        info = []
+        if invoice.payment_terms:
+            info.extend([
+                "<b>PAYMENT TERMS</b>",
+                invoice.payment_terms,
+                ""
+            ])
+        
+        if invoice.company.bank_name:
+            info.extend([
+                "<b>Bank Details:</b>",
+                f"Bank: {invoice.company.bank_name}",
+                f"BSB: {invoice.company.get_formatted_bsb()}",
+                f"Account: {invoice.company.account_number}"
+            ])
+        
+        return info
+
+    @staticmethod
+    def _get_totals_table(invoice):
+        totals_data = [
+            ["Subtotal (excl. GST)", f"${invoice.subtotal:.2f}"]
+        ]
+        
+        if invoice.gst_amount > 0:
+            totals_data.append(["GST (10%)", f"${invoice.gst_amount:.2f}"])
+        
+        totals_data.append(["TOTAL (inc. GST)", f"${invoice.total_amount:.2f}"])
+        
+        totals_table = Table(totals_data, colWidths=[4*cm, 2.5*cm])
+        totals_table.setStyle(TableStyle([
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ]))
+        
+        return totals_table
 
 
 def generate_invoice_pdf(invoice):
     buffer = BytesIO()
     doc = SimpleDocTemplate(
-        buffer, 
-        pagesize=A4, 
-        rightMargin=20*mm, 
-        leftMargin=20*mm, 
-        topMargin=20*mm, 
+        buffer,
+        pagesize=A4,
+        rightMargin=20*mm,
+        leftMargin=20*mm,
+        topMargin=20*mm,
         bottomMargin=30*mm
     )
     
-    styles = get_pdf_styles()
+    styles = PDFStyles.get_styles()
     story = []
     
-    story.append(create_professional_header(invoice, styles))
+    story.append(InvoiceHeaderBuilder.build(invoice, styles))
     story.append(Spacer(1, 12*mm))
     
-    story.append(create_client_section(invoice, styles))
+    story.append(InvoiceClientSection.build(invoice, styles))
     story.append(Spacer(1, 8*mm))
     
-    story.append(create_services_section(invoice, styles))
+    story.append(InvoiceItemsTable.build(invoice, styles))
     story.append(Spacer(1, 8*mm))
     
-    story.append(create_totals_section(invoice, styles))
+    story.append(InvoiceTotalsSection.build(invoice, styles))
     story.append(Spacer(1, 10*mm))
     
-    legal_note = invoice.get_legal_note()
+    legal_note = invoice.get_tax_invoice_note()
     if legal_note:
         story.append(Paragraph(legal_note, styles['legal']))
         story.append(Spacer(1, 5*mm))
     
-    legal_info = []
-    optional_info = []
-    
-    if invoice.company.mercantile_registry:
-        optional_info.append(f"Registro Mercantil: {invoice.company.mercantile_registry}")
-    if invoice.company.share_capital:
-        optional_info.append(f"Share Capital: ${invoice.company.share_capital:.2f} AUD")
-    
-    if invoice.irpf_amount > 0:
-        legal_info.append("Factura sujeta a retención de IRPF según normativa fiscal vigente")
-    if invoice.vat_amount > 0:
-        legal_info.append("IVA incluido según legislación vigente")
-    
-    legal_info.append("Factura emitida según Real Decreto 1619/2012 sobre obligaciones de facturación")
-    
-    if optional_info:
-        story.append(Paragraph(" | ".join(optional_info), styles['legal']))
-        story.append(Spacer(1, 3*mm))
-    
-    if legal_info:
-        story.append(Paragraph(" | ".join(legal_info), styles['legal']))
-        story.append(Spacer(1, 5*mm))
-    
-    entity_display = "Empresario Individual" if invoice.company.is_freelancer else invoice.company.get_legal_form_display()
-    story.append(Paragraph(f"{entity_display} - Página 1", styles['footer']))
+    footer_text = _build_footer_text(invoice)
+    story.append(Paragraph(footer_text, styles['footer']))
     
     doc.build(story)
     pdf = buffer.getvalue()
     buffer.close()
     return pdf
+
+
+def _build_footer_text(invoice):
+    footer_parts = []
+    
+    if invoice.company.gst_registered:
+        footer_parts.append("GST registered")
+    
+    footer_parts.append(f"{invoice.company.get_legal_form_display()} | ABN: {invoice.company.get_formatted_abn()}")
+    
+    return " | ".join(footer_parts)
