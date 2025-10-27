@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-{% load accounting_tags %}
 
-{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Gasto - Westforce{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Expense - Westforce{% endblock %}
 
 {% block breadcrumb %}
 {{ block.super }}
@@ -10,7 +9,7 @@
         <svg class="flex-shrink-0 w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
         </svg>
-        <a href="{% url 'expenses:categories' %}" class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Gastos</a>
+        <a href="{% url 'expenses:categories' %}" class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Expenses</a>
     </div>
 </li>
 <li>
@@ -18,7 +17,15 @@
         <svg class="flex-shrink-0 w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
         </svg>
-        <span class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400">{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %}</span>
+        <a href="{% url 'expenses:categories' %}" class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Expenses</a>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <svg class="flex-shrink-0 w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400">{% if form.instance.pk %}Edit{% else %}New{% endif %}</span>
     </div>
 </li>
 {% endblock %}
@@ -27,13 +34,13 @@
 <div class="flex justify-between items-center mb-6">
     <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-            {% if form.instance.pk %}Editar Gasto{% else %}Nuevo Gasto{% endif %}
+            {% if form.instance.pk %}Edit Expense{% else %}New Expense{% endif %}
         </h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">Gestión de gastos</p>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Expense management</p>
     </div>
     <a href="{% url 'expenses:categories' %}" 
        class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg transition-colors font-medium">
-        Cancelar
+        Cancel
     </a>
 </div>
 {% endblock %}
@@ -41,9 +48,9 @@
 {% block content %}
 <div class="max-w-2xl mx-auto">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                {% if form.instance.pk %}Editar información del gasto{% else %}Información del nuevo gasto{% endif %}
+                {% if form.instance.pk %}Edit expense information{% else %}New expense information{% endif %}
             </h3>
         </div>
         
@@ -70,7 +77,12 @@
                     {{ form.amount.label }}
                     <span class="text-red-500">*</span>
                 </label>
-                {% currency_field form.amount %}
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">
+                        $
+                    </span>
+                    {{ form.amount }}
+                </div>
                 {% if form.amount.errors %}
                     <div class="mt-1 text-sm text-red-600 dark:text-red-400">
                         {{ form.amount.errors.0 }}
@@ -90,16 +102,16 @@
                         {{ form.date.errors.0 }}
                     </div>
                 {% endif %}
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Fecha en que se realizó el gasto</p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Date when the expense was incurred</p>
             </div>
 
-            <!-- Category Field -->
-            {% if selected_category %}
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Categoría
+                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {{ form.category.label }}
+                    <span class="text-red-500">*</span>
                 </label>
-                <div class="mt-1 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+                {% if selected_category %}
+                <div class="p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
                     <div class="flex items-center">
                         <span class="px-2 py-1 text-xs font-medium rounded-full 
                                    {% if selected_category.category_type == 'FIXED' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
@@ -112,27 +124,16 @@
                     </div>
                 </div>
                 {{ form.category }}
-                {% if form.category.errors %}
-                    <div class="mt-1 text-sm text-red-600 dark:text-red-400">
-                        {{ form.category.errors.0 }}
-                    </div>
-                {% endif %}
-            </div>
-            {% else %}
-            <div>
-                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ form.category.label }}
-                    <span class="text-red-500">*</span>
-                </label>
+                {% else %}
                 {{ form.category }}
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Category to which this expense belongs</p>
+                {% endif %}
                 {% if form.category.errors %}
                     <div class="mt-1 text-sm text-red-600 dark:text-red-400">
                         {{ form.category.errors.0 }}
                     </div>
                 {% endif %}
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Categoría a la que pertenece este gasto</p>
             </div>
-            {% endif %}
 
             <!-- Invoice Number Field -->
             <div>
@@ -151,7 +152,7 @@
             <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <a href="{% url 'expenses:categories' %}" 
                    class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                    Cancelar
+                    Cancel
                 </a>
                 <button
                     type="submit"
@@ -159,18 +160,18 @@
                     :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
                     class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors font-medium inline-flex items-center"
                 >
-                    <span x-show="!loading" class="flex items-center">
+                                        <span x-show="!loading" class="flex items-center">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        {% if form.instance.pk %}Actualizar Gasto{% else %}Crear Gasto{% endif %}
+                        {% if form.instance.pk %}Update Expense{% else %}Create Expense{% endif %}
                     </span>
                     <span x-show="loading" class="flex items-center">
                         <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        {% if form.instance.pk %}Actualizando...{% else %}Creando...{% endif %}
+                        {% if form.instance.pk %}Updating...{% else %}Creating...{% endif %}
                     </span>
                 </button>
             </div>

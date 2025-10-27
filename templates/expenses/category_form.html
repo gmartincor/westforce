@@ -25,7 +25,13 @@
 {% block page_header %}
 <div class="mb-6">
     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ form_title }}</h1>
-    <p class="mt-2 text-gray-600 dark:text-gray-400">Complete los datos para la nueva categoría de gastos</p>
+    <p class="mt-2 text-gray-600 dark:text-gray-400">
+        {% if form.category_type.value %}
+            Creating a {{ form.category_type.value|lower }} expense category
+        {% else %}
+            Complete the data for the new expense category
+        {% endif %}
+    </p>
 </div>
 {% endblock %}
 

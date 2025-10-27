@@ -26,65 +26,70 @@
 <div class="mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Gastos {{ category_type_display }}</h1>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ category_type_display }} Expenses</h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">
-                Categorías de tipo {{ category_type_display|lower }}
+                Categories of type {{ category_type_display|lower }}
                 {% if current_month_name %}
                     - {{ current_month_name }} {{ current_year }}
                 {% else %}
-                    - Año {{ current_year }}
+                    - Year {{ current_year }}
                 {% endif %}
             </p>
         </div>
         
-        <!-- Filtros temporales -->
-        <div class="mt-4 sm:mt-0">
-            <div class="flex flex-col sm:flex-row gap-3">
-                <form method="get" class="flex flex-col lg:flex-row lg:items-end gap-3" x-data="{ year: {{ current_year }}, month: {{ current_month|default:'null' }} }">
-                    <select name="year" x-model="year" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                        {% for year_option in available_years %}
-                            <option value="{{ year_option }}" {% if year_option == current_year %}selected{% endif %}>{{ year_option }}</option>
-                        {% endfor %}
-                    </select>
-                    
-                    <select name="month" x-model="month" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                        <option value="">Todos los meses</option>
-                        {% for month_num, month_name in available_months %}
-                            <option value="{{ month_num }}" {% if month_num == current_month %}selected{% endif %}>{{ month_name }}</option>
-                        {% endfor %}
-                    </select>
-                    
-                    <div class="flex gap-3">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                            Aplicar Filtros
-                        </button>
-                        <a href="{{ request.path }}" 
-                           class="bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500 px-4 py-2 rounded-md transition-colors">
-                            Limpiar
-                        </a>
-                    </div>
-                </form>
-            </div>
+        <div class="mt-4 sm:mt-0 flex gap-3">
+            <a href="{% url 'expenses:category-create' %}?type={{ category_type }}" 
+               class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                New Category
+            </a>
         </div>
+    </div>
+    
+    <div class="mt-6">
+        <form method="get" class="flex flex-col lg:flex-row lg:items-end gap-3" x-data="{ year: {{ current_year }}, month: {{ current_month|default:'null' }} }">
+            <select name="year" x-model="year" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                {% for year_option in available_years %}
+                    <option value="{{ year_option }}" {% if year_option == current_year %}selected{% endif %}>{{ year_option }}</option>
+                {% endfor %}
+            </select>
+            
+            <select name="month" x-model="month" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="">All Months</option>
+                {% for month_num, month_name in available_months %}
+                    <option value="{{ month_num }}" {% if month_num == current_month %}selected{% endif %}>{{ month_name }}</option>
+                {% endfor %}
+            </select>
+            
+            <div class="flex gap-3">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                    Apply Filters
+                </button>
+                <a href="{{ request.path }}" 
+                   class="bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500 px-4 py-2 rounded-md transition-colors">
+                    Clear
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
-<!-- Summary Card -->
 <div class="mb-8">
     {% if category_type == 'FIXED' %}
-        {% include 'expenses/components/_summary_card.html' with title='Total Fijos' amount=total_amount icon_type='fixed' %}
+        {% include 'expenses/components/_summary_card.html' with title='Total Fixed' amount=total_amount icon_type='fixed' %}
     {% elif category_type == 'VARIABLE' %}
-        {% include 'expenses/components/_summary_card.html' with title='Total Variables' amount=total_amount icon_type='variable' %}
+        {% include 'expenses/components/_summary_card.html' with title='Total Variable' amount=total_amount icon_type='variable' %}
     {% elif category_type == 'TAX' %}
-        {% include 'expenses/components/_summary_card.html' with title='Total Impuestos' amount=total_amount icon_type='tax' %}
+        {% include 'expenses/components/_summary_card.html' with title='Total Taxes' amount=total_amount icon_type='tax' %}
     {% else %}
         {% include 'expenses/components/_summary_card.html' with title='Total '|add:category_type_display amount=total_amount icon_type='general' %}
     {% endif %}
 </div>
 
-<!-- Categories Grid -->
 {% if categories %}
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for category in categories %}
@@ -96,22 +101,17 @@
     <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
     </svg>
-    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No hay categorías</h3>
+    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No categories found</h3>
     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        No se encontraron categorías de tipo {{ category_type_display|lower }} 
-        {% if current_month_name %}
-            para {{ current_month_name }} {{ current_year }}
-        {% else %}
-            para el año {{ current_year }}
-        {% endif %}.
+        No {{ category_type_display|lower }} categories found.
     </p>
     <div class="mt-6">
-        <a href="{% url 'expenses:categories' %}" 
-           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+        <a href="{% url 'expenses:category-create' %}?type={{ category_type }}" 
+           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
             <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-            Ver todas las categorías
+            Create {{ category_type_display }} Category
         </a>
     </div>
 </div>

@@ -65,6 +65,63 @@ class ExpenseCategoryView(LoginRequiredMixin, TemplateView):
         return context
 
 
+class ExpenseCategoryByTypeView(LoginRequiredMixin, TemplateView):
+    template_name = 'expenses/categories_by_type.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category_type = self.kwargs.get('category_type')
+        
+        if category_type not in dict(ExpenseCategory.CategoryTypeChoices.choices):
+            from django.http import Http404
+            raise Http404("Invalid category type")
+        
+        filters = parse_temporal_filters(self.request)
+        year = filters.get('year')
+        month = filters.get('month')
+        
+        expense_filter = {}
+        if year:
+            expense_filter['accounting_year'] = year
+        if month:
+            expense_filter['accounting_month'] = month
+        
+        base_filter = Q(category__category_type=category_type)
+        if year:
+            base_filter &= Q(expenses__accounting_year=year)
+        if month:
+            base_filter &= Q(expenses__accounting_month=month)
+        
+        categories = ExpenseCategory.objects.filter(
+            is_active=True,
+            category_type=category_type
+        ).annotate(
+            total_amount=Sum('expenses__amount', filter=Q(
+                expenses__accounting_year=year) if year else Q() & 
+                Q(expenses__accounting_month=month) if month else Q()
+            ),
+            expense_count=Count('expenses', filter=Q(
+                expenses__accounting_year=year) if year else Q() & 
+                Q(expenses__accounting_month=month) if month else Q()
+            )
+        ).order_by('name')
+        
+        total_amount = Expense.objects.filter(
+            category__category_type=category_type,
+            **expense_filter
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        context.update({
+            'category_type': category_type,
+            'category_type_display': dict(ExpenseCategory.CategoryTypeChoices.choices)[category_type],
+            'categories': categories,
+            'total_amount': total_amount,
+            **get_temporal_context(year, month)
+        })
+        
+        return context
+
+
 class ExpenseListView(LoginRequiredMixin, TemporalFilterMixin, ListView):
     model = Expense
     template_name = 'expenses/expense_list.html'
@@ -215,6 +272,13 @@ class ExpenseCategoryCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['form_title'] = 'New Expense Category'
         return context
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        category_type = self.request.GET.get('type')
+        if category_type and category_type in dict(ExpenseCategory.CategoryTypeChoices.choices):
+            initial['category_type'] = category_type
+        return initial
     
     def form_valid(self, form):
         messages.success(self.request, SUCCESS_MESSAGES['CATEGORY_CREATED'].format(name=form.instance.name))
