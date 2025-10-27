@@ -118,11 +118,6 @@ class Company(TimeStampedModel):
     def get_display_name(self):
         return self.legal_name or self.business_name
 
-    def save(self, *args, **kwargs):
-        if not self.pk and Company.objects.exists():
-            raise ValidationError('Only one company can exist in the system.')
-        super().save(*args, **kwargs)
-
     @property
     def is_sole_trader(self):
         return self.legal_form == 'SOLE_TRADER'

@@ -54,10 +54,11 @@ class CompanyCreateView(CompanyFormMixin, CreateView):
     template_name = 'invoicing/company_form.html'
     success_url = reverse_lazy('invoicing:invoice_list')
     
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if Company.objects.exists():
+            messages.info(request, 'Company already configured. Edit existing company details.')
             return redirect('invoicing:company_edit')
-        return super().get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class CompanyUpdateView(CompanyFormMixin, UpdateView):
