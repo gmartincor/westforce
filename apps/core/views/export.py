@@ -136,20 +136,4 @@ def get_export_data():
     except Exception:
         data['expenses'] = []
     
-    try:
-        BusinessLine = apps.get_model('business_lines', 'BusinessLine')
-        business_lines = BusinessLine.objects.all()
-        data['business_lines'] = [
-            {
-                'name': bl.name,
-                'level': bl.level,
-                'description': bl.description,
-                'location': bl.location,
-                'is_active': bl.is_active,
-            }
-            for bl in business_lines
-        ]
-    except Exception:
-        data['business_lines'] = []
-    
     return data

@@ -1,32 +1,10 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.db.models import Sum, Count
-from decimal import Decimal
 from datetime import datetime
 from apps.accounting.models import Income
-from apps.business_lines.models import BusinessLine
 
 register = template.Library()
-
-
-@register.simple_tag
-def get_business_line_income(business_line_id, year=None, month=None):
-    queryset = Income.objects.filter(business_line_id=business_line_id)
-    
-    if year:
-        queryset = queryset.filter(accounting_year=year)
-    if month:
-        queryset = queryset.filter(accounting_month=month)
-    
-    result = queryset.aggregate(
-        total=Sum('amount'),
-        count=Count('id')
-    )
-    
-    return {
-        'total': result['total'] or 0,
-        'count': result['count'] or 0
-    }
 
 
 @register.simple_tag
@@ -49,7 +27,7 @@ def get_service_type_stats(service_type, year=None):
 
 
 @register.simple_tag
-def total_income_by_category(category, year=None, month=None):
+def total_income_by_year(year=None, month=None):
     queryset = Income.objects.all()
     
     if year:
@@ -128,18 +106,3 @@ def get_monthly_income_comparison(year, previous_year=None):
             'data': previous_year_data
         }
     }
-
-
-@register.filter
-def get_hierarchy_level(business_line):
-    return business_line.level
-
-
-@register.filter
-def indent_by_level(level):
-    return mark_safe("&nbsp;" * (level - 1) * 4)
-
-
-@register.simple_tag
-def business_line_hierarchy():
-    return BusinessLine.objects.filter(is_active=True).order_by('level', 'order', 'name')

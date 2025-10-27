@@ -14,14 +14,13 @@ class DashboardDataHandler:
         return {
             'start_date': parse_date(request.GET.get('start_date')) if request.GET.get('start_date') else None,
             'end_date': parse_date(request.GET.get('end_date')) if request.GET.get('end_date') else None,
-            'level': int(request.GET.get('level')) if request.GET.get('level') else None
         }
     
     def get_dashboard_context(self):
         return {
             **self.service.get_financial_summary(),
             'temporal_data': self.service.get_temporal_data(),
-            'business_lines': self.service.get_business_lines_data(),
+            'service_types': self.service.get_service_types_data(),
             'expense_categories': self.service.get_expense_categories_data(),
         }
 
@@ -34,20 +33,20 @@ def dashboard_home(request):
 
 
 @login_required
-def get_filtered_business_lines(request):
+def get_filtered_service_types(request):
     handler = DashboardDataHandler()
     filters = handler.get_filter_params(request)
     
-    business_lines = handler.service.get_business_lines_data(**filters)
+    service_types = handler.service.get_service_types_data(**filters)
     
     return JsonResponse({
-        'business_lines_data': [
+        'service_types_data': [
             {
-                'name': line['name'],
-                'revenue': float(line['total_revenue']),
-                'percentage': float(line['percentage'])
+                'name': st['name'],
+                'revenue': float(st['total_revenue']),
+                'percentage': float(st['percentage'])
             }
-            for line in business_lines
+            for st in service_types
         ]
     })
 

@@ -1,57 +1,44 @@
 {% extends "base.html" %}
 {% load static %}
-{% load accounting_tags %}
-{% load presentation_tags %}
 
-{% block title %}{{ page_title }} - Westforce{% endblock %}
+{% block title %}Revenue Summary - Westforce{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
     <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
         <div class="flex items-center space-x-4 mb-4">
-            <div class="w-16 h-16 rounded-xl flex items-center justify-center {% if category == 'personal' %}bg-green-100{% else %}bg-purple-100{% endif %}">
-                <svg class="w-8 h-8 {% if category == 'personal' %}text-green-600{% else %}text-purple-600{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-16 h-16 rounded-xl flex items-center justify-center bg-green-100 dark:bg-green-900/20">
+                <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
             </div>
             
             <div class="flex-1">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ page_title }}</h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-1">
-                    {{ page_subtitle }}
-                    {% if selected_month %}
-                        {% for m_num, m_name in months %}
-                            {% if m_num == selected_month %}- {{ m_name }} {{ selected_year }}{% endif %}
-                        {% endfor %}
-                    {% elif selected_year %}
-                        - Año {{ selected_year }}
-                    {% endif %}
-                </p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Revenue Summary</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-1">Analysis for {{ selected_year }}</p>
             </div>
         </div>
     </div>
 
-    {% include 'accounting/components/date_filters.html' with hide_search=True %}
-
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Resumen Total</h3>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Overall Summary</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Ingresos</div>
-                <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {{ total_summary.total_amount|format_currency:"$" }}
+            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                <div class="text-sm font-medium text-green-600 dark:text-green-400">Total Revenue</div>
+                <div class="text-2xl font-bold text-green-700 dark:text-green-300">
+                    ${{ summary.total_revenue|floatformat:2 }}
                 </div>
             </div>
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Pagos</div>
-                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {{ total_summary.total_payments }}
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <div class="text-sm font-medium text-blue-600 dark:text-blue-400">Total Services</div>
+                <div class="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                    {{ summary.total_services }}
                 </div>
             </div>
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Promedio por Pago</div>
-                <div class="text-2xl font-bold {% if category == 'personal' %}text-green-600 dark:text-green-400{% else %}text-purple-600 dark:text-purple-400{% endif %}">
-                    {{ total_summary.average_amount|format_currency:"$" }}
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <div class="text-sm font-medium text-purple-600 dark:text-purple-400">Average Revenue</div>
+                <div class="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                    ${{ summary.average_revenue|floatformat:2 }}
                 </div>
             </div>
         </div>
@@ -59,46 +46,90 @@
 
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
-                Jerarquía de Ingresos - Categoría {{ category_display }}
-            </h2>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Monthly Trends</h2>
         </div>
         
-        {% if revenue_data %}
+        {% if monthly_trends %}
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Línea de Negocio
+                            Month
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Total Ingresos
+                            Revenue
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Número de Pagos
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Promedio por Pago
+                            Services
                         </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {% for line_data in revenue_data %}
-                        {% include 'accounting/components/revenue_line_row.html' with line_data=line_data %}
+                    {% for trend in monthly_trends %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                            Month {{ trend.accounting_month }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600 dark:text-green-400">
+                            ${{ trend.total|floatformat:2 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                            {{ trend.count }}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
         <div class="text-center py-12">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Sin ingresos</h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                No hay ingresos registrados para los filtros seleccionados.
-            </p>
+            <p class="text-gray-500 dark:text-gray-400">No revenue data available for this period.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Service Type Breakdown</h2>
+        </div>
+        
+        {% if service_breakdown %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-900">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Service Type
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Revenue
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Services
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for service in service_breakdown %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                            {{ service.service_type|title|default:"Unknown" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600 dark:text-green-400">
+                            ${{ service.total|floatformat:2 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                            {{ service.count }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500 dark:text-gray-400">No service data available.</p>
         </div>
         {% endif %}
     </div>

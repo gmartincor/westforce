@@ -61,16 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% empty %}
             {% endfor %}
         ],
-        business_lines_data: [
-            {% for linea in lineas_negocio %}
-            {
-                nombre: "{{ linea.name|escapejs }}",
-                ingresos: "{{ linea.total_ingresos|default:0|floatformat:2 }}",
-                porcentaje: "{{ linea.porcentaje|default:0|floatformat:2 }}"
-            }{% if not forloop.last %},{% endif %}
-            {% empty %}
-            {% endfor %}
-        ]
+        business_lines_data: []
     };
     
     // Initialize dashboard charts
@@ -184,50 +175,29 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
 
-        <!-- Business Lines -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Revenue by Business Line</h3>
-                <div class="flex space-x-2 items-center">
-                    <select id="business-lines-level-filter" class="px-2 py-1 text-sm border border-gray-300 rounded">
-                        <option value="">All levels</option>
-                        <option value="1">Level 1</option>
-                        <option value="2">Level 2</option>
-                        <option value="3">Level 3</option>
-                    </select>
-                    <div class="flex space-x-2 text-sm">
-                        <button class="filter-btn px-3 py-1 rounded bg-blue-500 text-white" data-chart="business-lines" data-period="30">30d</button>
-                        <button class="filter-btn px-3 py-1 rounded bg-gray-300 text-gray-700" data-chart="business-lines" data-period="90">90d</button>
-                        <button class="filter-btn px-3 py-1 rounded bg-gray-300 text-gray-700" data-chart="business-lines" data-period="365">1y</button>
-                        <button class="filter-btn px-3 py-1 rounded bg-gray-300 text-gray-700" data-chart="business-lines" data-period="all">All</button>
-                    </div>
-                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Revenue by Service Type</h3>
             </div>
-            <div class="h-80" id="business-lines-chart">
-                <canvas id="businessLinesChart"></canvas>
+            <div class="h-80" id="service-types-chart">
+                <canvas id="serviceTypesChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
-            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ lineas_negocio|length }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Líneas de Negocio Activas</div>
+            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ expense_categories|length }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Expense Categories</div>
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
-            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ gastos_por_categoria|length }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Categorías de Gastos</div>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
-            <div class="text-2xl font-bold {% if margen_beneficio >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
-                {{ margen_beneficio|floatformat:1 }}%
+            <div class="text-2xl font-bold {% if profit_margin >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                {{ profit_margin|floatformat:1 }}%
             </div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Margen de Beneficio Total</div>
-            <div class="text-sm {% if margen_beneficio_mes >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %} mt-1">
-                {{ margen_beneficio_mes|floatformat:1 }}% este mes
+            <div class="text-sm text-gray-600 dark:text-gray-400">Total Profit Margin</div>
+            <div class="text-sm {% if monthly_profit_margin >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %} mt-1">
+                {{ monthly_profit_margin|floatformat:1 }}% this month
             </div>
         </div>
     </div>

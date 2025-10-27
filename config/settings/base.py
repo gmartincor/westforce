@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'apps.authentication',
     'apps.dashboard', 
     'apps.accounting',
-    'apps.business_lines',
     'apps.expenses',
     'apps.invoicing',
 ]

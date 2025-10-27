@@ -12,7 +12,6 @@ urlpatterns = [
     path('core/', include('apps.core.urls')),
     path('dashboard/', include('apps.dashboard.urls')),
     path('accounting/', include('apps.accounting.urls')),
-    path('business-lines/', include('apps.business_lines.urls')),
     path('expenses/', include('apps.expenses.urls')),
     path('invoicing/', include('apps.invoicing.urls')),
     path('', landing_page, name='landing_page'),

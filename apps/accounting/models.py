@@ -1,9 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from decimal import Decimal
 from apps.core.models import TimeStampedModel
-from apps.business_lines.models import BusinessLine
 
 
 class ServiceTypeChoices(models.TextChoices):
@@ -28,9 +26,6 @@ class PaymentMethodChoices(models.TextChoices):
 
 class IncomeQuerySet(models.QuerySet):
     
-    def by_business_line(self, business_line):
-        return self.filter(business_line=business_line)
-    
     def by_service_type(self, service_type):
         return self.filter(service_type=service_type)
     
@@ -49,9 +44,6 @@ class IncomeManager(models.Manager):
     def get_queryset(self):
         return IncomeQuerySet(self.model, using=self._db)
     
-    def by_business_line(self, business_line):
-        return self.get_queryset().by_business_line(business_line)
-    
     def by_service_type(self, service_type):
         return self.get_queryset().by_service_type(service_type)
     
@@ -63,13 +55,6 @@ class IncomeManager(models.Manager):
 
 
 class Income(TimeStampedModel):
-    
-    business_line = models.ForeignKey(
-        BusinessLine,
-        on_delete=models.CASCADE,
-        related_name='incomes',
-        verbose_name="Business line"
-    )
     
     service_type = models.CharField(
         max_length=20,
@@ -140,11 +125,9 @@ class Income(TimeStampedModel):
         verbose_name_plural = "Incomes"
         ordering = ['-date', '-created']
         indexes = [
-            models.Index(fields=['business_line', 'date']),
             models.Index(fields=['date']),
             models.Index(fields=['accounting_year', 'accounting_month']),
             models.Index(fields=['service_type', 'date']),
-            models.Index(fields=['business_line', 'service_type']),
         ]
 
     def clean(self):
@@ -164,11 +147,7 @@ class Income(TimeStampedModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.business_line.name} - ${self.amount} AUD ({self.date})"
-
-    @property
-    def service_location(self):
-        return self.business_line.get_full_hierarchy()
+        return f"{self.get_service_type_display()} - ${self.amount} AUD ({self.date})"
 
     def get_payment_method_display_icon(self):
         icons = {

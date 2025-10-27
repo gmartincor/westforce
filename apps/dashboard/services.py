@@ -5,7 +5,6 @@ from datetime import timedelta
 
 from apps.accounting.models import Income
 from apps.expenses.models import Expense, ExpenseCategory
-from apps.business_lines.models import BusinessLine
 
 
 class FinancialSummaryService:
@@ -91,42 +90,43 @@ class TemporalDataService:
         return months[-months_back:]
 
 
-class BusinessLineAnalyticsService:
+class ServiceTypeAnalyticsService:
     
     @staticmethod
-    def get_performance_data(start_date=None, end_date=None, level=None):
-        queryset = BusinessLine.objects.filter(is_active=True)
+    def get_performance_data(start_date=None, end_date=None):
+        from apps.accounting.models import ServiceTypeChoices
         
-        if level:
-            queryset = queryset.filter(level=level)
+        income_filter = Q()
         
-        business_lines = []
+        if start_date:
+            income_filter &= Q(date__gte=start_date)
+        if end_date:
+            income_filter &= Q(date__lte=end_date)
         
-        for line in queryset:
-            income_filter = Q(business_line=line)
+        service_types = []
+        
+        for choice in ServiceTypeChoices.choices:
+            service_type = choice[0]
+            service_label = choice[1]
             
-            if start_date:
-                income_filter &= Q(date__gte=start_date)
-            if end_date:
-                income_filter &= Q(date__lte=end_date)
-            
-            incomes = Income.objects.filter(income_filter)
+            incomes = Income.objects.filter(income_filter, service_type=service_type)
             total_revenue = incomes.aggregate(total=Sum('amount'))['total'] or 0
             service_count = incomes.count()
             
-            business_lines.append({
-                'name': line.name,
-                'total_revenue': total_revenue,
-                'service_count': service_count,
-            })
+            if total_revenue > 0:
+                service_types.append({
+                    'name': service_label,
+                    'total_revenue': total_revenue,
+                    'service_count': service_count,
+                })
         
-        business_lines.sort(key=lambda x: x['total_revenue'], reverse=True)
-        total_revenue = sum(line['total_revenue'] for line in business_lines)
+        service_types.sort(key=lambda x: x['total_revenue'], reverse=True)
+        total_revenue = sum(st['total_revenue'] for st in service_types)
         
-        for line in business_lines:
-            line['percentage'] = (line['total_revenue'] / total_revenue * 100) if total_revenue > 0 else 0
+        for st in service_types:
+            st['percentage'] = (st['total_revenue'] / total_revenue * 100) if total_revenue > 0 else 0
         
-        return business_lines
+        return service_types
 
 
 class ExpenseCategoryAnalyticsService:
@@ -174,7 +174,7 @@ class DashboardDataService:
     def __init__(self):
         self.financial_service = FinancialSummaryService()
         self.temporal_service = TemporalDataService()
-        self.business_line_service = BusinessLineAnalyticsService()
+        self.service_type_service = ServiceTypeAnalyticsService()
         self.expense_service = ExpenseCategoryAnalyticsService()
     
     def get_financial_summary(self):
@@ -183,8 +183,8 @@ class DashboardDataService:
     def get_temporal_data(self):
         return self.temporal_service.get_monthly_data()
     
-    def get_business_lines_data(self, start_date=None, end_date=None, level=None):
-        return self.business_line_service.get_performance_data(start_date, end_date, level)
+    def get_service_types_data(self, start_date=None, end_date=None):
+        return self.service_type_service.get_performance_data(start_date, end_date)
     
     def get_expense_categories_data(self, start_date=None, end_date=None):
         return self.expense_service.get_category_breakdown(start_date, end_date)

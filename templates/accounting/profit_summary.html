@@ -1,120 +1,80 @@
 {% extends "base.html" %}
 {% load static %}
-{% load accounting_tags %}
-{% load presentation_tags %}
 
-{% block title %}{{ page_title }} - Westforce{% endblock %}
+{% block title %}Profit Analysis - Westforce{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
     <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
         <div class="flex items-center space-x-4 mb-4">
-            <div class="w-16 h-16 rounded-xl flex items-center justify-center {% if category == 'personal' %}bg-amber-100{% else %}bg-indigo-100{% endif %}">
-                <svg class="w-8 h-8 {% if category == 'personal' %}text-amber-600{% else %}text-indigo-600{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-16 h-16 rounded-xl flex items-center justify-center bg-indigo-100 dark:bg-indigo-900/20">
+                <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
             </div>
             
             <div class="flex-1">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ page_title }}</h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-1">
-                    {{ page_subtitle }}
-                    {% if selected_month %}
-                        {% for m_num, m_name in months %}
-                            {% if m_num == selected_month %}- {{ m_name }} {{ selected_year }}{% endif %}
-                        {% endfor %}
-                    {% elif selected_year %}
-                        - Año {{ selected_year }}
-                    {% endif %}
-                </p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Profit Analysis</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-1">Financial analysis for {{ selected_year }}</p>
             </div>
         </div>
     </div>
 
-    {% include 'accounting/components/profit_filters.html' %}
-
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Análisis de Beneficios</h3>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Profit Analysis</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-                <div class="text-sm font-medium text-green-600 dark:text-green-400">Ingresos Totales</div>
+                <div class="text-sm font-medium text-green-600 dark:text-green-400">Total Revenue</div>
                 <div class="text-2xl font-bold text-green-700 dark:text-green-300">
-                    {{ total_revenue|format_currency:"$" }}
-                </div>
-                <div class="text-xs text-green-600 dark:text-green-400 mt-1">
-                    {{ revenue_stats.total_payments }} pagos
+                    ${{ summary.revenue|floatformat:2 }}
                 </div>
             </div>
             
             <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
-                <div class="text-sm font-medium text-red-600 dark:text-red-400">Gastos Totales</div>
+                <div class="text-sm font-medium text-red-600 dark:text-red-400">Total Expenses</div>
                 <div class="text-2xl font-bold text-red-700 dark:text-red-300">
-                    {{ total_expenses|format_currency:"$" }}
+                    ${{ summary.expenses|floatformat:2 }}
                 </div>
             </div>
             
-            <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
-                <div class="text-sm font-medium text-orange-600 dark:text-orange-400">Remanentes</div>
-                <div class="text-2xl font-bold text-orange-700 dark:text-orange-300">
-                    {% if category == 'personal' %}
-                        <span class="text-gray-500 dark:text-gray-400">N/A</span>
-                    {% else %}
-                        {{ total_remanentes|format_currency:"$" }}
-                    {% endif %}
+            <div class="bg-{% if summary.profit >= 0 %}blue{% else %}red{% endif %}-50 dark:bg-{% if summary.profit >= 0 %}blue{% else %}red{% endif %}-900/20 rounded-lg p-4">
+                <div class="text-sm font-medium text-{% if summary.profit >= 0 %}blue{% else %}red{% endif %}-600 dark:text-{% if summary.profit >= 0 %}blue{% else %}red{% endif %}-400">Net Profit</div>
+                <div class="text-2xl font-bold text-{% if summary.profit >= 0 %}blue{% else %}red{% endif %}-700 dark:text-{% if summary.profit >= 0 %}blue{% else %}red{% endif %}-300">
+                    ${{ summary.profit|floatformat:2 }}
                 </div>
-                {% if category == 'personal' %}
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    No aplica para categoría Personal
-                </div>
-                {% endif %}
             </div>
-            
-            <div class="bg-{% if profit >= 0 %}blue{% else %}red{% endif %}-50 dark:bg-{% if profit >= 0 %}blue{% else %}red{% endif %}-900/20 rounded-lg p-4">
-                <div class="text-sm font-medium text-{% if profit >= 0 %}blue{% else %}red{% endif %}-600 dark:text-{% if profit >= 0 %}blue{% else %}red{% endif %}-400">Beneficio Neto</div>
-                <div class="text-2xl font-bold text-{% if profit >= 0 %}blue{% else %}red{% endif %}-700 dark:text-{% if profit >= 0 %}blue{% else %}red{% endif %}-300">
-                    {{ profit|format_currency:"$" }}
+
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <div class="text-sm font-medium text-purple-600 dark:text-purple-400">Profit Margin</div>
+                <div class="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                    {{ summary.profit_margin|floatformat:1 }}%
                 </div>
-                {% if total_revenue > 0 %}
-                <div class="text-xs text-{% if profit >= 0 %}blue{% else %}red{% endif %}-600 dark:text-{% if profit >= 0 %}blue{% else %}red{% endif %}-400 mt-1">
-                    Margen: {% widthratio profit total_revenue 100 %}%
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
 
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Desglose del Cálculo</h3>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Calculation Breakdown</h3>
         <div class="space-y-4">
             <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                <span class="font-medium text-gray-900 dark:text-white">Ingresos de Categoría {{ category_display }}</span>
-                <span class="text-green-600 dark:text-green-400 font-semibold">{{ total_revenue|format_currency:"$" }}</span>
+                <span class="font-medium text-gray-900 dark:text-white">Total Revenue</span>
+                <span class="text-green-600 dark:text-green-400 font-semibold">${{ summary.revenue|floatformat:2 }}</span>
             </div>
             
             <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                <span class="font-medium text-gray-900 dark:text-white">Menos: Gastos de categoría {{ category_display }}</span>
-                <span class="text-red-600 dark:text-red-400 font-semibold">-{{ total_expenses|format_currency:"$" }}</span>
-            </div>
-            
-            <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                <span class="font-medium text-gray-900 dark:text-white">Menos: Remanentes aplicados</span>
-                {% if category == 'personal' %}
-                    <span class="text-gray-500 dark:text-gray-400 font-semibold">N/A (No aplica)</span>
-                {% else %}
-                    <span class="text-orange-600 dark:text-orange-400 font-semibold">-{{ total_remanentes|format_currency:"$" }}</span>
-                {% endif %}
+                <span class="font-medium text-gray-900 dark:text-white">Less: Total Expenses</span>
+                <span class="text-red-600 dark:text-red-400 font-semibold">-${{ summary.expenses|floatformat:2 }}</span>
             </div>
             
             <div class="flex justify-between items-center py-3 border-t-2 border-gray-300 dark:border-gray-600">
-                <span class="text-lg font-bold text-gray-900 dark:text-white">Beneficio Neto</span>
-                <span class="text-xl font-bold {% if profit >= 0 %}text-blue-600 dark:text-blue-400{% else %}text-red-600 dark:text-red-400{% endif %}">
-                    {{ profit|format_currency:"$" }}
+                <span class="text-lg font-bold text-gray-900 dark:text-white">Net Profit</span>
+                <span class="text-xl font-bold {% if summary.profit >= 0 %}text-blue-600 dark:text-blue-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                    ${{ summary.profit|floatformat:2 }}
                 </span>
             </div>
         </div>
     </div>
 
-    {% if selected_month and selected_year %}
     <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
         <div class="flex">
             <div class="flex-shrink-0">
@@ -123,13 +83,12 @@
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Información sobre el cálculo</h3>
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">About this calculation</h3>
                 <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
-                    <p>Este cálculo muestra los ingresos totales de la categoría {{ category_display }} menos los gastos de la misma categoría del período seleccionado{% if category == 'business' %} y los remanentes aplicados{% endif %}.</p>
+                    <p>This shows total revenue from all services minus all expenses for the selected period.</p>
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %}

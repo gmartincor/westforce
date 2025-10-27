@@ -44,9 +44,7 @@
                 
                 <ul x-show="open" x-transition class="mt-2 ml-8 space-y-1">
                     <li><a href="{% url 'accounting:income_list' %}" class="block px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Todos los Ingresos</a></li>
-                    <li><a href="{% url 'accounting:business-lines' %}" class="block px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Por Línea de Negocio</a></li>
-                    <li><a href="{% url 'accounting:payments' %}" class="block px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Gestión de Pagos</a></li>
-                    <li><a href="{% url 'accounting:payment-history' %}" class="block px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Historial de Pagos</a></li>
+                    <li><a href="{% url 'accounting:income_add' %}" class="block px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Registrar Ingreso</a></li>
                 </ul>
             </li>
 
@@ -141,7 +139,7 @@
                             </svg>
                         </button>
                         <ul x-show="subopen" x-transition class="mt-1 ml-4 space-y-1">
-                            <li><a href="{% url 'accounting:revenue-summary' category='business' %}" class="block px-3 py-1 text-xs text-gray-500 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">Resumen Ingresos</a></li>
+                            <li><a href="{% url 'accounting:revenue_summary' %}" class="block px-3 py-1 text-xs text-gray-500 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">Resumen Ingresos</a></li>
                         </ul>
                     </li>
                     <li x-data="{ subopen: {% if request.resolver_match.app_name == 'accounting' %}true{% else %}false{% endif %} }">
@@ -152,7 +150,7 @@
                             </svg>
                         </button>
                         <ul x-show="subopen" x-transition class="mt-1 ml-4 space-y-1">
-                            <li><a href="{% url 'accounting:profit-summary' category='business' %}" class="block px-3 py-1 text-xs text-gray-500 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">Análisis Beneficios</a></li>
+                            <li><a href="{% url 'accounting:profit_summary' %}" class="block px-3 py-1 text-xs text-gray-500 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">Análisis Beneficios</a></li>
                         </ul>
                     </li>
                 </ul>
