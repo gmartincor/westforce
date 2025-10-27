@@ -38,7 +38,7 @@ class TemporalFilterService:
         
         current_month_name = month_names[current_month - 1] if current_month else None
         
-        available_years = list(range(2020, now.year + 2))
+        available_years = list(range(2025, now.year + 2))
         available_months = [(i, month_names[i - 1]) for i in range(1, 13)]
         
         return {
@@ -54,7 +54,7 @@ class TemporalDataService:
     @staticmethod
     def get_available_years():
         current_year = timezone.now().year
-        return list(range(2020, current_year + 2))
+        return list(range(2025, current_year + 2))
     
     @staticmethod
     def get_current_year():
@@ -71,7 +71,7 @@ class TemporalDataService:
         current_month = current_date.month
         
         choices = []
-        for year in range(2020, current_year + 2):
+        for year in range(2025, current_year + 2):
             for month in range(1, 13):
                 if year == current_year and month > current_month:
                     break
