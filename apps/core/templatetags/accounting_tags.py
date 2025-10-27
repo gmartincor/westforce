@@ -8,6 +8,11 @@ register = template.Library()
 
 
 @register.simple_tag
+def currency_field(field):
+    return mark_safe(str(field))
+
+
+@register.simple_tag
 def get_service_type_stats(service_type, year=None):
     queryset = Income.objects.filter(service_type=service_type)
     

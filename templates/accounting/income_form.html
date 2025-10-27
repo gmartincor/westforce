@@ -104,12 +104,7 @@
                                 <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Amount (AUD)
                                 </label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-500 sm:text-sm">$</span>
-                                    </div>
-                                    {{ form.amount }}
-                                </div>
+                                {{ form.amount }}
                                 {% if form.amount.errors %}
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.amount.errors.0 }}</p>
                                 {% endif %}
@@ -198,13 +193,8 @@
 </div>
 
 <style>
-/* Custom styling for form fields */
 .form-input, .form-select, .form-textarea {
     @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white;
-}
-
-#id_amount {
-    padding-left: 1.75rem;
 }
 </style>
 

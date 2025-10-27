@@ -77,7 +77,7 @@ class Expense(TimeStampedModel):
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        verbose_name="Amount AUD"
+        verbose_name="Amount"
     )
     
     date = models.DateField(

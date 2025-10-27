@@ -30,7 +30,7 @@ class Company(TimeStampedModel):
     bank_name = models.CharField(max_length=100, verbose_name="Bank")
     iban = models.CharField(max_length=34, verbose_name="BSB/Account")
     mercantile_registry = models.CharField(max_length=200, blank=True, verbose_name="ASIC registration")
-    share_capital = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Share capital AUD")
+    share_capital = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Share capital")
     invoice_prefix = models.CharField(max_length=10, default="INV", verbose_name="Invoice prefix")
     current_number = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     logo = models.ImageField(upload_to='company/logos/', blank=True, null=True)
@@ -140,7 +140,7 @@ class InvoiceItem(models.Model):
     unit_price = models.DecimalField(
         max_digits=10, decimal_places=2,
         validators=[MinValueValidator(Decimal('0.01'))],
-        verbose_name="Unit price AUD"
+        verbose_name="Unit price"
     )
     gst_rate = models.DecimalField(
         max_digits=5, decimal_places=2, default=Decimal('10.00'),

@@ -3,7 +3,7 @@
 {% load accounting_tags %}
     <div>
         <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {{ form.amount.label }}
+            {{ form.amount.label }} (AUD)
         </label>
         {% currency_field form.amount %}
         {% if form.amount.help_text %}
