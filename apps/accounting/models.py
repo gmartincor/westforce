@@ -24,36 +24,6 @@ class PaymentMethodChoices(models.TextChoices):
     OTHER = 'OTHER', 'Other'
 
 
-class IncomeQuerySet(models.QuerySet):
-    
-    def by_service_type(self, service_type):
-        return self.filter(service_type=service_type)
-    
-    def by_date_range(self, start_date, end_date):
-        return self.filter(date__range=[start_date, end_date])
-    
-    def by_accounting_period(self, year, month=None):
-        queryset = self.filter(accounting_year=year)
-        if month:
-            queryset = queryset.filter(accounting_month=month)
-        return queryset
-
-
-class IncomeManager(models.Manager):
-    
-    def get_queryset(self):
-        return IncomeQuerySet(self.model, using=self._db)
-    
-    def by_service_type(self, service_type):
-        return self.get_queryset().by_service_type(service_type)
-    
-    def by_date_range(self, start_date, end_date):
-        return self.get_queryset().by_date_range(start_date, end_date)
-    
-    def by_accounting_period(self, year, month=None):
-        return self.get_queryset().by_accounting_period(year, month)
-
-
 class Income(TimeStampedModel):
     
     service_type = models.CharField(
@@ -117,8 +87,6 @@ class Income(TimeStampedModel):
         db_index=True
     )
 
-    objects = IncomeManager()
-
     class Meta:
         db_table = 'incomes'
         verbose_name = "Income"
@@ -148,15 +116,3 @@ class Income(TimeStampedModel):
 
     def __str__(self):
         return f"{self.get_service_type_display()} - ${self.amount} AUD ({self.date})"
-
-    def get_payment_method_display_icon(self):
-        icons = {
-            'CARD': 'credit-card',
-            'CASH': 'money-bill-wave',
-            'BANK_TRANSFER': 'university', 
-            'EFTPOS': 'credit-card',
-            'PAYPAL': 'paypal',
-            'CHEQUE': 'money-check',
-            'OTHER': 'coins'
-        }
-        return icons.get(self.payment_method, 'coins')

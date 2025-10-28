@@ -1,14 +1,21 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.db.models import Sum, Count, Q
 from django.utils import timezone
+from django.db.models import Sum, Count
 
 from .models import Income
-from .services import AccountingService
+from .services import IncomeService
 from .forms import IncomeFilterForm
+
+
+INCOME_FIELDS = [
+    'service_type', 'amount', 'date', 'payment_method',
+    'client_name', 'pickup_address', 'delivery_address',
+    'description', 'reference_number'
+]
 
 
 class IncomeListView(LoginRequiredMixin, ListView):
@@ -18,9 +25,9 @@ class IncomeListView(LoginRequiredMixin, ListView):
     paginate_by = 25
     
     def get_queryset(self):
-        queryset = Income.objects.select_related().order_by('-date')
-        
+        queryset = Income.objects.order_by('-date')
         form = IncomeFilterForm(self.request.GET)
+        
         if form.is_valid():
             if date_from := form.cleaned_data.get('date_from'):
                 queryset = queryset.filter(date__gte=date_from)
@@ -43,15 +50,21 @@ class IncomeListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['filter_form'] = IncomeFilterForm(self.request.GET)
         
-        incomes = context.get('incomes', [])
-        if incomes:
-            context['total_amount'] = sum(income.amount for income in incomes)
-            context['income_count'] = len(incomes)
-            context['average_amount'] = context['total_amount'] / context['income_count']
+        page_incomes = context.get('incomes', [])
+        if page_incomes:
+            total = sum(income.amount for income in page_incomes)
+            count = len(page_incomes)
+            context.update({
+                'total_amount': total,
+                'income_count': count,
+                'average_amount': total / count
+            })
         else:
-            context['total_amount'] = 0
-            context['income_count'] = 0
-            context['average_amount'] = 0
+            context.update({
+                'total_amount': 0,
+                'income_count': 0,
+                'average_amount': 0
+            })
         
         return context
 
@@ -59,16 +72,14 @@ class IncomeListView(LoginRequiredMixin, ListView):
 class IncomeCreateView(LoginRequiredMixin, CreateView):
     model = Income
     template_name = 'accounting/income_form.html'
-    fields = ['service_type', 'amount', 'date', 'payment_method', 
-              'client_name', 'pickup_address', 'delivery_address', 'description', 'reference_number']
+    fields = INCOME_FIELDS
     success_url = reverse_lazy('accounting:income_list')
 
 
 class IncomeUpdateView(LoginRequiredMixin, UpdateView):
     model = Income
     template_name = 'accounting/income_form.html'
-    fields = ['service_type', 'amount', 'date', 'payment_method', 
-              'client_name', 'pickup_address', 'delivery_address', 'description', 'reference_number']
+    fields = INCOME_FIELDS
     success_url = reverse_lazy('accounting:income_list')
 
 
@@ -80,11 +91,10 @@ class IncomeDeleteView(LoginRequiredMixin, DeleteView):
 
 @login_required
 def revenue_summary_view(request):
-    current_year = timezone.now().year
-    year = int(request.GET.get('year', current_year))
+    year = int(request.GET.get('year', timezone.now().year))
+    service = IncomeService()
     
-    accounting_service = AccountingService()
-    summary = accounting_service.get_revenue_summary(year)
+    summary = service.get_revenue_summary(year)
     
     monthly_trends = Income.objects.filter(
         accounting_year=year
@@ -114,11 +124,10 @@ def revenue_summary_view(request):
 
 @login_required
 def profit_summary_view(request):
-    current_year = timezone.now().year
-    year = int(request.GET.get('year', current_year))
+    year = int(request.GET.get('year', timezone.now().year))
+    service = IncomeService()
     
-    accounting_service = AccountingService()
-    summary = accounting_service.get_profit_summary(year)
+    summary = service.get_profit_summary(year)
     
     context = {
         'page_title': 'Profit Analysis',

@@ -5,7 +5,6 @@ from .models import Income
 
 @admin.register(Income)
 class IncomeAdmin(admin.ModelAdmin):
-    
     list_display = [
         'service_type',
         'amount_display',
@@ -30,9 +29,7 @@ class IncomeAdmin(admin.ModelAdmin):
     ]
     
     date_hierarchy = 'date'
-    
     ordering = ['-date', '-created']
-    
     readonly_fields = ['accounting_year', 'accounting_month', 'created', 'modified']
     
     fieldsets = (
