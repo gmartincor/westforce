@@ -5,7 +5,9 @@
 
 {% block extra_js %}
 {{ block.super }}
+<script src="{% static 'js/time-range-filter.js' %}"></script>
 <script src="{% static 'js/dashboard-charts.js' %}"></script>
+<script src="{% static 'js/expense-distribution-filter.js' %}"></script>
 <script>
 window.addEventListener('load', () => {
     const dashboardData = {
@@ -16,6 +18,7 @@ window.addEventListener('load', () => {
     };
     
     DashboardCharts.init(dashboardData);
+    ExpenseDistributionFilter.init('#expense-distribution-filter');
 });
 </script>
 {% endblock %}
@@ -58,7 +61,7 @@ window.addEventListener('load', () => {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {% include 'components/charts/card.html' with title='Cash Flow Trend' canvas_id='cashFlowChart' %}
         
-        {% include 'components/charts/card.html' with title='Expense Distribution' canvas_id='expenseDistributionChart' %}
+        {% include 'components/charts/card_with_filter.html' with title='Expense Distribution' canvas_id='expenseDistributionChart' show_filter=True filter_id='expense-distribution-filter' %}
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

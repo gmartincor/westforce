@@ -163,7 +163,14 @@ const DashboardCharts = (() => {
     };
 
     const renderExpenseDistribution = (data) => {
-        if (!data || data.length === 0) return;
+        if (!data || data.length === 0) {
+            const ctx = document.getElementById('expenseDistributionChart');
+            if (ctx) {
+                destroyChart('expenseDistributionChart');
+                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+            }
+            return;
+        }
 
         const chartData = {
             labels: data.map(d => d.name),
@@ -265,7 +272,8 @@ const DashboardCharts = (() => {
 
     return {
         init,
-        destroy: destroyAll
+        destroy: destroyAll,
+        renderExpenseDistribution
     };
 })();
 

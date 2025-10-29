@@ -1,0 +1,57 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ title }}</h3>
+        {% if show_filter %}
+        <div id="{{ filter_id }}" class="flex gap-1">
+            <button type="button" 
+                    class="time-preset-btn px-3 py-1.5 text-xs font-medium rounded-md border transition-colors
+                           border-gray-300 dark:border-gray-600 
+                           text-gray-700 dark:text-gray-300
+                           hover:bg-gray-50 dark:hover:bg-gray-700
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    data-preset="all">
+                All
+            </button>
+            <button type="button" 
+                    class="time-preset-btn px-3 py-1.5 text-xs font-medium rounded-md border transition-colors
+                           border-gray-300 dark:border-gray-600 
+                           text-gray-700 dark:text-gray-300
+                           hover:bg-gray-50 dark:hover:bg-gray-700
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    data-preset="month">
+                30d
+            </button>
+            <button type="button" 
+                    class="time-preset-btn px-3 py-1.5 text-xs font-medium rounded-md border transition-colors
+                           border-gray-300 dark:border-gray-600 
+                           text-gray-700 dark:text-gray-300
+                           hover:bg-gray-50 dark:hover:bg-gray-700
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    data-preset="3months">
+                90d
+            </button>
+            <button type="button" 
+                    class="time-preset-btn px-3 py-1.5 text-xs font-medium rounded-md border transition-colors
+                           border-gray-300 dark:border-gray-600 
+                           text-gray-700 dark:text-gray-300
+                           hover:bg-gray-50 dark:hover:bg-gray-700
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    data-preset="6months">
+                6m
+            </button>
+            <button type="button" 
+                    class="time-preset-btn px-3 py-1.5 text-xs font-medium rounded-md border transition-colors
+                           border-gray-300 dark:border-gray-600 
+                           text-gray-700 dark:text-gray-300
+                           hover:bg-gray-50 dark:hover:bg-gray-700
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    data-preset="year">
+                1y
+            </button>
+        </div>
+        {% endif %}
+    </div>
+    <div class="h-80">
+        <canvas id="{{ canvas_id }}"></canvas>
+    </div>
+</div>
