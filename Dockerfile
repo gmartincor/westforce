@@ -3,7 +3,7 @@ FROM node:20-alpine AS css-builder
 WORKDIR /build
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 COPY tailwind.config.js postcss.config.js ./
 COPY static/css/tailwind.css ./static/css/
