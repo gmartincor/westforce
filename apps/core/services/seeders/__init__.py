@@ -5,6 +5,8 @@ from .category_seeder import CategorySeeder
 from .company_seeder import CompanySeeder
 from .transaction_seeder import TransactionSeeder
 from .invoice_seeder import InvoiceSeeder
+from .yearly_transaction_seeder import YearlyTransactionSeeder
+from .yearly_invoice_seeder import YearlyInvoiceSeeder
 
 __all__ = [
     'DevDataSeeder',
@@ -14,4 +16,6 @@ __all__ = [
     'CompanySeeder',
     'TransactionSeeder',
     'InvoiceSeeder',
+    'YearlyTransactionSeeder',
+    'YearlyInvoiceSeeder',
 ]
