@@ -4,27 +4,21 @@ const ExpenseDistributionFilter = (() => {
         if (startDate) params.append('start_date', startDate);
         if (endDate) params.append('end_date', endDate);
 
-        const url = `/dashboard/api/expense-distribution/?${params.toString()}`;
-        
         try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            const response = await fetch(`/dashboard/api/expense-distribution/?${params}`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return await response.json();
         } catch (error) {
-            console.error('Error fetching expense distribution data:', error);
+            console.error('Error fetching expense distribution:', error);
             return [];
         }
     };
 
     const init = (filterSelector) => {
-        const filter = TimeRangeFilter.init(filterSelector, async ({ startDate, endDate }) => {
+        return TimeRangeFilter.init(filterSelector, async ({ startDate, endDate }) => {
             const data = await fetchData(startDate, endDate);
             DashboardCharts.renderExpenseDistribution(data);
         });
-
-        return filter;
     };
 
     return { init };

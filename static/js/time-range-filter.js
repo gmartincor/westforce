@@ -23,13 +23,11 @@ const TimeRangeFilter = (() => {
     };
 
     const updateButtonStates = (container, activePreset) => {
+        const activeClasses = ['bg-blue-600', 'text-white', 'border-blue-600', 'dark:bg-blue-600', 'dark:border-blue-600'];
+        
         container.querySelectorAll('.time-preset-btn').forEach(btn => {
             const isActive = btn.dataset.preset === activePreset;
-            btn.classList.toggle('bg-blue-600', isActive);
-            btn.classList.toggle('text-white', isActive);
-            btn.classList.toggle('border-blue-600', isActive);
-            btn.classList.toggle('dark:bg-blue-600', isActive);
-            btn.classList.toggle('dark:border-blue-600', isActive);
+            activeClasses.forEach(cls => btn.classList.toggle(cls, isActive));
         });
     };
 
@@ -45,9 +43,7 @@ const TimeRangeFilter = (() => {
             
             updateButtonStates(container, preset);
             
-            if (onChange) {
-                onChange({ startDate, endDate, preset });
-            }
+            onChange?.({ startDate, endDate, preset });
         };
 
         container.querySelectorAll('.time-preset-btn').forEach(btn => {

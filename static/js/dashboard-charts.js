@@ -27,7 +27,7 @@ const DashboardCharts = (() => {
     };
 
     const formatPercentage = (value) => {
-        return parseFloat(value || 0).toFixed(1) + '%';
+        return `${parseFloat(value || 0).toFixed(1)}%`;
     };
 
     const parseFloatSafe = (value) => {
@@ -51,6 +51,11 @@ const DashboardCharts = (() => {
         Object.keys(instances).forEach(destroyChart);
     };
 
+    const getScaleConfig = (axis, showGrid = true) => ({
+        beginAtZero: true,
+        grid: showGrid ? { color: CONFIG.gridColor } : { display: false }
+    });
+
     const getBaseConfig = (type, data, customOptions = {}) => {
         const baseConfigs = {
             line: {
@@ -70,13 +75,8 @@ const DashboardCharts = (() => {
                         }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: CONFIG.gridColor }
-                        },
-                        x: {
-                            grid: { color: CONFIG.gridColor }
-                        }
+                        y: getScaleConfig('y'),
+                        x: getScaleConfig('x')
                     }
                 }
             },
@@ -91,13 +91,8 @@ const DashboardCharts = (() => {
                         legend: { display: false }
                     },
                     scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: { color: CONFIG.gridColor }
-                        },
-                        y: {
-                            grid: { display: false }
-                        }
+                        x: getScaleConfig('x'),
+                        y: getScaleConfig('y', false)
                     }
                 }
             },
@@ -127,7 +122,7 @@ const DashboardCharts = (() => {
 
     const createChart = (type, elementId, data, options = {}) => {
         const ctx = document.getElementById(elementId);
-        if (!ctx || !data) return null;
+        if (!ctx) return null;
 
         destroyChart(elementId);
 
@@ -138,9 +133,9 @@ const DashboardCharts = (() => {
     };
 
     const renderCashFlow = (data) => {
-        if (!data || data.length === 0) return;
+        if (!data?.length) return;
 
-        const chartData = {
+        createChart('line', 'cashFlowChart', {
             labels: data.map(d => d.month),
             datasets: [{
                 label: 'Cash Flow',
@@ -151,72 +146,68 @@ const DashboardCharts = (() => {
                 fill: true,
                 borderWidth: 2
             }]
-        };
-
-        createChart('line', 'cashFlowChart', chartData, {
+        }, {
             tooltip: {
                 callbacks: {
-                    label: (ctx) => 'Cash Flow: ' + formatCurrency(ctx.parsed.y)
+                    label: (ctx) => `Cash Flow: ${formatCurrency(ctx.parsed.y)}`
                 }
             }
         });
     };
 
     const renderExpenseDistribution = (data) => {
-        if (!data || data.length === 0) {
-            const ctx = document.getElementById('expenseDistributionChart');
-            if (ctx) {
-                destroyChart('expenseDistributionChart');
-                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
-            }
+        const chartId = 'expenseDistributionChart';
+        const ctx = document.getElementById(chartId);
+        
+        if (!ctx) return;
+
+        if (!data?.length) {
+            destroyChart(chartId);
+            ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
             return;
         }
 
-        const chartData = {
+        createChart('doughnut', chartId, {
             labels: data.map(d => d.name),
             datasets: [{
                 data: data.map(d => parseFloatSafe(d.total)),
                 backgroundColor: getColors(data.length),
                 borderWidth: 0
             }]
-        };
-
-        createChart('doughnut', 'expenseDistributionChart', chartData, {
+        }, {
             tooltip: {
                 callbacks: {
                     label: (ctx) => {
                         const item = data[ctx.dataIndex];
-                        const value = formatCurrency(ctx.parsed);
-                        const percentage = formatPercentage(item.percentage);
-                        return `${ctx.label}: ${value} (${percentage})`;
+                        return `${ctx.label}: ${formatCurrency(ctx.parsed)} (${formatPercentage(item.percentage)})`;
                     }
                 }
             }
         });
     };
 
-    const renderServiceProfitability = (data) => {
-        if (!data || data.length === 0) return;
+    const renderServiceRevenue = (data) => {
+        if (!data?.length) return;
 
-        const chartData = {
+        createChart('bar', 'serviceRevenueChart', {
             labels: data.map(d => d.name),
             datasets: [{
-                label: 'Profit Margin (%)',
-                data: data.map(d => parseFloatSafe(d.profit_margin)),
-                backgroundColor: CONFIG.colors.success,
+                label: 'Revenue',
+                data: data.map(d => parseFloatSafe(d.revenue)),
+                backgroundColor: CONFIG.colors.primary,
                 borderRadius: 8,
                 borderWidth: 0
             }]
-        };
-
-        createChart('bar', 'serviceProfitabilityChart', chartData, {
+        }, {
             tooltip: {
                 callbacks: {
                     label: (ctx) => {
                         const item = data[ctx.dataIndex];
-                        const margin = formatPercentage(ctx.parsed.x);
-                        const revenue = formatCurrency(item.revenue);
-                        return `${margin} margin (${revenue} revenue)`;
+                        return [
+                            `Revenue: ${formatCurrency(ctx.parsed.x)} (${formatPercentage(item.percentage)})`,
+                            `Jobs: ${item.count}`,
+                            `Average: ${formatCurrency(item.avg_revenue)}`
+                        ];
                     }
                 }
             }
@@ -224,28 +215,22 @@ const DashboardCharts = (() => {
     };
 
     const renderExpenseTrends = (data) => {
-        if (!data || !data.categories || !data.monthly_trends) return;
+        if (!data?.categories?.length || !data?.monthly_trends?.length) return;
 
         const colors = getColors(data.categories.length);
 
-        const datasets = data.categories.map((cat, index) => ({
-            label: cat.name,
-            data: data.monthly_trends.map(month => 
-                parseFloatSafe(month.categories[cat.id])
-            ),
-            borderColor: colors[index],
-            backgroundColor: colors[index] + '30',
-            tension: 0.4,
-            fill: false,
-            borderWidth: 2
-        }));
-
-        const chartData = {
+        createChart('line', 'expenseTrendsChart', {
             labels: data.monthly_trends.map(d => d.month),
-            datasets
-        };
-
-        createChart('line', 'expenseTrendsChart', chartData, {
+            datasets: data.categories.map((cat, index) => ({
+                label: cat.name,
+                data: data.monthly_trends.map(month => parseFloatSafe(month.categories[cat.id])),
+                borderColor: colors[index],
+                backgroundColor: colors[index] + '30',
+                tension: 0.4,
+                fill: false,
+                borderWidth: 2
+            }))
+        }, {
             tooltip: {
                 callbacks: {
                     label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`
@@ -260,14 +245,10 @@ const DashboardCharts = (() => {
             return;
         }
 
-        try {
-            renderCashFlow(data.cashflow_data);
-            renderExpenseDistribution(data.expense_distribution);
-            renderServiceProfitability(data.service_profitability);
-            renderExpenseTrends(data.expense_trends);
-        } catch (error) {
-            console.error('Error initializing charts:', error);
-        }
+        renderCashFlow(data.cashflow_data);
+        renderExpenseDistribution(data.expense_distribution);
+        renderServiceRevenue(data.service_revenue);
+        renderExpenseTrends(data.expense_trends);
     };
 
     return {

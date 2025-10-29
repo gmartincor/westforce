@@ -1,10 +1,10 @@
-from django.db.models import Sum, Count, Avg, Q
+from django.db.models import Sum, Count, Avg
 from typing import List, Dict
 from apps.accounting.models import Income, ServiceTypeChoices
 from .base import BaseAnalyticsService, BaseAggregationService
 
 
-class ServiceProfitabilityService(BaseAnalyticsService, BaseAggregationService):
+class ServiceRevenueService(BaseAnalyticsService, BaseAggregationService):
     
     def get_data(self, **filters) -> List[Dict]:
         start_date = filters.get('start_date')
@@ -26,7 +26,7 @@ class ServiceProfitabilityService(BaseAnalyticsService, BaseAggregationService):
         
         self._add_percentages(services, total_revenue)
         
-        return sorted(services, key=lambda x: x['profit_margin'], reverse=True)
+        return sorted(services, key=lambda x: x['revenue'], reverse=True)
     
     def _calculate_service_metrics(self, service_type: str, start_date=None, end_date=None) -> Dict:
         queryset = Income.objects.filter(service_type=service_type)
@@ -42,21 +42,15 @@ class ServiceProfitabilityService(BaseAnalyticsService, BaseAggregationService):
         count = aggregation['count'] or 0
         avg_revenue = float(aggregation['avg_revenue'] or 0)
         
-        estimated_costs = revenue * 0.3
-        profit = revenue - estimated_costs
-        profit_margin = (profit / revenue * 100) if revenue > 0 else 0
-        
         return {
             'revenue': revenue,
             'count': count,
             'avg_revenue': avg_revenue,
-            'estimated_profit': profit,
-            'profit_margin': profit_margin,
         }
     
     def _add_percentages(self, services: List[Dict], total_revenue: float):
         for service in services:
-            service['revenue_percentage'] = self._calculate_percentage(
+            service['percentage'] = self._calculate_percentage(
                 service['revenue'], 
                 total_revenue
             )

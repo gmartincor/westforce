@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
     const dashboardData = {
         cashflow_data: {{ cashflow_data|json_encode }},
         expense_distribution: {{ expense_distribution|json_encode }},
-        service_profitability: {{ service_profitability|json_encode }},
+        service_revenue: {{ service_revenue|json_encode }},
         expense_trends: {{ expense_trends|json_encode }}
     };
     
@@ -65,7 +65,7 @@ window.addEventListener('load', () => {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {% include 'components/charts/card.html' with title='Service Profitability' canvas_id='serviceProfitabilityChart' %}
+        {% include 'components/charts/card.html' with title='Revenue by Service Type' canvas_id='serviceRevenueChart' %}
         
         {% include 'components/charts/card.html' with title='Expense Trends (6 months)' canvas_id='expenseTrendsChart' %}
     </div>
