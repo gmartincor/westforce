@@ -1,36 +1,65 @@
-FROM python:3.12.7-slim
+FROM node:20-alpine AS css-builder
+
+WORKDIR /build
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY tailwind.config.js postcss.config.js ./
+COPY static/css/tailwind.css ./static/css/
+COPY templates ./templates
+COPY apps ./apps
+
+RUN npm run build-css
+
+FROM python:3.12.7-slim AS python-builder
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1
 
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    gcc \
-    libjpeg-dev \
-    libpng-dev \
-    libfreetype6-dev \
-    curl \
+WORKDIR /build
+
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip wheel --no-cache-dir --no-deps --wheel-dir /build/wheels -r requirements.txt
+
+FROM python:3.12.7-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PORT=8000
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    libjpeg62-turbo \
+    libpng16-16 \
+    libfreetype6 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd --create-home --shell /bin/bash --uid 1000 westforce
-
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+COPY --from=python-builder /build/wheels /wheels
+RUN pip install --no-cache /wheels/*
 
-COPY --chown=westforce:westforce . .
+COPY . .
+COPY --from=css-builder /build/static/css/style.css ./static/css/
 
 RUN mkdir -p static_collected media logs && \
-    chown -R westforce:westforce /app
-
-USER westforce
+    chmod +x scripts/*.sh
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/health/ || exit 1
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD gunicorn \
+    --bind 0.0.0.0:$PORT \
+    --workers 3 \
+    --worker-class sync \
+    --max-requests 1000 \
+    --max-requests-jitter 100 \
+    --timeout 120 \
+    --keep-alive 5 \
+    --log-level info \
+    --access-logfile - \
+    --error-logfile - \
+    config.wsgi:application

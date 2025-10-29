@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from decouple import config, Csv
 from .base import *
 
@@ -22,7 +23,6 @@ if env_allowed_hosts and env_allowed_hosts != ['']:
         if host and host not in ALLOWED_HOSTS:
             ALLOWED_HOSTS.append(host)
 
-# SSL and Security settings
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 63072000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -32,7 +32,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_REFERRER_POLICY = 'same-origin'
 
-# Cookie security
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Strict'
@@ -43,22 +42,17 @@ CSRF_COOKIE_SAMESITE = 'Strict'
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 
-# Database configuration
-import dj_database_url
-
 DATABASE_URL = config('DATABASE_URL', default='')
 
 if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=300)
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True
+        )
     }
-    DATABASES['default']['OPTIONS'] = {
-        'sslmode': 'require',
-        'connect_timeout': 60,
-    }
-    DATABASES['default']['CONN_HEALTH_CHECKS'] = True
-    DATABASES['default']['ATOMIC_REQUESTS'] = True
-    DATABASES['default']['TIME_ZONE'] = 'Australia/Perth'
 else:
     DATABASES = {
         'default': {
@@ -68,14 +62,8 @@ else:
             'PASSWORD': config('DB_PASSWORD'),
             'HOST': config('DB_HOST', default='localhost'),
             'PORT': config('DB_PORT', default='5432'),
-            'OPTIONS': {
-                'sslmode': 'require',
-                'connect_timeout': 60,
-            },
-            'CONN_MAX_AGE': 300,
+            'CONN_MAX_AGE': 600,
             'CONN_HEALTH_CHECKS': True,
-            'ATOMIC_REQUESTS': True,
-            'TIME_ZONE': 'Australia/Perth',
         }
     }
 

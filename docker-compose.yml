@@ -40,6 +40,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,westforce.com,www.westforce.com,web}
+      PORT: 8000
     ports:
       - "${APP_PORT_EXTERNAL:-8000}:8000"
     volumes:
@@ -51,7 +52,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: python manage.py runserver 0.0.0.0:8000
     restart: unless-stopped
 
 volumes:
