@@ -18,22 +18,58 @@ class IncomeService(FinancialService, ValidationMixin):
         self.validate_date_range(start_date, end_date)
         return self.get_all(date__range=[start_date, end_date])
     
-    def get_profit_summary(self, year: Optional[int] = None) -> Dict:
+    def get_filtered_queryset(
+        self,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        service_types: Optional[List[str]] = None
+    ) -> QuerySet:
+        queryset = self.get_all()
+        
+        if date_from:
+            queryset = queryset.filter(date__gte=date_from)
+        
+        if date_to:
+            queryset = queryset.filter(date__lte=date_to)
+        
+        if service_types:
+            queryset = queryset.filter(service_type__in=service_types)
+        
+        return queryset
+    
+    def get_profit_summary(
+        self,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        service_types: Optional[List[str]] = None,
+        expense_categories: Optional[List[str]] = None
+    ) -> Dict:
         from apps.expenses.models import Expense
         
-        if year is None:
-            year = timezone.now().year
+        income_queryset = self.get_filtered_queryset(date_from, date_to, service_types)
+        revenue = income_queryset.aggregate(total=Sum('amount'))['total'] or 0
         
-        revenue = self.get_all(accounting_year=year).aggregate(total=Sum('amount'))['total'] or 0
-        expenses = Expense.objects.filter(date__year=year).aggregate(total=Sum('amount'))['total'] or 0
+        expense_queryset = Expense.objects.all()
+        
+        if date_from:
+            expense_queryset = expense_queryset.filter(date__gte=date_from)
+        
+        if date_to:
+            expense_queryset = expense_queryset.filter(date__lte=date_to)
+        
+        if expense_categories:
+            expense_queryset = expense_queryset.filter(category__category_type__in=expense_categories)
+        
+        expenses = expense_queryset.aggregate(total=Sum('amount'))['total'] or 0
         profit = revenue - expenses
         
         return {
-            'year': year,
             'revenue': revenue,
             'expenses': expenses,
             'profit': profit,
             'profit_margin': (profit / revenue * 100) if revenue > 0 else 0,
+            'income_count': income_queryset.count(),
+            'expense_count': expense_queryset.count(),
         }
     
     def get_service_performance(self, year: int) -> Dict[str, Dict]:

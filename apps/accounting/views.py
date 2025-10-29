@@ -8,7 +8,7 @@ from django.db.models import Sum, Count
 
 from .models import Income
 from .services import IncomeService
-from .forms import IncomeFilterForm
+from .forms import IncomeFilterForm, ProfitFilterForm
 
 
 INCOME_FIELDS = [
@@ -91,16 +91,31 @@ class IncomeDeleteView(LoginRequiredMixin, DeleteView):
 
 @login_required
 def profit_summary_view(request):
-    year = int(request.GET.get('year', timezone.now().year))
+    form = ProfitFilterForm(request.GET)
     service = IncomeService()
     
-    summary = service.get_profit_summary(year)
+    filter_params = {}
+    
+    if form.is_valid():
+        if date_from := form.cleaned_data.get('date_from'):
+            filter_params['date_from'] = date_from
+        
+        if date_to := form.cleaned_data.get('date_to'):
+            filter_params['date_to'] = date_to
+        
+        if service_types := form.cleaned_data.get('service_types'):
+            filter_params['service_types'] = service_types
+        
+        if expense_categories := form.cleaned_data.get('expense_categories'):
+            filter_params['expense_categories'] = expense_categories
+    
+    summary = service.get_profit_summary(**filter_params)
     
     context = {
         'page_title': 'Profit Analysis',
-        'page_subtitle': f'Profit analysis for {year}',
+        'page_subtitle': 'Comprehensive profit analysis with filters',
         'summary': summary,
-        'selected_year': year,
+        'filter_form': form,
     }
     
     return render(request, 'accounting/profit_summary.html', context)

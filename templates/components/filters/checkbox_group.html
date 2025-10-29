@@ -1,0 +1,19 @@
+<div>
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ label }}
+    </label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        {% for choice_value, choice_label in choices %}
+        <label class="inline-flex items-center cursor-pointer">
+            <input 
+                type="checkbox" 
+                name="{{ field_name }}" 
+                value="{{ choice_value }}"
+                {% if choice_value in selected_values %}checked{% endif %}
+                class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+            >
+            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ choice_label }}</span>
+        </label>
+        {% endfor %}
+    </div>
+</div>
