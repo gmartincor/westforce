@@ -86,7 +86,7 @@ class ExpenseCategoryByTypeView(LoginRequiredMixin, TemplateView):
         if month:
             expense_filter['accounting_month'] = month
         
-        base_filter = Q(category__category_type=category_type)
+        base_filter = Q()
         if year:
             base_filter &= Q(expenses__accounting_year=year)
         if month:
@@ -96,14 +96,8 @@ class ExpenseCategoryByTypeView(LoginRequiredMixin, TemplateView):
             is_active=True,
             category_type=category_type
         ).annotate(
-            total_amount=Sum('expenses__amount', filter=Q(
-                expenses__accounting_year=year) if year else Q() & 
-                Q(expenses__accounting_month=month) if month else Q()
-            ),
-            expense_count=Count('expenses', filter=Q(
-                expenses__accounting_year=year) if year else Q() & 
-                Q(expenses__accounting_month=month) if month else Q()
-            )
+            total_amount=Sum('expenses__amount', filter=base_filter),
+            expense_count=Count('expenses', filter=base_filter)
         ).order_by('name')
         
         total_amount = Expense.objects.filter(
@@ -170,19 +164,20 @@ class ExpenseListView(LoginRequiredMixin, TemporalFilterMixin, ListView):
         
         if hasattr(self, 'category'):
             context['category'] = self.category
+            context['category_display'] = self.category.name
         elif category_type:
             category_type_display = dict(ExpenseCategory.CategoryTypeChoices.choices).get(category_type, category_type)
             context['category_type_display'] = category_type_display
         
-        expenses = context['expenses']
-        if expenses:
-            context['total_amount'] = sum(expense.amount for expense in expenses)
-            context['expense_count'] = len(expenses)
-            context['average_amount'] = context['total_amount'] / len(expenses) if len(expenses) > 0 else 0
-        else:
-            context['total_amount'] = 0
-            context['expense_count'] = 0
-            context['average_amount'] = 0
+        queryset_for_stats = self.get_queryset()
+        stats = queryset_for_stats.aggregate(
+            total=Sum('amount'),
+            count=Count('id')
+        )
+        
+        context['total_amount'] = stats['total'] or 0
+        context['expense_count'] = stats['count'] or 0
+        context['average_amount'] = context['total_amount'] / context['expense_count'] if context['expense_count'] > 0 else 0
         
         return context
 
