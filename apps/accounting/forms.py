@@ -1,8 +1,12 @@
 from django import forms
-from .models import Income, ServiceTypeChoices
+from .models import Income, ServiceTypeChoices, PaymentMethodChoices
 
 
 TAILWIND_INPUT_CLASSES = 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
+
+TAILWIND_SELECT_CLASSES = 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
+
+TAILWIND_TEXTAREA_CLASSES = 'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none'
 
 
 class DateRangeFilterMixin:
@@ -100,3 +104,62 @@ class ProfitFilterForm(forms.Form, DateRangeFilterMixin):
     def clean(self):
         cleaned_data = super().clean()
         return self.validate_date_range(cleaned_data)
+
+
+class IncomeForm(forms.ModelForm):
+    
+    class Meta:
+        model = Income
+        fields = [
+            'service_type', 'amount', 'date', 'payment_method',
+            'client_name', 'pickup_address', 'delivery_address',
+            'description', 'reference_number'
+        ]
+        widgets = {
+            'service_type': forms.Select(attrs={'class': TAILWIND_SELECT_CLASSES}),
+            'amount': forms.NumberInput(attrs={
+                'class': TAILWIND_INPUT_CLASSES,
+                'step': '0.01',
+                'min': '0',
+                'placeholder': 'Enter amount in AUD'
+            }),
+            'date': forms.DateInput(attrs={
+                'class': TAILWIND_INPUT_CLASSES,
+                'type': 'date'
+            }),
+            'payment_method': forms.Select(attrs={'class': TAILWIND_SELECT_CLASSES}),
+            'client_name': forms.TextInput(attrs={
+                'class': TAILWIND_INPUT_CLASSES,
+                'placeholder': 'Enter client name'
+            }),
+            'pickup_address': forms.Textarea(attrs={
+                'class': TAILWIND_TEXTAREA_CLASSES,
+                'rows': '3',
+                'placeholder': 'Enter pickup address'
+            }),
+            'delivery_address': forms.Textarea(attrs={
+                'class': TAILWIND_TEXTAREA_CLASSES,
+                'rows': '3',
+                'placeholder': 'Enter delivery address'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': TAILWIND_TEXTAREA_CLASSES,
+                'rows': '3',
+                'placeholder': 'Optional service details'
+            }),
+            'reference_number': forms.TextInput(attrs={
+                'class': TAILWIND_INPUT_CLASSES,
+                'placeholder': 'Optional invoice or job reference'
+            }),
+        }
+        labels = {
+            'service_type': 'Service Type',
+            'amount': 'Amount',
+            'date': 'Service Date',
+            'payment_method': 'Payment Method',
+            'client_name': 'Client Name',
+            'pickup_address': 'Pickup Address',
+            'delivery_address': 'Delivery Address',
+            'description': 'Service Description',
+            'reference_number': 'Reference Number',
+        }

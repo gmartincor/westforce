@@ -1,0 +1,18 @@
+<div class="{% if wide %}col-span-2{% endif %}">
+    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ field.label }}
+        {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+    </label>
+    
+    {{ field }}
+    
+    {% if field.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ field.errors.0 }}
+        </div>
+    {% endif %}
+    
+    {% if help_text %}
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ help_text }}</p>
+    {% endif %}
+</div>

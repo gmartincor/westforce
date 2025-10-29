@@ -1,216 +1,74 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}
-{% if object %}Edit Income Record{% else %}Record New Income{% endif %} - Westforce Moving Services
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Income - Westforce{% endblock %}
+
+{% block page_header %}
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            {% if form.instance.pk %}Edit Income Record{% else %}New Income Record{% endif %}
+        </h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+            {% if form.instance.pk %}Update the details of this income record{% else %}Add income from a completed moving service{% endif %}
+        </p>
+    </div>
+    <a href="{% url 'accounting:income_list' %}" 
+       class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg transition-colors font-medium flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Income List
+    </a>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-6 max-w-4xl">
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                {% if object %}Edit Income Record{% else %}Record New Income{% endif %}
-            </h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-1">
-                {% if object %}Update the details of this income record{% else %}Add income from a completed moving service{% endif %}
-            </p>
-        </div>
-        <a href="{% url 'accounting:income_list' %}" 
-           class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg transition-colors font-medium flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-            Back to Income List
-        </a>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <form method="post" class="space-y-6">
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <form method="post" class="p-6 space-y-6">
             {% csrf_token %}
             
-            {% if form.errors %}
-            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.98-.833-2.75 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                        </svg>
+            {% include 'components/forms/errors.html' %}
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                        Service Information
+                    </h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {% include 'components/forms/field.html' with field=form.service_type %}
+                        {% include 'components/forms/field.html' with field=form.client_name %}
                     </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                            There were errors with your submission
-                        </h3>
-                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                            <ul class="list-disc pl-5 space-y-1">
-                                {% for field, errors in form.errors.items %}
-                                    {% for error in errors %}
-                                        <li>{{ field|title }}: {{ error }}</li>
-                                    {% endfor %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Service Information</h3>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label for="{{ form.service_type.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Service Type
-                                </label>
-                                {{ form.service_type }}
-                                {% if form.service_type.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.service_type.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.client_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Client Name
-                                </label>
-                                {{ form.client_name }}
-                                {% if form.client_name.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.client_name.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Service Description
-                                </label>
-                                {{ form.description }}
-                                {% if form.description.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.description.errors.0 }}</p>
-                                {% endif %}
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Optional details about the moving service</p>
-                            </div>
-                        </div>
+                    <div class="mt-6">
+                        {% include 'components/forms/field.html' with field=form.description help_text="Optional details about the moving service" %}
                     </div>
                 </div>
 
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Financial Information</h3>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Amount (AUD)
-                                </label>
-                                {{ form.amount }}
-                                {% if form.amount.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.amount.errors.0 }}</p>
-                                {% endif %}
-                            </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                        Financial Information
+                    </h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {% include 'components/forms/field.html' with field=form.amount help_text="Amount in AUD" %}
+                        {% include 'components/forms/field.html' with field=form.date help_text="Date when the service was completed" %}
+                        {% include 'components/forms/field.html' with field=form.payment_method %}
+                        {% include 'components/forms/field.html' with field=form.reference_number help_text="Optional invoice or job reference" %}
+                    </div>
+                </div>
 
-                            <div>
-                                <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Service Date
-                                </label>
-                                {{ form.date }}
-                                {% if form.date.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.date.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.payment_method.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Payment Method
-                                </label>
-                                {{ form.payment_method }}
-                                {% if form.payment_method.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.payment_method.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.reference_number.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Reference Number
-                                </label>
-                                {{ form.reference_number }}
-                                {% if form.reference_number.errors %}
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.reference_number.errors.0 }}</p>
-                                {% endif %}
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Optional invoice or job reference</p>
-                            </div>
-                        </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                        Location Information
+                    </h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {% include 'components/forms/field.html' with field=form.pickup_address help_text="Where items were collected from" %}
+                        {% include 'components/forms/field.html' with field=form.delivery_address help_text="Where items were delivered to" %}
                     </div>
                 </div>
             </div>
 
-            <!-- Address Information -->
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Location Information</h3>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                        <label for="{{ form.pickup_address.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Pickup Address
-                        </label>
-                        {{ form.pickup_address }}
-                        {% if form.pickup_address.errors %}
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.pickup_address.errors.0 }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Where items were collected from</p>
-                    </div>
-
-                    <div>
-                        <label for="{{ form.delivery_address.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Delivery Address
-                        </label>
-                        {{ form.delivery_address }}
-                        {% if form.delivery_address.errors %}
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.delivery_address.errors.0 }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Where items were delivered to</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <a href="{% url 'accounting:income_list' %}" 
-                   class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    Cancel
-                </a>
-                <button type="submit" 
-                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    {% if object %}Update Income Record{% else %}Save Income Record{% endif %}
-                </button>
-            </div>
+            {% include 'components/forms/actions.html' with cancel_url_name='accounting:income_list' submit_text=form.instance.pk|yesno:"Update Income Record,Save Income Record" %}
         </form>
     </div>
 </div>
-
-<style>
-.form-input, .form-select, .form-textarea {
-    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add form styling classes
-    const inputs = document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], select, textarea');
-    inputs.forEach(input => {
-        if (input.type === 'text' || input.type === 'number' || input.type === 'date') {
-            input.classList.add('form-input');
-        } else if (input.tagName === 'SELECT') {
-            input.classList.add('form-select');
-        } else if (input.tagName === 'TEXTAREA') {
-            input.classList.add('form-textarea');
-        }
-    });
-});
-</script>
 {% endblock %}

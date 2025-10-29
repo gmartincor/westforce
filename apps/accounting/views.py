@@ -8,14 +8,7 @@ from django.db.models import Sum, Count
 
 from .models import Income
 from .services import IncomeService
-from .forms import IncomeFilterForm, ProfitFilterForm
-
-
-INCOME_FIELDS = [
-    'service_type', 'amount', 'date', 'payment_method',
-    'client_name', 'pickup_address', 'delivery_address',
-    'description', 'reference_number'
-]
+from .forms import IncomeFilterForm, ProfitFilterForm, IncomeForm
 
 
 class IncomeListView(LoginRequiredMixin, ListView):
@@ -71,15 +64,15 @@ class IncomeListView(LoginRequiredMixin, ListView):
 
 class IncomeCreateView(LoginRequiredMixin, CreateView):
     model = Income
+    form_class = IncomeForm
     template_name = 'accounting/income_form.html'
-    fields = INCOME_FIELDS
     success_url = reverse_lazy('accounting:income_list')
 
 
 class IncomeUpdateView(LoginRequiredMixin, UpdateView):
     model = Income
+    form_class = IncomeForm
     template_name = 'accounting/income_form.html'
-    fields = INCOME_FIELDS
     success_url = reverse_lazy('accounting:income_list')
 
 
