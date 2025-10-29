@@ -90,39 +90,6 @@ class IncomeDeleteView(LoginRequiredMixin, DeleteView):
 
 
 @login_required
-def revenue_summary_view(request):
-    year = int(request.GET.get('year', timezone.now().year))
-    service = IncomeService()
-    
-    summary = service.get_revenue_summary(year)
-    
-    monthly_trends = Income.objects.filter(
-        accounting_year=year
-    ).values('accounting_month').annotate(
-        total=Sum('amount'),
-        count=Count('id')
-    ).order_by('accounting_month')
-    
-    service_breakdown = Income.objects.filter(
-        accounting_year=year
-    ).values('service_type').annotate(
-        total=Sum('amount'),
-        count=Count('id')
-    ).order_by('-total')
-    
-    context = {
-        'page_title': 'Revenue Summary',
-        'page_subtitle': f'Revenue analysis for {year}',
-        'summary': summary,
-        'monthly_trends': monthly_trends,
-        'service_breakdown': service_breakdown,
-        'selected_year': year,
-    }
-    
-    return render(request, 'accounting/revenue_summary.html', context)
-
-
-@login_required
 def profit_summary_view(request):
     year = int(request.GET.get('year', timezone.now().year))
     service = IncomeService()

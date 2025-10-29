@@ -18,25 +18,6 @@ class IncomeService(FinancialService, ValidationMixin):
         self.validate_date_range(start_date, end_date)
         return self.get_all(date__range=[start_date, end_date])
     
-    def get_revenue_summary(self, year: Optional[int] = None) -> Dict:
-        if year is None:
-            year = timezone.now().year
-        
-        revenue_data = self.get_all(accounting_year=year).aggregate(
-            total=Sum('amount'),
-            count=Count('id')
-        )
-        
-        total = revenue_data['total'] or 0
-        count = revenue_data['count'] or 0
-        
-        return {
-            'year': year,
-            'total_revenue': total,
-            'total_services': count,
-            'average_revenue': total / max(count, 1),
-        }
-    
     def get_profit_summary(self, year: Optional[int] = None) -> Dict:
         from apps.expenses.models import Expense
         
