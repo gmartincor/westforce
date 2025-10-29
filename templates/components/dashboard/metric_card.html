@@ -1,0 +1,26 @@
+{% load dashboard_extras %}
+
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-all hover:shadow-md">
+    <div class="flex items-center justify-between">
+        <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+                {% if icon %}
+                <div class="p-3 rounded-lg {{ icon_bg_class }}">
+                    {{ icon|safe }}
+                </div>
+                {% endif %}
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ label }}</p>
+                    <p class="text-3xl font-bold {{ value_class|default:'text-gray-900 dark:text-white' }}">
+                        {{ value|format_currency }}
+                    </p>
+                </div>
+            </div>
+            {% if secondary_value %}
+            <p class="text-sm {{ secondary_class|default:'text-gray-600 dark:text-gray-400' }} mt-2">
+                {{ secondary_label }}: {{ secondary_value|format_currency }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>

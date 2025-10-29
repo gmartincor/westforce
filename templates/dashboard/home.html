@@ -7,147 +7,74 @@
 {{ block.super }}
 <script src="{% static 'js/dashboard/config.js' %}"></script>
 <script src="{% static 'js/dashboard/utils.js' %}"></script>
+<script src="{% static 'js/dashboard/chart_factory.js' %}"></script>
 <script src="{% static 'js/dashboard/charts.js' %}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    if (typeof Chart === 'undefined' || !window.dashboardCharts) {
+    if (typeof Chart === 'undefined' || !window.DashboardCharts) {
         console.error('Required libraries not loaded');
         return;
     }
     
     const dashboardData = {
-        temporal_data: {{ temporal_data|json_encode }},
-        expense_categories: {{ expense_categories|json_encode }},
-        service_types: {{ service_types|json_encode }},
-        payment_methods: {{ payment_methods|json_encode }}
+        cashflow_data: {{ cashflow_data|json_encode }},
+        expense_distribution: {{ expense_distribution|json_encode }},
+        service_profitability: {{ service_profitability|json_encode }},
+        expense_trends: {{ expense_trends|json_encode }}
     };
     
-    window.dashboardCharts.init(dashboardData);
+    const charts = new window.DashboardCharts();
+    charts.init(dashboardData);
 });
 </script>
 {% endblock %}
 
+
 {% block page_header %}
 <div class="mb-6">
     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-    <p class="mt-2 text-gray-600 dark:text-gray-400">Financial overview and business analytics</p>
+    <p class="mt-2 text-gray-600 dark:text-gray-400">Real-time financial insights and business analytics</p>
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900">
-                    <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Income</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_income|format_currency }}</p>
-                    <p class="text-sm text-green-600 dark:text-green-400">{{ monthly_income|format_currency }} this month</p>
-                </div>
-            </div>
-        </div>
+        {% include 'components/dashboard/metric_card.html' with label='Total Income' value=total_income secondary_label='This month' secondary_value=monthly_income icon='<svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>' icon_bg_class='bg-green-100 dark:bg-green-900' secondary_class='text-green-600 dark:text-green-400' %}
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-lg bg-red-100 dark:bg-red-900">
-                    <svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expenses</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_expenses|format_currency }}</p>
-                    <p class="text-sm text-red-600 dark:text-red-400">{{ monthly_expenses|format_currency }} this month</p>
-                </div>
-            </div>
-        </div>
+        {% include 'components/dashboard/metric_card.html' with label='Total Expenses' value=total_expenses secondary_label='This month' secondary_value=monthly_expenses icon='<svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>' icon_bg_class='bg-red-100 dark:bg-red-900' secondary_class='text-red-600 dark:text-red-400' %}
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-lg {{ total_profit|positive_bg_class }}">
-                    <svg class="w-6 h-6 {{ total_profit|positive_class|replace:'text-':'text-' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Net Profit</p>
-                    <p class="text-2xl font-bold {{ total_profit|positive_class }}">{{ total_profit|format_currency }}</p>
-                    <p class="text-sm {{ monthly_profit|positive_class }}">{{ monthly_profit|format_currency }} this month</p>
-                </div>
-            </div>
-        </div>
+        {% include 'components/dashboard/metric_card.html' with label='Net Profit' value=total_profit secondary_label='This month' secondary_value=monthly_profit icon='<svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>' icon_bg_class=total_profit|positive_bg_class value_class=total_profit|positive_class secondary_class=monthly_profit|positive_class %}
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex items-center">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 mb-2">
                 <div class="p-3 rounded-lg {{ profit_margin|positive_bg_class }}">
-                    <svg class="w-6 h-6 {{ profit_margin|positive_class|replace:'text-':'text-' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                     </svg>
                 </div>
-                <div class="ml-4">
+                <div class="flex-1">
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Profit Margin</p>
-                    <p class="text-2xl font-bold {{ profit_margin|positive_class }}">{{ profit_margin|floatformat:1 }}%</p>
-                    <p class="text-sm {{ monthly_profit_margin|positive_class }}">{{ monthly_profit_margin|floatformat:1 }}% this month</p>
+                    <p class="text-3xl font-bold {{ profit_margin|positive_class }}">{{ profit_margin|floatformat:1 }}%</p>
                 </div>
             </div>
+            <p class="text-sm {{ monthly_profit_margin|positive_class }} mt-2">
+                This month: {{ monthly_profit_margin|floatformat:1 }}%
+            </p>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {% include 'components/charts/card.html' with title='Financial Trend (12 months)' canvas_id='temporalChart' %}
+        {% include 'components/charts/card.html' with title='Cash Flow Trend' canvas_id='cashFlowChart' %}
         
-        {% include 'components/charts/card.html' with title='Expense Distribution' canvas_id='expensesChart' %}
-        
-        {% include 'components/charts/card.html' with title='Revenue by Service Type' canvas_id='serviceTypesChart' %}
-        
-        {% include 'components/charts/card.html' with title='Payment Methods' canvas_id='paymentMethodsChart' %}
+        {% include 'components/charts/card.html' with title='Expense Distribution' canvas_id='expenseDistributionChart' %}
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Clients</h3>
-            <div class="space-y-3">
-                {% for client in top_clients %}
-                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ client.client_name }}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ client.service_count }} service{{ client.service_count|pluralize }}</p>
-                    </div>
-                    <p class="text-lg font-semibold text-green-600 dark:text-green-400">{{ client.total_revenue|format_currency }}</p>
-                </div>
-                {% empty %}
-                <p class="text-gray-600 dark:text-gray-400 text-center py-4">No client data available</p>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Stats</h3>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
-                    <p class="text-3xl font-bold text-purple-600 dark:text-purple-400">{{ expense_categories|length }}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Expense Categories</p>
-                </div>
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
-                    <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ service_types|length }}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Service Types</p>
-                </div>
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
-                    <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ payment_methods|length }}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Payment Methods</p>
-                </div>
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
-                    <p class="text-3xl font-bold text-orange-600 dark:text-orange-400">{{ top_clients|length }}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Active Clients</p>
-                </div>
-            </div>
-        </div>
+        {% include 'components/charts/card.html' with title='Service Profitability' canvas_id='serviceProfitabilityChart' %}
+        
+        {% include 'components/charts/card.html' with title='Expense Trends (6 months)' canvas_id='expenseTrendsChart' %}
     </div>
 </div>
 {% endblock %}
