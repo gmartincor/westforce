@@ -8,6 +8,7 @@
 <script src="{% static 'js/time-range-filter.js' %}"></script>
 <script src="{% static 'js/dashboard-charts.js' %}"></script>
 <script src="{% static 'js/expense-distribution-filter.js' %}"></script>
+<script src="{% static 'js/service-revenue-filter.js' %}"></script>
 <script>
 window.addEventListener('load', () => {
     const dashboardData = {
@@ -19,6 +20,7 @@ window.addEventListener('load', () => {
     
     DashboardCharts.init(dashboardData);
     ExpenseDistributionFilter.init('#expense-distribution-filter');
+    ServiceRevenueFilter.init('#service-revenue-filter');
 });
 </script>
 {% endblock %}
@@ -65,7 +67,7 @@ window.addEventListener('load', () => {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {% include 'components/charts/card.html' with title='Revenue by Service Type' canvas_id='serviceRevenueChart' %}
+        {% include 'components/charts/card_with_filter.html' with title='Revenue by Service Type' canvas_id='serviceRevenueChart' show_filter=True filter_id='service-revenue-filter' %}
         
         {% include 'components/charts/card.html' with title='Expense Trends (6 months)' canvas_id='expenseTrendsChart' %}
     </div>

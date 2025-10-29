@@ -254,7 +254,8 @@ const DashboardCharts = (() => {
     return {
         init,
         destroy: destroyAll,
-        renderExpenseDistribution
+        renderExpenseDistribution,
+        renderServiceRevenue
     };
 })();
 
