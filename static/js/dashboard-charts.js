@@ -132,24 +132,30 @@ const DashboardCharts = (() => {
         return instances[elementId];
     };
 
+    const createLineDataset = (label, data, color, fill = false) => ({
+        label,
+        data,
+        borderColor: color,
+        backgroundColor: color + '20',
+        tension: 0.4,
+        fill,
+        borderWidth: 2
+    });
+
     const renderCashFlow = (data) => {
         if (!data?.length) return;
 
         createChart('line', 'cashFlowChart', {
             labels: data.map(d => d.month),
-            datasets: [{
-                label: 'Cash Flow',
-                data: data.map(d => parseFloatSafe(d.cash_flow)),
-                borderColor: CONFIG.colors.primary,
-                backgroundColor: CONFIG.colors.primary + '20',
-                tension: 0.4,
-                fill: true,
-                borderWidth: 2
-            }]
+            datasets: [
+                createLineDataset('Income', data.map(d => parseFloatSafe(d.income)), CONFIG.colors.success),
+                createLineDataset('Expenses', data.map(d => parseFloatSafe(d.expenses)), CONFIG.colors.danger),
+                createLineDataset('Cash Flow', data.map(d => parseFloatSafe(d.cash_flow)), CONFIG.colors.primary, true)
+            ]
         }, {
             tooltip: {
                 callbacks: {
-                    label: (ctx) => `Cash Flow: ${formatCurrency(ctx.parsed.y)}`
+                    label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`
                 }
             }
         });
@@ -221,15 +227,13 @@ const DashboardCharts = (() => {
 
         createChart('line', 'expenseTrendsChart', {
             labels: data.monthly_trends.map(d => d.month),
-            datasets: data.categories.map((cat, index) => ({
-                label: cat.name,
-                data: data.monthly_trends.map(month => parseFloatSafe(month.categories[cat.id])),
-                borderColor: colors[index],
-                backgroundColor: colors[index] + '30',
-                tension: 0.4,
-                fill: false,
-                borderWidth: 2
-            }))
+            datasets: data.categories.map((cat, index) => 
+                createLineDataset(
+                    cat.name,
+                    data.monthly_trends.map(month => parseFloatSafe(month.categories[cat.id])),
+                    colors[index]
+                )
+            )
         }, {
             tooltip: {
                 callbacks: {
