@@ -28,12 +28,12 @@ services:
       dockerfile: Dockerfile
     image: westforce-web:latest
     container_name: westforce-web
+    command: python manage.py runserver 0.0.0.0:8000
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.base
       SECRET_KEY: ${SECRET_KEY:-django-insecure-development-key}
       DEBUG: "${DEBUG:-True}"
       ENVIRONMENT: ${ENVIRONMENT:-development}
-      LOAD_TEST_DATA: "${LOAD_TEST_DATA:-True}"
       DB_NAME: ${DB_NAME:-westforce_moving}
       DB_USER: ${DB_USER:-westforce}
       DB_PASSWORD: ${DB_PASSWORD:-westforce123}

@@ -1,13 +1,10 @@
-# =============================================================================
-# Westforce - Clean Architecture Commands
-# =============================================================================
+.PHONY: help dev prod build clean test logs status restart migrate makemigrations shell superuser seed seed-flush
 
-.PHONY: help dev prod build clean test logs status restart migrate makemigrations shell superuser
-
+COMPOSE := docker-compose
 COMPOSE_FILE := docker-compose.yml
 ENV_FILE_DEV := .env.dev-with-prod-db
 
-help: ## Show available commands
+help:
 	@echo "🐳 Westforce Commands:"
 	@echo ""
 	@echo "DEVELOPMENT:"
@@ -21,6 +18,8 @@ help: ## Show available commands
 	@echo "  makemigrations - Create new migrations"
 	@echo "  shell        - Open Django shell"
 	@echo "  superuser    - Create superuser"
+	@echo "  seed         - Seed development data (manual)"
+	@echo "  seed-flush   - Flush and reseed all data"
 	@echo ""
 	@echo "UTILS:"
 	@echo "  test         - Run tests"
@@ -28,62 +27,59 @@ help: ## Show available commands
 	@echo "  status       - Show container status"
 	@echo ""
 
-dev: ## Start development environment
+dev:
 	@echo "🚀 Starting development environment..."
 	@docker-compose --env-file $(ENV_FILE_DEV) up --remove-orphans
 
-migrate: ## Run migrations
-	@echo "� Running migrations..."
-	@docker exec westforce-web-1 python manage.py migrate --verbosity=2
-
-setup: ## Complete setup (migrate + load data)
-	@echo "⚙️ Setting up application..."
-	@$(MAKE) migrate
-	@echo "📊 Loading initial data..."
-	@docker exec westforce-web-1 python manage.py loaddata fixtures.json || true
-	@echo "✅ Setup complete"
-
-prod: ## Start production environment
+prod:
 	@echo "🏭 Starting production environment..."
 	@DJANGO_SETTINGS_MODULE=config.settings.production docker-compose up --remove-orphans
 
-build: ## Rebuild images
+build:
 	@echo "🔨 Rebuilding images..."
 	@docker-compose build --no-cache
 
-clean: ## Clean containers and volumes
+clean:
 	@echo "🧹 Cleaning containers and volumes..."
 	@docker-compose down -v --remove-orphans
 	@docker system prune -f
 
-restart: ## Restart services
+restart:
 	@echo "🔄 Restarting services..."
 	@docker-compose restart
 
-test: ## Run tests
+test:
 	@echo "🧪 Running tests..."
 	@docker-compose exec web python manage.py test
 
-logs: ## Show logs
+logs:
 	@docker-compose logs -f web
 
-status: ## Show container status
+status:
 	@docker-compose ps
 
-migrate: ## Run migrations
+migrate:
 	@echo "🔄 Running migrations..."
-	@docker exec westforce-web-1 python manage.py migrate --verbosity=2
+	@docker exec westforce-web python manage.py migrate --verbosity=2
 
-makemigrations: ## Create new migrations
+makemigrations:
 	@echo "📝 Creating migrations..."
-	@docker exec westforce-web-1 python manage.py makemigrations
+	@docker exec westforce-web python manage.py makemigrations
 
-shell: ## Open Django shell
+shell:
 	@echo "🐍 Opening Django shell..."
-	@docker exec -it westforce-web-1 python manage.py shell
+	@docker exec -it westforce-web python manage.py shell
 
-superuser: ## Create superuser
+superuser:
 	@echo "👑 Creating superuser..."
-	@docker exec -it westforce-web-1 python manage.py createsuperuser
+	@docker exec -it westforce-web python manage.py createsuperuser
+
+seed:
+	@echo "🌱 Seeding development data..."
+	@docker exec westforce-web python manage.py seed_dev_data
+
+seed-flush:
+	@echo "⚠️  Flushing and reseeding all data..."
+	@docker exec westforce-web python manage.py seed_dev_data --flush
 
 .DEFAULT_GOAL := help
