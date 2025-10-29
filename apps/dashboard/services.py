@@ -1,7 +1,8 @@
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Avg
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal
 
 from apps.accounting.models import Income
 from apps.expenses.models import Expense, ExpenseCategory
@@ -188,3 +189,42 @@ class DashboardDataService:
     
     def get_expense_categories_data(self, start_date=None, end_date=None):
         return self.expense_service.get_category_breakdown(start_date, end_date)
+    
+    def get_payment_methods_data(self):
+        from apps.accounting.models import PaymentMethodChoices
+        
+        payment_methods = []
+        for choice in PaymentMethodChoices.choices:
+            method = choice[0]
+            label = choice[1]
+            
+            total = Income.objects.filter(payment_method=method).aggregate(
+                total=Sum('amount')
+            )['total'] or Decimal('0')
+            
+            count = Income.objects.filter(payment_method=method).count()
+            
+            if total > 0:
+                payment_methods.append({
+                    'method': label,
+                    'total': total,
+                    'count': count
+                })
+        
+        payment_methods.sort(key=lambda x: x['total'], reverse=True)
+        total_amount = sum(pm['total'] for pm in payment_methods)
+        
+        for pm in payment_methods:
+            pm['percentage'] = (pm['total'] / total_amount * 100) if total_amount > 0 else 0
+        
+        return payment_methods
+    
+    def get_top_clients(self, limit=5):
+        clients = Income.objects.exclude(
+            client_name=''
+        ).values('client_name').annotate(
+            total_revenue=Sum('amount'),
+            service_count=Count('id')
+        ).order_by('-total_revenue')[:limit]
+        
+        return list(clients)

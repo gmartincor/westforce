@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static dashboard_extras %}
 
 {% block title %}Dashboard - Westforce{% endblock %}
 
@@ -11,86 +11,33 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== Dashboard Modular Debug ===');
-    
-    // Debug: Check static files availability
-    console.log('🔍 Current location:', window.location.href);
-    console.log('🔍 Static root:', '{% get_static_prefix %}');
-    
-    // Debug: Check Chart.js availability
-    if (typeof Chart === 'undefined') {
-        console.error('❌ Chart.js not available - Check if chart.min.js is loaded');
-        console.log('🔍 Verify Chart.js URL: {% static "js/chart.min.js" %}');
+    if (typeof Chart === 'undefined' || !window.dashboardCharts) {
+        console.error('Required libraries not loaded');
         return;
-    } else {
-        console.log('✅ Chart.js available, version:', Chart.version || 'unknown');
     }
     
-    // Debug: Check dashboard modules availability
-    if (!window.dashboardCharts) {
-        console.error('❌ Dashboard charts module not loaded');
-        console.log('🔍 Check these JS files:');
-        console.log('   - {% static "js/dashboard/config.js" %}');
-        console.log('   - {% static "js/dashboard/utils.js" %}');
-        console.log('   - {% static "js/dashboard/charts.js" %}');
-        return;
-    } else {
-        console.log('✅ Dashboard charts module loaded');
-    }
-    
-    // Prepare data from Django template
     const dashboardData = {
-        temporal_data: [
-            {% for data in temporal_data %}
-            {
-                fecha: "{{ data.month|escapejs }}",
-                ingresos: "{{ data.ingresos|default:0|floatformat:2 }}",
-                gastos: "{{ data.gastos|default:0|floatformat:2 }}",
-                beneficio: "{{ data.beneficio|default:0|floatformat:2 }}"
-            }{% if not forloop.last %},{% endif %}
-            {% empty %}
-            {% endfor %}
-        ],
-        expenses_data: [
-            {% for cat in gastos_por_categoria %}
-            {
-                categoria: "{{ cat.name|escapejs }}",
-                total: "{{ cat.total|default:0|floatformat:2 }}",
-                porcentaje: "{{ cat.porcentaje|default:0|floatformat:2 }}"
-            }{% if not forloop.last %},{% endif %}
-            {% empty %}
-            {% endfor %}
-        ],
-        business_lines_data: []
+        temporal_data: {{ temporal_data|json_encode }},
+        expense_categories: {{ expense_categories|json_encode }},
+        service_types: {{ service_types|json_encode }},
+        payment_methods: {{ payment_methods|json_encode }}
     };
     
-    // Initialize dashboard charts
-    console.log('📊 Dashboard data prepared:', dashboardData);
-    try {
-        window.dashboardCharts.init(dashboardData);
-        console.log('✅ Dashboard charts initialized successfully');
-    } catch (error) {
-        console.error('❌ Error initializing charts:', error);
-        console.error('🔍 Stack trace:', error.stack);
-    }
+    window.dashboardCharts.init(dashboardData);
 });
 </script>
 {% endblock %}
 
-
 {% block page_header %}
 <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-        Dashboard - Westforce
-    </h1>
-    <p class="mt-2 text-gray-600 dark:text-gray-400">Análisis financiero de tu negocio</p>
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+    <p class="mt-2 text-gray-600 dark:text-gray-400">Financial overview and business analytics</p>
 </div>
 {% endblock %}
 
 {% block content %}
-<div>
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div class="flex items-center">
                 <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900">
@@ -99,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Ingresos</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ total_ingresos|floatformat:2 }}</p>
-                    <p class="text-sm text-green-600 dark:text-green-400">+${{ ingresos_mes|floatformat:2 }} este mes</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Income</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_income|format_currency }}</p>
+                    <p class="text-sm text-green-600 dark:text-green-400">{{ monthly_income|format_currency }} this month</p>
                 </div>
             </div>
         </div>
@@ -114,90 +61,91 @@ document.addEventListener('DOMContentLoaded', function() {
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Gastos</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ total_gastos|floatformat:2 }}</p>
-                    <p class="text-sm text-red-600 dark:text-red-400">+${{ gastos_mes|floatformat:2 }} este mes</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expenses</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_expenses|format_currency }}</p>
+                    <p class="text-sm text-red-600 dark:text-red-400">{{ monthly_expenses|format_currency }} this month</p>
                 </div>
             </div>
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div class="flex items-center">
-                <div class="p-3 rounded-lg {% if resultado_total >= 0 %}bg-green-100 dark:bg-green-900{% else %}bg-red-100 dark:bg-red-900{% endif %}">
-                    <svg class="w-6 h-6 {% if resultado_total >= 0 %}text-green-600 dark:text-green-300{% else %}text-red-600 dark:text-red-300{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-3 rounded-lg {{ total_profit|positive_bg_class }}">
+                    <svg class="w-6 h-6 {{ total_profit|positive_class|replace:'text-':'text-' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Beneficio Total</p>
-                    <p class="text-2xl font-bold {% if resultado_total >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
-                        {% if resultado_total >= 0 %}+{% endif %}${{ resultado_total|floatformat:2 }}
-                    </p>
-                    <p class="text-sm {% if resultado_mes >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
-                        {% if resultado_mes >= 0 %}+{% endif %}${{ resultado_mes|floatformat:2 }} este mes
-                    </p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Net Profit</p>
+                    <p class="text-2xl font-bold {{ total_profit|positive_class }}">{{ total_profit|format_currency }}</p>
+                    <p class="text-sm {{ monthly_profit|positive_class }}">{{ monthly_profit|format_currency }} this month</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-lg {{ profit_margin|positive_bg_class }}">
+                    <svg class="w-6 h-6 {{ profit_margin|positive_class|replace:'text-':'text-' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Profit Margin</p>
+                    <p class="text-2xl font-bold {{ profit_margin|positive_class }}">{{ profit_margin|floatformat:1 }}%</p>
+                    <p class="text-sm {{ monthly_profit_margin|positive_class }}">{{ monthly_profit_margin|floatformat:1 }}% this month</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Charts Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Evolución Temporal -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Evolución Financiera (12 meses)</h3>
-            <div class="h-80" id="temporal-chart">
-                <canvas id="temporalChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Gastos por Categoría -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Distribución de Gastos</h3>
-                <div class="flex space-x-2 text-sm">
-                    <button class="filter-btn px-3 py-1 rounded bg-blue-500 text-white" data-chart="expenses" data-period="30">30d</button>
-                    <button class="filter-btn px-3 py-1 rounded bg-gray-300 text-gray-700" data-chart="expenses" data-period="90">90d</button>
-                    <button class="filter-btn px-3 py-1 rounded bg-gray-300 text-gray-700" data-chart="expenses" data-period="365">1a</button>
-                    <button class="filter-btn px-3 py-1 rounded bg-gray-300 text-gray-700" data-chart="expenses" data-period="all">Todo</button>
-                </div>
-            </div>
-            <div class="h-80" id="expenses-chart">
-                <canvas id="expensesChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Margen de Beneficio -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Margen de Beneficio (%)</h3>
-            <div class="h-80" id="margin-chart">
-                <canvas id="marginChart"></canvas>
-            </div>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Revenue by Service Type</h3>
-            </div>
-            <div class="h-80" id="service-types-chart">
-                <canvas id="serviceTypesChart"></canvas>
-            </div>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {% include 'components/charts/card.html' with title='Financial Trend (12 months)' canvas_id='temporalChart' %}
+        
+        {% include 'components/charts/card.html' with title='Expense Distribution' canvas_id='expensesChart' %}
+        
+        {% include 'components/charts/card.html' with title='Revenue by Service Type' canvas_id='serviceTypesChart' %}
+        
+        {% include 'components/charts/card.html' with title='Payment Methods' canvas_id='paymentMethodsChart' %}
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
-            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ expense_categories|length }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Expense Categories</div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Clients</h3>
+            <div class="space-y-3">
+                {% for client in top_clients %}
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ client.client_name }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ client.service_count }} service{{ client.service_count|pluralize }}</p>
+                    </div>
+                    <p class="text-lg font-semibold text-green-600 dark:text-green-400">{{ client.total_revenue|format_currency }}</p>
+                </div>
+                {% empty %}
+                <p class="text-gray-600 dark:text-gray-400 text-center py-4">No client data available</p>
+                {% endfor %}
+            </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
-            <div class="text-2xl font-bold {% if profit_margin >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
-                {{ profit_margin|floatformat:1 }}%
-            </div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Total Profit Margin</div>
-            <div class="text-sm {% if monthly_profit_margin >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %} mt-1">
-                {{ monthly_profit_margin|floatformat:1 }}% this month
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Stats</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                    <p class="text-3xl font-bold text-purple-600 dark:text-purple-400">{{ expense_categories|length }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Expense Categories</p>
+                </div>
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                    <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ service_types|length }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Service Types</p>
+                </div>
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                    <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ payment_methods|length }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Payment Methods</p>
+                </div>
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                    <p class="text-3xl font-bold text-orange-600 dark:text-orange-400">{{ top_clients|length }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Active Clients</p>
+                </div>
             </div>
         </div>
     </div>

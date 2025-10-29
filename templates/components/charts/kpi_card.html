@@ -1,0 +1,14 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <div class="flex items-center">
+        <div class="p-3 rounded-lg {{ icon_bg_class }}">
+            {{ icon_svg|safe }}
+        </div>
+        <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ label }}</p>
+            <p class="text-2xl font-bold {{ value_class }}">{{ value }}</p>
+            {% if subtitle %}
+            <p class="text-sm {{ subtitle_class }}">{{ subtitle }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

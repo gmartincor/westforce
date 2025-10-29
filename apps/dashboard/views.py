@@ -22,6 +22,8 @@ class DashboardDataHandler:
             'temporal_data': self.service.get_temporal_data(),
             'service_types': self.service.get_service_types_data(),
             'expense_categories': self.service.get_expense_categories_data(),
+            'payment_methods': self.service.get_payment_methods_data(),
+            'top_clients': self.service.get_top_clients(),
         }
 
 

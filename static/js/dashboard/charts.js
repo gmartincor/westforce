@@ -1,31 +1,34 @@
 window.dashboardCharts = {
-    data: null,
+    instances: {},
 
-    init: function(dashboardData) {
-        this.data = dashboardData;
-        this.createTemporalChart();
-        this.createExpensesChart();
-        this.createMarginChart();
-        this.createBusinessLinesChart();
-        this.setupEventListeners();
+    init: function(data) {
+        this.createTemporalChart(data.temporal_data);
+        this.createExpensesChart(data.expense_categories);
+        this.createServiceTypesChart(data.service_types);
+        this.createPaymentMethodsChart(data.payment_methods);
     },
 
-    createTemporalChart: function() {
+    destroy: function(chartId) {
+        if (this.instances[chartId]) {
+            this.instances[chartId].destroy();
+            delete this.instances[chartId];
+        }
+    },
+
+    createTemporalChart: function(data) {
         const ctx = document.getElementById('temporalChart');
-        if (!ctx) return;
+        if (!ctx || !data || data.length === 0) return;
 
-        window.dashboardUtils.destroyChart('temporal');
+        this.destroy('temporal');
 
-        const data = this.data.temporal_data;
-        
-        window.chartInstances.temporal = new Chart(ctx, {
+        this.instances.temporal = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.map(d => d.date),
+                labels: data.map(d => d.month),
                 datasets: [
                     {
-                        label: 'Revenue',
-                        data: data.map(d => window.dashboardUtils.parseFloatSafe(d.revenue)),
+                        label: 'Income',
+                        data: data.map(d => parseFloat(d.income) || 0),
                         borderColor: window.dashboardConfig.colors.success,
                         backgroundColor: window.dashboardConfig.colors.success + '20',
                         tension: 0.4,
@@ -33,7 +36,7 @@ window.dashboardCharts = {
                     },
                     {
                         label: 'Expenses',
-                        data: data.map(d => window.dashboardUtils.parseFloatSafe(d.expenses)),
+                        data: data.map(d => parseFloat(d.expenses) || 0),
                         borderColor: window.dashboardConfig.colors.danger,
                         backgroundColor: window.dashboardConfig.colors.danger + '20',
                         tension: 0.4,
@@ -41,7 +44,7 @@ window.dashboardCharts = {
                     },
                     {
                         label: 'Profit',
-                        data: data.map(d => window.dashboardUtils.parseFloatSafe(d.profit)),
+                        data: data.map(d => parseFloat(d.profit) || 0),
                         borderColor: window.dashboardConfig.colors.primary,
                         backgroundColor: window.dashboardConfig.colors.primary + '20',
                         tension: 0.4,
@@ -57,9 +60,6 @@ window.dashboardCharts = {
                         mode: 'index',
                         intersect: false,
                         callbacks: {
-                            title: function(context) {
-                                return context[0].label;
-                            },
                             label: function(context) {
                                 return context.dataset.label + ': ' + 
                                        window.dashboardUtils.formatCurrency(context.parsed.y);
@@ -75,21 +75,18 @@ window.dashboardCharts = {
         });
     },
 
-    createExpensesChart: function() {
+    createExpensesChart: function(data) {
         const ctx = document.getElementById('expensesChart');
-        if (!ctx) return;
+        if (!ctx || !data || data.length === 0) return;
 
-        window.dashboardUtils.destroyChart('expenses');
+        this.destroy('expenses');
 
-        const data = this.data.expenses_data;
-        if (!data || data.length === 0) return;
-
-        window.chartInstances.expenses = new Chart(ctx, {
+        this.instances.expenses = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: data.map(d => d.categoria),
+                labels: data.map(d => d.name),
                 datasets: [{
-                    data: data.map(d => window.dashboardUtils.parseFloatSafe(d.total)),
+                    data: data.map(d => parseFloat(d.total) || 0),
                     backgroundColor: window.dashboardUtils.generateColors(data.length)
                 }]
             },
@@ -102,7 +99,7 @@ window.dashboardCharts = {
                         callbacks: {
                             label: function(context) {
                                 const value = window.dashboardUtils.formatCurrency(context.parsed);
-                                const percentage = data[context.dataIndex].porcentaje;
+                                const percentage = parseFloat(data[context.dataIndex].percentage) || 0;
                                 return context.label + ': ' + value + 
                                        ' (' + window.dashboardUtils.formatPercentage(percentage) + ')';
                             }
@@ -113,39 +110,34 @@ window.dashboardCharts = {
         });
     },
 
-    createMarginChart: function() {
-        const ctx = document.getElementById('marginChart');
-        if (!ctx) return;
+    createServiceTypesChart: function(data) {
+        const ctx = document.getElementById('serviceTypesChart');
+        if (!ctx || !data || data.length === 0) return;
 
-        window.dashboardUtils.destroyChart('margin');
+        this.destroy('serviceTypes');
 
-        const data = this.data.temporal_data;
-        
-        window.chartInstances.margin = new Chart(ctx, {
+        this.instances.serviceTypes = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: data.map(d => d.date),
+                labels: data.map(d => d.name),
                 datasets: [{
-                    label: 'Margin (%)',
-                    data: data.map(d => {
-                        const revenue = window.dashboardUtils.parseFloatSafe(d.revenue);
-                        const profit = window.dashboardUtils.parseFloatSafe(d.profit);
-                        return revenue > 0 ? ((profit / revenue) * 100) : 0;
-                    }),
-                    backgroundColor: data.map(d => {
-                        const profit = window.dashboardUtils.parseFloatSafe(d.profit);
-                        return profit >= 0 ? window.dashboardConfig.colors.success : window.dashboardConfig.colors.danger;
-                    })
+                    label: 'Revenue',
+                    data: data.map(d => parseFloat(d.total_revenue) || 0),
+                    backgroundColor: window.dashboardConfig.colors.primary,
+                    borderRadius: 8
                 }]
             },
             options: {
                 ...window.dashboardConfig.chartDefaults,
+                indexAxis: 'y',
                 plugins: {
                     ...window.dashboardConfig.chartDefaults.plugins,
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return 'Margin: ' + window.dashboardUtils.formatPercentage(context.parsed.y);
+                                const value = window.dashboardUtils.formatCurrency(context.parsed.x);
+                                const count = data[context.dataIndex].service_count;
+                                return value + ' (' + count + ' services)';
                             }
                         }
                     }
@@ -154,21 +146,18 @@ window.dashboardCharts = {
         });
     },
 
-    createBusinessLinesChart: function() {
-        const ctx = document.getElementById('businessLinesChart');
-        if (!ctx) return;
+    createPaymentMethodsChart: function(data) {
+        const ctx = document.getElementById('paymentMethodsChart');
+        if (!ctx || !data || data.length === 0) return;
 
-        window.dashboardUtils.destroyChart('businessLines');
+        this.destroy('paymentMethods');
 
-        const data = this.data.business_lines_data;
-        if (!data || data.length === 0) return;
-
-        window.chartInstances.businessLines = new Chart(ctx, {
+        this.instances.paymentMethods = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: data.map(d => d.name),
+                labels: data.map(d => d.method),
                 datasets: [{
-                    data: data.map(d => window.dashboardUtils.parseFloatSafe(d.revenue)),
+                    data: data.map(d => parseFloat(d.total) || 0),
                     backgroundColor: window.dashboardUtils.generateColors(data.length)
                 }]
             },
@@ -181,59 +170,15 @@ window.dashboardCharts = {
                         callbacks: {
                             label: function(context) {
                                 const value = window.dashboardUtils.formatCurrency(context.parsed);
-                                const percentage = data[context.dataIndex].percentage;
+                                const percentage = parseFloat(data[context.dataIndex].percentage) || 0;
+                                const count = data[context.dataIndex].count;
                                 return context.label + ': ' + value + 
-                                       ' (' + window.dashboardUtils.formatPercentage(percentage) + ')';
+                                       ' (' + window.dashboardUtils.formatPercentage(percentage) + ', ' + count + ' transactions)';
                             }
                         }
                     }
                 }
             }
         });
-    },
-
-    setupEventListeners: function() {
-        window.dashboardUtils.setupFilterButtons('expenses', (period) => {
-            console.log('Filtering expenses by period:', period);
-        });
-
-        window.dashboardUtils.setupFilterButtons('business-lines', (period, level) => {
-            this.fetchBusinessLinesData(period, level);
-        });
-        
-        const levelFilter = document.getElementById('business-lines-level-filter');
-        if (levelFilter && !levelFilter.hasAttribute('data-initialized')) {
-            levelFilter.setAttribute('data-initialized', 'true');
-            levelFilter.addEventListener('change', () => {
-                const activeButton = document.querySelector('[data-chart="business-lines"].bg-blue-500');
-                const period = activeButton ? activeButton.dataset.period : '30';
-                this.fetchBusinessLinesData(period, levelFilter.value || null);
-            });
-        }
-    },
-
-    fetchBusinessLinesData: function(period, level) {
-        const params = new URLSearchParams();
-        if (period && period !== 'all') {
-            const days = { '30': 30, '90': 90, '365': 365 }[period];
-            if (days) {
-                const endDate = new Date();
-                const startDate = new Date();
-                startDate.setDate(endDate.getDate() - days);
-                params.append('start_date', startDate.toISOString().split('T')[0]);
-                params.append('end_date', endDate.toISOString().split('T')[0]);
-            }
-        }
-        if (level) {
-            params.append('level', level);
-        }
-
-        fetch(`/dashboard/api/business-lines/?${params.toString()}`)
-            .then(response => response.json())
-            .then(data => {
-                this.data.business_lines_data = data.business_lines_data;
-                this.createBusinessLinesChart();
-            })
-            .catch(error => console.error('Error fetching business lines data:', error));
     }
 };
