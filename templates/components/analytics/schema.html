@@ -1,0 +1,59 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MovingCompany",
+  "name": "{{ company_name }}",
+  "description": "{{ company_tagline }}",
+  "url": "{{ request.scheme }}://{{ request.get_host }}",
+  "logo": "{{ request.scheme }}://{{ request.get_host }}{% if company_logo %}{{ company_logo }}{% endif %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% if company_image %}{{ company_image }}{% endif %}",
+  "telephone": "{{ company_phone|default:'+61-8-1234-5678' }}",
+  "email": "{{ company_email|default:'info@westforce.com' }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ company_street|default:'' }}",
+    "addressLocality": "{{ company_city|default:'Perth' }}",
+    "addressRegion": "{{ company_state|default:'WA' }}",
+    "postalCode": "{{ company_postal_code|default:'' }}",
+    "addressCountry": "AU"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "{{ company_latitude|default:'-31.9505' }}",
+    "longitude": "{{ company_longitude|default:'115.8605' }}"
+  },
+  "priceRange": "$$",
+  "areaServed": {
+    "@type": "Country",
+    "name": "Australia"
+  },
+  "serviceArea": {
+    "@type": "GeoCircle",
+    "geoMidpoint": {
+      "@type": "GeoCoordinates",
+      "latitude": "{{ company_latitude|default:'-31.9505' }}",
+      "longitude": "{{ company_longitude|default:'115.8605' }}"
+    },
+    "geoRadius": "500000"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "08:00",
+      "closes": "18:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Saturday",
+      "opens": "09:00",
+      "closes": "14:00"
+    }
+  ],
+  "sameAs": [
+    {% if company_facebook %}"{{ company_facebook }}"{% endif %}
+    {% if company_instagram %}{% if company_facebook %},{% endif %}"{{ company_instagram }}"{% endif %}
+    {% if company_linkedin %}{% if company_facebook or company_instagram %},{% endif %}"{{ company_linkedin }}"{% endif %}
+  ]
+}
+</script>

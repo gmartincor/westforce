@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django.contrib.sitemaps',
     'apps.core',
     'apps.authentication',
     'apps.dashboard', 
@@ -71,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.core.context_processors.analytics_context',
             ],
         },
     },
@@ -152,6 +154,14 @@ LOGOUT_REDIRECT_URL = 'landing_page'
 
 COMPANY_NAME = config('COMPANY_NAME', default='Westforce Moving Company')
 COMPANY_TAGLINE = config('COMPANY_TAGLINE', default='Professional Australian Moving Company Management System')
+
+GOOGLE_ANALYTICS_ID = config('GOOGLE_ANALYTICS_ID', default='')
+GOOGLE_TAG_MANAGER_ID = config('GOOGLE_TAG_MANAGER_ID', default='')
+GOOGLE_ADS_ID = config('GOOGLE_ADS_ID', default='')
+GOOGLE_ADS_CONVERSION_ID = config('GOOGLE_ADS_CONVERSION_ID', default='')
+GOOGLE_ADS_PHONE_CONVERSION_LABEL = config('GOOGLE_ADS_PHONE_CONVERSION_LABEL', default='')
+GOOGLE_ADS_EMAIL_CONVERSION_LABEL = config('GOOGLE_ADS_EMAIL_CONVERSION_LABEL', default='')
+GOOGLE_ADS_QUOTE_CONVERSION_LABEL = config('GOOGLE_ADS_QUOTE_CONVERSION_LABEL', default='')
 
 # Messages framework settings
 from django.contrib.messages import constants as messages

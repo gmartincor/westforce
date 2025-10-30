@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://westforce.com/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+Disallow: /admin/
+Disallow: /static/admin/
+Disallow: /media/private/

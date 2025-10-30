@@ -1,0 +1,63 @@
+<script>
+{% if GOOGLE_ANALYTICS_ID or GOOGLE_TAG_MANAGER_ID %}
+window.trackConversion = function(action, category, label, value) {
+  if (typeof gtag !== 'undefined') {
+    gtag('event', action, {
+      'event_category': category,
+      'event_label': label,
+      'value': value
+    });
+  }
+};
+
+window.trackPhoneClick = function() {
+  trackConversion('phone_click', 'engagement', 'Phone Call CTA', 1);
+  {% if GOOGLE_ADS_CONVERSION_ID and GOOGLE_ADS_PHONE_CONVERSION_LABEL %}
+  gtag('event', 'conversion', {
+    'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_PHONE_CONVERSION_LABEL }}'
+  });
+  {% endif %}
+};
+
+window.trackEmailClick = function() {
+  trackConversion('email_click', 'engagement', 'Email CTA', 1);
+  {% if GOOGLE_ADS_CONVERSION_ID and GOOGLE_ADS_EMAIL_CONVERSION_LABEL %}
+  gtag('event', 'conversion', {
+    'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_EMAIL_CONVERSION_LABEL }}'
+  });
+  {% endif %}
+};
+
+window.trackQuoteRequest = function() {
+  trackConversion('quote_request', 'lead', 'Quote Form Submission', 10);
+  {% if GOOGLE_ADS_CONVERSION_ID and GOOGLE_ADS_QUOTE_CONVERSION_LABEL %}
+  gtag('event', 'conversion', {
+    'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_QUOTE_CONVERSION_LABEL }}',
+    'value': 10.0,
+    'currency': 'AUD'
+  });
+  {% endif %}
+};
+
+window.trackScroll = function(depth) {
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'scroll', {
+      'event_category': 'engagement',
+      'event_label': depth + '%',
+      'value': depth
+    });
+  }
+};
+
+let scrollTracked = {25: false, 50: false, 75: false, 100: false};
+window.addEventListener('scroll', function() {
+  const scrollPercent = Math.round((window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+  Object.keys(scrollTracked).forEach(function(depth) {
+    if (scrollPercent >= parseInt(depth) && !scrollTracked[depth]) {
+      scrollTracked[depth] = true;
+      trackScroll(depth);
+    }
+  });
+});
+{% endif %}
+</script>
