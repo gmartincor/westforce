@@ -127,22 +127,33 @@ class Company(TimeStampedModel):
 
     class Meta:
         verbose_name_plural = "Companies"
+        indexes = [
+            models.Index(fields=['abn'], name='invoicing_c_abn_idx'),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(current_number__gte=0),
+                name='current_number_non_negative'
+            ),
+        ]
 
 
 class Invoice(TimeStampedModel):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, db_index=True)
     reference = models.CharField(
         max_length=50,
         unique=True,
         null=True,
-        blank=True
+        blank=True,
+        db_index=True
     )
-    issue_date = models.DateField(default=date.today, verbose_name="Issue date")
+    issue_date = models.DateField(default=date.today, verbose_name="Issue date", db_index=True)
     due_date = models.DateField(
         null=True,
         blank=True,
         verbose_name="Due date",
-        help_text='Calculated from issue date and payment terms'
+        help_text='Calculated from issue date and payment terms',
+        db_index=True
     )
     
     client_type = models.CharField(
@@ -150,12 +161,13 @@ class Invoice(TimeStampedModel):
         choices=CLIENT_TYPES,
         verbose_name="Client type"
     )
-    client_name = models.CharField(max_length=200, verbose_name="Client name")
+    client_name = models.CharField(max_length=200, verbose_name="Client name", db_index=True)
     client_abn = models.CharField(
         max_length=14,
         blank=True,
         verbose_name="Client ABN",
-        help_text='Required for business clients'
+        help_text='Required for business clients',
+        db_index=True
     )
     client_address = models.TextField(verbose_name="Client address")
     
@@ -163,7 +175,8 @@ class Invoice(TimeStampedModel):
         max_length=20,
         choices=INVOICE_STATUS,
         default='DRAFT',
-        verbose_name="Status"
+        verbose_name="Status",
+        db_index=True
     )
     payment_terms = models.TextField(
         default="Payment due within 30 days",
@@ -317,13 +330,32 @@ class Invoice(TimeStampedModel):
         ordering = ['-issue_date', '-id']
         verbose_name = "Invoice"
         verbose_name_plural = "Invoices"
+        indexes = [
+            models.Index(fields=['company', 'status'], name='invoicing_i_company_status_idx'),
+            models.Index(fields=['issue_date', 'status'], name='invoicing_i_issue_status_idx'),
+            models.Index(fields=['client_abn', 'status'], name='invoicing_i_abn_status_idx'),
+            models.Index(fields=['-issue_date', '-id'], name='invoicing_i_issue_id_desc_idx'),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(
+                    models.Q(client_type='INDIVIDUAL') | models.Q(client_abn__gt=''),
+                ),
+                name='client_abn_required_for_business'
+            ),
+            models.CheckConstraint(
+                check=models.Q(due_date__gte=models.F('issue_date')),
+                name='due_date_after_issue_date'
+            ),
+        ]
 
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey(
         'Invoice',
         on_delete=models.CASCADE,
-        related_name='items'
+        related_name='items',
+        db_index=True
     )
     description = models.TextField(verbose_name="Description")
     quantity = models.PositiveIntegerField(default=1, verbose_name="Quantity")
@@ -365,3 +397,13 @@ class InvoiceItem(models.Model):
     class Meta:
         verbose_name = "Invoice item"
         verbose_name_plural = "Invoice items"
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(quantity__gt=0),
+                name='quantity_positive'
+            ),
+            models.CheckConstraint(
+                check=models.Q(unit_price__gt=0),
+                name='unit_price_positive'
+            ),
+        ]
