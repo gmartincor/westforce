@@ -13,23 +13,30 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--username', type=str, help='Username for the manager')
         parser.add_argument('--email', type=str, help='Email for the manager')
+        parser.add_argument('--password', type=str, help='Password for the manager')
+        parser.add_argument('--first-name', type=str, help='First name', default='')
+        parser.add_argument('--last-name', type=str, help='Last name', default='')
+        parser.add_argument('--phone', type=str, help='Phone number', default='')
+        parser.add_argument('--position', type=str, help='Position', default='')
         parser.add_argument('--company-name', type=str, help='Company name', default='Westforce Moving Company')
 
     def handle(self, *args, **options):
         username = options.get('username') or input('Username: ')
         email = options.get('email') or input('Email: ')
-        first_name = input('First name: ')
-        last_name = input('Last name: ')
-        phone = input('Phone (optional): ')
-        position = input('Position (optional): ')
+        first_name = options.get('first_name') or input('First name: ')
+        last_name = options.get('last_name') or input('Last name: ')
+        phone = options.get('phone') or input('Phone (optional): ')
+        position = options.get('position') or input('Position (optional): ')
         company_name = options.get('company_name') or input(f'Company name [Westforce Moving Company]: ') or 'Westforce Moving Company'
         
-        password = getpass.getpass('Password: ')
-        password_confirm = getpass.getpass('Confirm password: ')
-        
-        if password != password_confirm:
-            self.stdout.write(self.style.ERROR('Passwords do not match'))
-            return
+        password = options.get('password')
+        if not password:
+            password = getpass.getpass('Password: ')
+            password_confirm = getpass.getpass('Confirm password: ')
+            
+            if password != password_confirm:
+                self.stdout.write(self.style.ERROR('Passwords do not match'))
+                return
 
         try:
             with transaction.atomic():

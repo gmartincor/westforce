@@ -28,7 +28,8 @@ FROM python:3.12.7-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PORT=8000
+    PORT=8000 \
+    DJANGO_SETTINGS_MODULE=config.settings.production
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
@@ -46,20 +47,11 @@ RUN pip install --no-cache /wheels/*
 COPY . .
 COPY --from=css-builder /build/static/css/style.css ./static/css/
 
-RUN mkdir -p static_collected media logs && \
-    chmod +x scripts/*.sh
+RUN mkdir -p static_collected media logs /tmp && \
+    chmod +x scripts/docker-entrypoint.sh
+
+RUN python manage.py collectstatic --noinput --clear
 
 EXPOSE 8000
 
-CMD gunicorn \
-    --bind 0.0.0.0:$PORT \
-    --workers 3 \
-    --worker-class sync \
-    --max-requests 1000 \
-    --max-requests-jitter 100 \
-    --timeout 120 \
-    --keep-alive 5 \
-    --log-level info \
-    --access-logfile - \
-    --error-logfile - \
-    config.wsgi:application
+ENTRYPOINT ["scripts/docker-entrypoint.sh"]
