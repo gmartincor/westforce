@@ -18,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument('--last-name', type=str, help='Last name', default='')
         parser.add_argument('--phone', type=str, help='Phone number', default='')
         parser.add_argument('--position', type=str, help='Position', default='')
-        parser.add_argument('--company-name', type=str, help='Company name', default='Westforce Moving Company')
+        parser.add_argument('--company-name', type=str, help='Company name', default='Westforce Removals Company')
 
     def handle(self, *args, **options):
         username = options.get('username') or input('Username: ')
@@ -27,7 +27,7 @@ class Command(BaseCommand):
         last_name = options.get('last_name') or input('Last name: ')
         phone = options.get('phone') or input('Phone (optional): ')
         position = options.get('position') or input('Position (optional): ')
-        company_name = options.get('company_name') or input(f'Company name [Westforce Moving Company]: ') or 'Westforce Moving Company'
+        company_name = options.get('company_name') or input(f'Company name [Westforce Removals Company]: ') or 'Westforce Removals Company'
         
         password = options.get('password')
         if not password:

@@ -35,8 +35,9 @@ class User(AbstractUser):
     
     company_name = models.CharField(
         max_length=200,
-        default="Westforce Moving Company",
-        verbose_name="Company name"
+        verbose_name="Company name",
+        default="Westforce Removals Company",
+        blank=True
     )
     
     is_active = models.BooleanField(

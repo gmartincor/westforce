@@ -4,8 +4,11 @@ from django.conf import settings
 from apps.core.services.seeders import DevDataSeeder
 
 
+from django.core.management.base import BaseCommand
+
+
 class Command(BaseCommand):
-    help = 'Seeds development database with realistic test data for Australian moving company'
+    help = 'Seeds development database with realistic test data for Australian removals company'
 
     def add_arguments(self, parser):
         parser.add_argument(

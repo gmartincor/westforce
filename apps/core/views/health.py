@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from django.db import connection
 from django.conf import settings
-import traceback
 
 
 def health_check(request):
@@ -9,35 +8,31 @@ def health_check(request):
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
         
-        ct_status = "unknown"
-        try:
-            from django.contrib.contenttypes.models import ContentType
-            ct_count = ContentType.objects.count()
-            ct_status = f"OK: {ct_count} content types"
-        except Exception as e:
-            ct_status = f"ERROR: {e}"
-        
-        auth_status = "unknown"
-        try:
-            from apps.authentication.models import User
-            user_count = User.objects.count()
-            auth_status = f"OK: {user_count} users"
-        except Exception as e:
-            auth_status = f"ERROR: {e}"
-        
-        return JsonResponse({
+        response_data = {
             "status": "healthy",
-            "environment": getattr(settings, 'ENVIRONMENT', 'unknown'),
-            "debug": settings.DEBUG,
-            "database": "OK",
-            "content_types": ct_status,
-            "authentication": auth_status,
-            "app_name": "Westforce"
-        })
+            "app": "Westforce",
+            "database": "connected"
+        }
+        
+        if settings.DEBUG:
+            try:
+                from django.contrib.contenttypes.models import ContentType
+                ct_count = ContentType.objects.count()
+                response_data["content_types"] = str(ct_count)
+            except Exception as e:
+                response_data["content_types_error"] = str(e)
+            
+            try:
+                from apps.authentication.models import User
+                user_count = User.objects.count()
+                response_data["users"] = str(user_count)
+            except Exception as e:
+                response_data["users_error"] = str(e)
+        
+        return JsonResponse(response_data)
     
     except Exception as e:
         return JsonResponse({
-            "status": "error",
-            "error": str(e),
-            "traceback": traceback.format_exc() if settings.DEBUG else None
+            "status": "unhealthy",
+            "error": "Database connection failed" if not settings.DEBUG else str(e)
         }, status=500)

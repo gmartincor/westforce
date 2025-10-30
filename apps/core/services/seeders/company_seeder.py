@@ -12,9 +12,8 @@ class CompanySeeder(BaseSeeder):
             return
         
         company = Company.objects.create(
-            legal_form='PTY_LTD',
-            business_name='Westforce Moving Company',
-            legal_name='Westforce Moving Company Pty Ltd',
+            business_name='Westforce Removals Company',
+            legal_name='Westforce Removals Company Pty Ltd',
             abn='51234567890',
             acn='123456789',
             gst_registered=True,

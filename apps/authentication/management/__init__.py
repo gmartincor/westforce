@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Command(BaseCommand):
-    help = 'Create test users for Westforce Moving Company'
+    help = 'Create test users for Westforce Removals Company'
 
     def handle(self, *args, **options):
         # Delete existing users first
@@ -47,7 +47,7 @@ class Command(BaseCommand):
         
         self.stdout.write(
             self.style.SUCCESS(
-                f'Successfully created users for Westforce Moving Company:\n'
+                f'Successfully created users for Westforce Removals Company:\n'
                 f'- admin (password: admin123) - System Administrator\n'
                 f'- james.turner (password: manager123) - Operations Manager\n'
                 f'- sarah.mitchell (password: finance123) - Finance Coordinator'

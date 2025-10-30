@@ -26,11 +26,6 @@ if isinstance(allowed_hosts_str, str):
 else:
     ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
-if DEBUG:
-    ALLOWED_HOSTS.extend(['*'])
-else:
-    ALLOWED_HOSTS.extend(['westforce.com', 'www.westforce.com'])
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -86,7 +81,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='westforce_moving'),
+        'NAME': config('DB_NAME', default='westforce_removals'),
         'USER': config('DB_USER', default='westforce'),
         'PASSWORD': config('DB_PASSWORD', default='westforce123'),
         'HOST': config('DB_HOST', default='localhost'),
@@ -152,8 +147,8 @@ LOGIN_URL = 'authentication:login'
 LOGIN_REDIRECT_URL = 'dashboard:home'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
-COMPANY_NAME = config('COMPANY_NAME', default='Westforce Moving Company')
-COMPANY_TAGLINE = config('COMPANY_TAGLINE', default='Professional Australian Moving Company Management System')
+COMPANY_NAME = config('COMPANY_NAME', default='Westforce Removals Company')
+COMPANY_TAGLINE = config('COMPANY_TAGLINE', default='Professional Australian Removals Company Management System')
 
 GOOGLE_ANALYTICS_ID = config('GOOGLE_ANALYTICS_ID', default='')
 GOOGLE_TAG_MANAGER_ID = config('GOOGLE_TAG_MANAGER_ID', default='')

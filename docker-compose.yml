@@ -5,7 +5,7 @@ services:
     image: postgres:15-alpine
     container_name: westforce-postgres
     environment:
-      POSTGRES_DB: ${DB_NAME:-westforce_moving}
+      POSTGRES_DB: ${DB_NAME:-westforce_removals}
       POSTGRES_USER: ${DB_USER:-westforce}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-westforce123}
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -16,7 +16,7 @@ services:
     networks:
       - app_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-westforce} -d ${DB_NAME:-westforce_moving}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-westforce} -d ${DB_NAME:-westforce_removals}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,15 +34,15 @@ services:
       SECRET_KEY: ${SECRET_KEY:-django-insecure-development-key}
       DEBUG: "${DEBUG:-True}"
       ENVIRONMENT: ${ENVIRONMENT:-development}
-      DB_NAME: ${DB_NAME:-westforce_moving}
+      DB_NAME: ${DB_NAME:-westforce_removals}
       DB_USER: ${DB_USER:-westforce}
       DB_PASSWORD: ${DB_PASSWORD:-westforce123}
       DB_HOST: postgres
       DB_PORT: 5432
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,westforce.com,www.westforce.com,web}
       PORT: 8000
-      COMPANY_NAME: ${COMPANY_NAME:-Westforce Moving Company}
-      COMPANY_TAGLINE: ${COMPANY_TAGLINE:-Professional Australian Moving Company Management System}
+      COMPANY_NAME: ${COMPANY_NAME:-Westforce Removals Company}
+      COMPANY_TAGLINE: ${COMPANY_TAGLINE:-Professional Australian Removals Company Management System}
       GOOGLE_ANALYTICS_ID: ${GOOGLE_ANALYTICS_ID:-}
       GOOGLE_TAG_MANAGER_ID: ${GOOGLE_TAG_MANAGER_ID:-}
       GOOGLE_ADS_ID: ${GOOGLE_ADS_ID:-}

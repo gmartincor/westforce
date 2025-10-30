@@ -84,23 +84,19 @@ class IncomeViewsTestCase(TestCase):
         self.assertContains(response, 'Test Client')
 
 
-def validate_moving_company_setup():
+def validate_removals_company_setup():
     try:
         service_types = [choice[0] for choice in ServiceTypeChoices.choices]
         expected_types = ['local', 'interstate', 'international', 'storage', 'packing', 'cleaning']
         
-        if all(service_type in service_types for service_type in expected_types):
-            print("✅ Moving service types configured")
+        service_types_valid = all(service_type in service_types for service_type in expected_types)
         
         payment_methods = [choice[0] for choice in PaymentMethodChoices.choices]
         australian_methods = ['CARD', 'CASH', 'BANK_TRANSFER', 'EFTPOS']
         
-        if all(method in payment_methods for method in australian_methods):
-            print("✅ Australian payment methods configured")
+        payment_methods_valid = all(method in payment_methods for method in australian_methods)
         
-        print("✅ Moving company setup validation passed")
-        return True
+        return service_types_valid and payment_methods_valid
         
-    except Exception as e:
-        print(f"❌ Validation error: {e}")
+    except Exception:
         return False

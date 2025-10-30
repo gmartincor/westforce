@@ -61,10 +61,6 @@ scripts/production_to_dev_workflow.sh
 scripts/sync_production_db.sh
 scripts/verify_safety.sh
 
-# Render configuration with secrets
-render.yaml
-render.yml
-
 # Security: Nunca commitear archivos de producción
 .env.production.*
 *.production.env

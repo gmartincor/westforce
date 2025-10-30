@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: westforce-web
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    region: oregon
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /health/
+    
+    domains:
+      - westforce.com
+      - www.westforce.com
+    
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      
+      - key: ENVIRONMENT
+        value: production
+      
+      - key: SECRET_KEY
+        generateValue: true
+      
+      - key: ALLOWED_HOSTS
+        value: westforce.com,www.westforce.com,westforce-web.onrender.com
+      
+      - key: DATABASE_URL
+        value: postgresql://westforce_user:Ol9d6aF3hzqdcqaaSGvIGCZocGkYzMQ7@dpg-d41v1rf5r7bs73e23mc0-a/westforce
+      
+      - key: COMPANY_NAME
+        value: Westforce Removals Company
+      
+      - key: COMPANY_TAGLINE
+        value: Professional Australian Removals Company Management System

@@ -1,4 +1,4 @@
-# Westforce - Australian Moving Company Management System
+# Westforce - Australian Removals Company Management System
 
 A comprehensive ERP system designed for single company management with hierarchical business lines, professional invoicing, and complete data portability.
 
@@ -236,4 +236,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Developed with ❤️ for Australian moving companies**
+**Developed with ❤️ for Australian removals companies**
