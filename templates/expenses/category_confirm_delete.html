@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Eliminar Categoría - Westforce{% endblock %}
+{% block title %}Delete Category - Westforce{% endblock %}
 
 {% block breadcrumb %}
 {{ block.super }}
@@ -9,7 +9,7 @@
         <svg class="flex-shrink-0 w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
         </svg>
-        <a href="{% url 'expenses:categories' %}" class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Gastos</a>
+        <a href="{% url 'expenses:categories' %}" class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Expenses</a>
     </div>
 </li>
 <li>
@@ -17,15 +17,15 @@
         <svg class="flex-shrink-0 w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
         </svg>
-        <span class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400">Eliminar Categoría</span>
+        <span class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400">Delete Category</span>
     </div>
 </li>
 {% endblock %}
 
 {% block page_header %}
 <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Eliminar Categoría</h1>
-    <p class="mt-2 text-gray-600 dark:text-gray-400">Confirme la eliminación de la categoría</p>
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Delete Category</h1>
+    <p class="mt-2 text-gray-600 dark:text-gray-400">Confirm the deletion of the category</p>
 </div>
 {% endblock %}
 
@@ -39,35 +39,35 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.632 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                     </svg>
                 </div>
-                <h3 class="ml-3 text-lg font-medium text-red-800 dark:text-red-200">¡Atención!</h3>
+                <h3 class="ml-3 text-lg font-medium text-red-800 dark:text-red-200">Warning!</h3>
             </div>
         </div>
         
         <div class="p-6">
             <div class="mb-6">
                 <p class="text-gray-900 dark:text-white text-lg mb-4">
-                    ¿Está seguro que desea eliminar la categoría 
+                    Are you sure you want to delete the category 
                     <strong>"{{ object.name }}"</strong>?
                 </p>
                 
                 <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Nombre:</span>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Name:</span>
                             <span class="text-sm text-gray-900 dark:text-white">{{ object.name }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Tipo:</span>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Type:</span>
                             <span class="text-sm text-gray-900 dark:text-white">{{ object.get_category_type_display }}</span>
                         </div>
                         {% if object.description %}
                         <div class="flex justify-between">
-                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Descripción:</span>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Description:</span>
                             <span class="text-sm text-gray-900 dark:text-white">{{ object.description }}</span>
                         </div>
                         {% endif %}
                         <div class="flex justify-between">
-                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Gastos asociados:</span>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Associated expenses:</span>
                             <span class="text-sm text-gray-900 dark:text-white">{{ expense_count }}</span>
                         </div>
                     </div>
@@ -83,12 +83,12 @@
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                                No se puede eliminar esta categoría
+                                This category cannot be deleted
                             </h3>
                             <div class="mt-2 text-sm text-red-700 dark:text-red-300">
                                 <p>
-                                    Esta categoría tiene {{ expense_count }} gasto{{ expense_count|pluralize }} asociado{{ expense_count|pluralize }}.
-                                    Para eliminarla, primero debe reasignar o eliminar todos los gastos de esta categoría.
+                                    This category has {{ expense_count }} associated expense{{ expense_count|pluralize }}.
+                                    To delete it, you must first reassign or delete all expenses in this category.
                                 </p>
                             </div>
                         </div>
@@ -104,10 +104,10 @@
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                                Esta acción no se puede deshacer
+                                This action cannot be undone
                             </h3>
                             <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                                <p>Una vez eliminada, la categoría no podrá ser recuperada.</p>
+                                <p>Once deleted, the category cannot be recovered.</p>
                             </div>
                         </div>
                     </div>
@@ -119,27 +119,27 @@
             <div class="flex justify-end space-x-3">
                 <a href="{% url 'expenses:categories' %}" 
                    class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg transition-colors font-medium">
-                    Cancelar
+                    Cancel
                 </a>
                 {% if expense_count == 0 %}
                 <form method="post" class="inline">
                     {% csrf_token %}
                     <button type="submit" 
                             class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                        Eliminar Categoría
+                        Delete Category
                     </button>
                 </form>
                 {% else %}
                 <a href="{% url 'expenses:by-category' object.slug %}" 
                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                    Ver Gastos de esta Categoría
+                    View Expenses in this Category
                 </a>
                 <form method="post" class="inline">
                     {% csrf_token %}
                     <button type="submit" 
                             class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
-                            onclick="return confirm('Esta categoría tiene {{ expense_count }} gasto(s) asociado(s). ¿Está seguro de eliminarla? Esto también eliminará todos los gastos asociados.')">
-                        Eliminar de Todas Formas
+                            onclick="return confirm('This category has {{ expense_count }} associated expense(s). Are you sure you want to delete it? This will also delete all associated expenses.')">
+                        Delete Anyway
                     </button>
                 </form>
                 {% endif %}
