@@ -1,8 +1,6 @@
-.PHONY: help dev prod build clean test logs status restart migrate makemigrations shell superuser seed seed-flush
+.PHONY: help dev prod build clean test logs status restart migrate makemigrations shell superuser seed seed-flush mcp-setup deploy-logs deploy-status
 
 COMPOSE := docker-compose
-COMPOSE_FILE := docker-compose.yml
-ENV_FILE_DEV := .env.dev-with-prod-db
 
 help:
 	@echo "🐳 Westforce Commands:"
@@ -12,6 +10,11 @@ help:
 	@echo "  build        - Rebuild images"
 	@echo "  clean        - Clean containers and volumes"
 	@echo "  restart      - Restart services"
+	@echo ""
+	@echo "RENDER MCP:"
+	@echo "  mcp-setup    - Configure Render MCP"
+	@echo "  deploy-logs  - View latest deploy logs"
+	@echo "  deploy-status - Service status"
 	@echo ""
 	@echo "DATABASE:"
 	@echo "  migrate      - Run migrations"
@@ -29,34 +32,43 @@ help:
 
 dev:
 	@echo "🚀 Starting development environment..."
-	@docker-compose --env-file $(ENV_FILE_DEV) up --remove-orphans
+	@$(COMPOSE) up --remove-orphans
 
 prod:
 	@echo "🏭 Starting production environment..."
-	@DJANGO_SETTINGS_MODULE=config.settings.production docker-compose up --remove-orphans
+	@DJANGO_SETTINGS_MODULE=config.settings.production $(COMPOSE) up --remove-orphans
 
 build:
 	@echo "🔨 Rebuilding images..."
-	@docker-compose build --no-cache
+	@$(COMPOSE) build --no-cache
 
 clean:
 	@echo "🧹 Cleaning containers and volumes..."
-	@docker-compose down -v --remove-orphans
+	@$(COMPOSE) down -v --remove-orphans
 	@docker system prune -f
 
 restart:
 	@echo "🔄 Restarting services..."
-	@docker-compose restart
+	@$(COMPOSE) restart
 
 test:
 	@echo "🧪 Running tests..."
-	@docker-compose exec web python manage.py test
+	@$(COMPOSE) exec web python manage.py test
 
 logs:
-	@docker-compose logs -f web
+	@$(COMPOSE) logs -f web
 
 status:
-	@docker-compose ps
+	@$(COMPOSE) ps
+
+mcp-setup:
+	@./scripts/setup-mcp.sh
+
+deploy-logs:
+	@./scripts/render-deploy-logs.sh
+
+deploy-status:
+	@./scripts/render-service-status.sh
 
 migrate:
 	@echo "🔄 Running migrations..."
