@@ -50,8 +50,6 @@ COPY --from=css-builder /build/static/css/style.css ./static/css/
 RUN mkdir -p static_collected media logs /tmp && \
     chmod +x scripts/docker-entrypoint.sh
 
-RUN python manage.py collectstatic --noinput --clear
-
 EXPOSE 8000
 
 ENTRYPOINT ["scripts/docker-entrypoint.sh"]

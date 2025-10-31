@@ -35,3 +35,21 @@ services:
       
       - key: COMPANY_TAGLINE
         value: Professional Australian Removals Company Management System
+      
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      
+      - key: EMAIL_PORT
+        value: 587
+      
+      - key: EMAIL_USE_TLS
+        value: true
+      
+      - key: EMAIL_HOST_USER
+        value: ""
+      
+      - key: EMAIL_HOST_PASSWORD
+        value: ""
+      
+      - key: DEFAULT_FROM_EMAIL
+        value: noreply@westforce.com
