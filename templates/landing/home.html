@@ -1,0 +1,524 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional moving and removalist services in Perth, Western Australia. Local and interstate relocations with expert care. Get your free quote today.">
+    <meta name="keywords" content="movers Perth, removalists Perth, moving company Perth, furniture removals, interstate movers WA">
+    
+    <title>Westforce Removals - Professional Moving Services Perth | Local & Interstate Movers</title>
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body class="antialiased bg-white">
+    
+    <header id="main-header" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img src="{% static 'images/landing/logo/Company_logo.jpeg' %}" alt="Westforce Removals Logo" class="h-12 w-auto">
+                    </a>
+                </div>
+                
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">About</a>
+                    <a href="#services" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">Services</a>
+                    <a href="#locations" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">Locations</a>
+                    <a href="tel:+61892345678" class="flex items-center text-primary-900 hover:text-accent-600 font-semibold transition-colors">
+                        <i class="fas fa-phone mr-2"></i>
+                        <span>(08) 9234 5678</span>
+                    </a>
+                    <a href="#quote" class="bg-accent-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md hover:shadow-lg">
+                        Get a Quote
+                    </a>
+                </nav>
+                
+                <button id="mobile-menu-btn" class="md:hidden text-gray-700 hover:text-primary-900">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-4 py-4 space-y-3">
+                <a href="#about" class="block text-gray-700 hover:text-primary-900 font-medium py-2">About</a>
+                <a href="#services" class="block text-gray-700 hover:text-primary-900 font-medium py-2">Services</a>
+                <a href="#locations" class="block text-gray-700 hover:text-primary-900 font-medium py-2">Locations</a>
+                <a href="tel:+61892345678" class="block text-primary-900 font-semibold py-2">
+                    <i class="fas fa-phone mr-2"></i>(08) 9234 5678
+                </a>
+                <a href="#quote" class="block bg-accent-500 text-white text-center px-6 py-3 rounded-lg font-semibold hover:bg-accent-600">
+                    Get a Quote
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-20">
+        
+        <section id="hero" class="relative bg-primary-900 text-white overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <img src="{% static 'images/landing/hero/View-of-Perth-City-as-seen-from-Kings-Park.jpg' %}" alt="Perth City View" class="w-full h-full object-cover opacity-40">
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-900 to-primary-900/80"></div>
+            </div>
+            
+            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 lg:py-40">
+                <div class="max-w-3xl">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in-up">
+                        Perth's Trusted
+                        <span class="text-accent-400">Moving Experts</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed animate-fade-in-up">
+                        Professional local and interstate removalist services across Western Australia. Safe, reliable, and stress-free moves for homes and offices.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 animate-fade-in-up">
+                        <a href="#quote" class="bg-accent-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-accent-600 transition-all shadow-lg hover:shadow-xl inline-flex items-center justify-center">
+                            <i class="fas fa-clipboard-list mr-2"></i>
+                            Get Free Quote
+                        </a>
+                        <a href="tel:+61892345678" class="bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white/20 transition-all border-2 border-white/30 inline-flex items-center justify-center">
+                            <i class="fas fa-phone mr-2"></i>
+                            Call Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-16 md:py-24 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-primary-900 mb-6">
+                            Your Trusted Moving Partner in Perth
+                        </h2>
+                        <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+                            At Westforce Removals, we understand that moving can be stressful. That's why we're dedicated to providing professional, reliable, and personalized moving services across Perth and Western Australia.
+                        </p>
+                        <p class="text-lg text-gray-700 mb-8 leading-relaxed">
+                            With years of experience in the removalist industry, our expert team handles every move with care and precision, ensuring your belongings arrive safely at their destination.
+                        </p>
+                        
+                        <div class="grid grid-cols-2 gap-6 mb-8">
+                            <div class="text-center p-6 bg-white rounded-lg shadow-soft">
+                                <div class="text-4xl font-bold text-accent-500 mb-2">10+</div>
+                                <div class="text-gray-600 font-medium">Years Experience</div>
+                            </div>
+                            <div class="text-center p-6 bg-white rounded-lg shadow-soft">
+                                <div class="text-4xl font-bold text-accent-500 mb-2">1000+</div>
+                                <div class="text-gray-600 font-medium">Happy Customers</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            <div class="bg-primary-900 text-white p-6 rounded-lg shadow-lg">
+                                <i class="fas fa-shield-alt text-3xl text-accent-400 mb-3"></i>
+                                <h3 class="font-semibold text-lg mb-2">Fully Insured</h3>
+                                <p class="text-sm text-gray-300">Complete protection for your peace of mind</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-soft border border-gray-200">
+                                <i class="fas fa-award text-3xl text-accent-500 mb-3"></i>
+                                <h3 class="font-semibold text-lg mb-2 text-primary-900">Professional Team</h3>
+                                <p class="text-sm text-gray-600">Trained and experienced movers</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4 pt-8">
+                            <div class="bg-accent-500 text-white p-6 rounded-lg shadow-lg">
+                                <i class="fas fa-clock text-3xl text-white mb-3"></i>
+                                <h3 class="font-semibold text-lg mb-2">On-Time Service</h3>
+                                <p class="text-sm text-accent-100">Always punctual and reliable</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-soft border border-gray-200">
+                                <i class="fas fa-tag text-3xl text-accent-500 mb-3"></i>
+                                <h3 class="font-semibold text-lg mb-2 text-primary-900">Fair Pricing</h3>
+                                <p class="text-sm text-gray-600">Transparent, competitive rates</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
+                        Our Moving Services
+                    </h2>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                        Comprehensive removalist solutions tailored to your needs
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-brand-lg transition-all duration-300 group">
+                        <div class="bg-accent-50 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent-500 transition-colors">
+                            <i class="fas fa-home text-3xl text-accent-500 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">Local Moves</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            Professional moving services across Perth metropolitan area. Quick, efficient, and affordable local relocations.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Same-day service available</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Professional packing materials</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Furniture disassembly & assembly</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-brand-lg transition-all duration-300 group">
+                        <div class="bg-primary-50 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary-900 transition-colors">
+                            <i class="fas fa-truck text-3xl text-primary-900 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">Interstate Moves</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            Seamless relocations across Australia. Reliable interstate moving with real-time tracking.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Door-to-door service</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Secure storage options</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Insurance coverage</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-brand-lg transition-all duration-300 group">
+                        <div class="bg-accent-50 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent-500 transition-colors">
+                            <i class="fas fa-building text-3xl text-accent-500 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">Office Relocations</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            Minimize downtime with our efficient commercial moving services. Expert handling of office equipment.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>After-hours moving available</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>IT equipment handling</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Minimal business disruption</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-brand-lg transition-all duration-300 group">
+                        <div class="bg-primary-50 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary-900 transition-colors">
+                            <i class="fas fa-box text-3xl text-primary-900 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">Packing Services</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            Professional packing and unpacking services to protect your valuables during transit.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Quality packing materials</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Fragile item specialists</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Unpacking assistance</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-brand-lg transition-all duration-300 group">
+                        <div class="bg-accent-50 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent-500 transition-colors">
+                            <i class="fas fa-warehouse text-3xl text-accent-500 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">Storage Solutions</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            Secure, climate-controlled storage facilities for short and long-term needs.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>From $200/month</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>24/7 security monitoring</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Flexible access options</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-brand-lg transition-all duration-300 group">
+                        <div class="bg-primary-50 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary-900 transition-colors">
+                            <i class="fas fa-couch text-3xl text-primary-900 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">Furniture Removals</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            Specialized handling of furniture, antiques, and valuable items with expert care.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Piano & heavy item specialists</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>Protective wrapping & blankets</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-accent-500 mt-1 mr-2"></i>
+                                <span>White glove service</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="locations" class="py-16 md:py-24 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
+                        Service Areas Across Perth
+                    </h2>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                        Proudly serving metropolitan Perth and surrounding regions
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-white rounded-lg shadow-soft p-6 border border-gray-200">
+                        <h3 class="text-xl font-bold text-primary-900 mb-4">North Perth</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Joondalup
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Wanneroo
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Stirling
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Balcatta
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-soft p-6 border border-gray-200">
+                        <h3 class="text-xl font-bold text-primary-900 mb-4">South Perth</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Fremantle
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Rockingham
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Mandurah
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Kwinana
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-soft p-6 border border-gray-200">
+                        <h3 class="text-xl font-bold text-primary-900 mb-4">East Perth</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Midland
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Kalamunda
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Armadale
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-accent-500 mr-3"></i>
+                                Forrestfield
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-primary-900 rounded-2xl p-8 md:p-12 text-white text-center">
+                    <h3 class="text-2xl md:text-3xl font-bold mb-4">Don't see your suburb listed?</h3>
+                    <p class="text-lg text-gray-300 mb-6">
+                        We service all Perth metropolitan areas and can arrange interstate moves across Australia.
+                    </p>
+                    <a href="#quote" class="bg-accent-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-accent-600 transition-all inline-block shadow-lg">
+                        Get a Custom Quote
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        {% include 'landing/components/quote-form.html' %}
+
+    </main>
+
+    <footer class="bg-primary-900 text-white pt-12 pb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <img src="{% static 'images/landing/logo/Company_logo.jpeg' %}" alt="Westforce Removals" class="h-12 mb-4 brightness-0 invert">
+                    <p class="text-gray-300 mb-4">
+                        Perth's trusted removalist service for professional, reliable moves.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-accent-400 transition-colors">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-accent-400 transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-accent-400 transition-colors">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Services</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#services" class="hover:text-accent-400 transition-colors">Local Moves</a></li>
+                        <li><a href="#services" class="hover:text-accent-400 transition-colors">Interstate Moves</a></li>
+                        <li><a href="#services" class="hover:text-accent-400 transition-colors">Office Relocations</a></li>
+                        <li><a href="#services" class="hover:text-accent-400 transition-colors">Packing Services</a></li>
+                        <li><a href="#services" class="hover:text-accent-400 transition-colors">Storage Solutions</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Company</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#about" class="hover:text-accent-400 transition-colors">About Us</a></li>
+                        <li><a href="#locations" class="hover:text-accent-400 transition-colors">Service Areas</a></li>
+                        <li><a href="#quote" class="hover:text-accent-400 transition-colors">Get a Quote</a></li>
+                        <li><a href="#" class="hover:text-accent-400 transition-colors">Testimonials</a></li>
+                        <li><a href="#" class="hover:text-accent-400 transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-phone mt-1 mr-3 text-accent-400"></i>
+                            <a href="tel:+61892345678" class="hover:text-accent-400 transition-colors">(08) 9234 5678</a>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-3 text-accent-400"></i>
+                            <a href="mailto:info@westforceremovals.com.au" class="hover:text-accent-400 transition-colors">info@westforceremovals.com.au</a>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-accent-400"></i>
+                            <span>Perth, Western Australia</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-clock mt-1 mr-3 text-accent-400"></i>
+                            <span>Mon-Sat: 7am - 6pm<br>Sun: By appointment</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-6">
+                <div class="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
+                    <p>&copy; 2024 Westforce Removals. All rights reserved.</p>
+                    <div class="flex space-x-6 mt-4 md:mt-0">
+                        <a href="#" class="hover:text-accent-400 transition-colors">Privacy Policy</a>
+                        <a href="#" class="hover:text-accent-400 transition-colors">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/quote-form.js' %}"></script>
+    <script>
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerOffset = 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+            });
+        });
+
+        let lastScroll = 0;
+        const header = document.getElementById('main-header');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                header.style.transform = 'translateY(0)';
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>

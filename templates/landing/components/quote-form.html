@@ -1,0 +1,346 @@
+<section id="quote" class="py-16 md:py-24 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
+                Get Your Free Quote
+            </h2>
+            <p class="text-lg text-gray-600">
+                Receive an obligation-free quote within 30 minutes
+            </p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-brand-lg p-8 md:p-12 border border-gray-200" id="quote-form-container">
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-2">
+                    <span id="step-text" class="text-sm font-medium text-gray-600">Step 1 of 6</span>
+                    <span class="text-sm font-medium text-primary-900"><span id="progress-percent">17</span>%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="progress-bar" class="bg-accent-500 h-2 rounded-full transition-all duration-300" style="width: 17%"></div>
+                </div>
+            </div>
+
+            <form id="quote-form" class="space-y-8">
+                {% csrf_token %}
+                
+                <div id="step-1" class="step-container">
+                    <h3 class="text-2xl font-bold text-primary-900 mb-2">
+                        Get a quote within 30 minutes
+                    </h3>
+                    <p class="text-gray-600 mb-6">I want to move the contents of my...</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <button type="button" data-bedroom="1" class="bedroom-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-3xl mb-2">🛏️</div>
+                            <div class="font-semibold">1 Bedroom</div>
+                        </button>
+                        <button type="button" data-bedroom="2" class="bedroom-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-3xl mb-2">🏠</div>
+                            <div class="font-semibold">2 Bedroom</div>
+                        </button>
+                        <button type="button" data-bedroom="3" class="bedroom-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-3xl mb-2">🏡</div>
+                            <div class="font-semibold">3 Bedroom</div>
+                        </button>
+                        <button type="button" data-bedroom="4" class="bedroom-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-3xl mb-2">🏘️</div>
+                            <div class="font-semibold">4 Bedroom</div>
+                        </button>
+                        <button type="button" data-bedroom="5+" class="bedroom-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-3xl mb-2">🏰</div>
+                            <div class="font-semibold">5+ Bedroom</div>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <a href="#" class="text-primary-900 hover:text-accent-500 font-medium">
+                            Moving office? Click here
+                        </a>
+                    </div>
+                    
+                    <div class="flex justify-end mt-8">
+                        <button type="button" data-next-step class="bg-accent-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md">
+                            Next
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step-2" class="step-container hidden">
+                    <h3 class="text-2xl font-bold text-primary-900 mb-6">
+                        Please tell us about your move
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label for="from-suburb" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Which suburb are you moving from? *
+                            </label>
+                            <input type="text" id="from-suburb" name="fromSuburb" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="e.g., Fremantle">
+                        </div>
+                        
+                        <div>
+                            <label for="to-suburb" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Which suburb are you moving to? *
+                            </label>
+                            <input type="text" id="to-suburb" name="toSuburb" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="e.g., Joondalup">
+                        </div>
+                        
+                        <div>
+                            <label for="move-date" class="block text-sm font-semibold text-gray-700 mb-2">
+                                What date would you like to move? *
+                            </label>
+                            <input type="date" id="move-date" name="moveDate" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        
+                        <div>
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" name="flexibleDates" 
+                                    class="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                                <span class="text-gray-700">If the above date is not available, would you consider the day before or after?</span>
+                            </label>
+                        </div>
+                        
+                        <div>
+                            <label for="start-time" class="block text-sm font-semibold text-gray-700 mb-2">
+                                What time would you like to start? *
+                            </label>
+                            <select id="start-time" name="startTime" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <option value="">Select a time</option>
+                                <option value="7:00 AM">7:00 AM</option>
+                                <option value="8:00 AM">8:00 AM</option>
+                                <option value="9:00 AM">9:00 AM</option>
+                                <option value="10:00 AM">10:00 AM</option>
+                                <option value="11:00 AM">11:00 AM</option>
+                                <option value="12:00 PM">12:00 PM</option>
+                                <option value="1:00 PM">1:00 PM</option>
+                                <option value="2:00 PM">2:00 PM</option>
+                                <option value="Flexible">Flexible</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" name="additionalStop" 
+                                    class="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                                <span class="text-gray-700">Do you need an additional pick-up or drop-off along the way?</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" data-prev-step class="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                            Back
+                        </button>
+                        <button type="button" data-next-step class="bg-accent-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md">
+                            Next
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step-3" class="step-container hidden">
+                    <h3 class="text-2xl font-bold text-primary-900 mb-2">
+                        Do you have any items over 100kg or 3 meters?
+                    </h3>
+                    <p class="text-gray-600 mb-6">For example: pianos, pool tables, safes, large furniture</p>
+                    
+                    <div class="space-y-4">
+                        <label class="flex items-center space-x-3 p-4 border-2 border-gray-300 rounded-lg hover:border-primary-600 cursor-pointer transition-all">
+                            <input type="radio" name="largeItems" value="yes" 
+                                class="w-5 h-5 text-primary-600 border-gray-300 focus:ring-primary-500">
+                            <span class="text-gray-700 font-medium">Yes, I have large/heavy items</span>
+                        </label>
+                        
+                        <label class="flex items-center space-x-3 p-4 border-2 border-gray-300 rounded-lg hover:border-primary-600 cursor-pointer transition-all">
+                            <input type="radio" name="largeItems" value="no" checked
+                                class="w-5 h-5 text-primary-600 border-gray-300 focus:ring-primary-500">
+                            <span class="text-gray-700 font-medium">No large/heavy items</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" data-prev-step class="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                            Back
+                        </button>
+                        <button type="button" data-next-step class="bg-accent-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md">
+                            Next
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step-4" class="step-container hidden">
+                    <h3 class="text-2xl font-bold text-primary-900 mb-2">
+                        Want to save time and reduce stress with our professional packing + unpacking service?
+                    </h3>
+                    <p class="text-gray-600 mb-6">We provide all materials and handle everything with care</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <button type="button" data-packing="pack" class="packing-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-4xl mb-3">📦</div>
+                            <div class="font-semibold text-lg mb-2">Pack</div>
+                            <p class="text-sm text-gray-600">We pack everything for you</p>
+                        </button>
+                        
+                        <button type="button" data-packing="unpack" class="packing-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-4xl mb-3">📭</div>
+                            <div class="font-semibold text-lg mb-2">Unpack</div>
+                            <p class="text-sm text-gray-600">We unpack at your new home</p>
+                        </button>
+                        
+                        <button type="button" data-packing="both" class="packing-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-4xl mb-3">📦📭</div>
+                            <div class="font-semibold text-lg mb-2">Pack + Unpack</div>
+                            <p class="text-sm text-gray-600">Full service, stress-free</p>
+                        </button>
+                        
+                        <button type="button" data-packing="not-required" class="packing-btn border-2 border-gray-300 rounded-lg p-6 text-center hover:border-primary-600 hover:bg-primary-50 transition-all bg-white text-gray-700">
+                            <div class="text-4xl mb-3">❌</div>
+                            <div class="font-semibold text-lg mb-2">Not Required</div>
+                            <p class="text-sm text-gray-600">I'll handle packing myself</p>
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" data-prev-step class="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                            Back
+                        </button>
+                        <button type="button" data-next-step class="bg-accent-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md">
+                            Next
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step-5" class="step-container hidden">
+                    <h3 class="text-2xl font-bold text-primary-900 mb-2">
+                        Are you looking to store any of your items?
+                    </h3>
+                    <p class="text-gray-600 mb-6">
+                        We offer convenient and secure storage service from only $200 per month
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <label class="flex items-center space-x-3 p-4 border-2 border-gray-300 rounded-lg hover:border-primary-600 cursor-pointer transition-all">
+                            <input type="radio" name="storage" value="yes" 
+                                class="w-5 h-5 text-primary-600 border-gray-300 focus:ring-primary-500">
+                            <div>
+                                <span class="text-gray-700 font-medium block">Yes, I need storage</span>
+                                <span class="text-sm text-gray-500">Climate-controlled, 24/7 security</span>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center space-x-3 p-4 border-2 border-gray-300 rounded-lg hover:border-primary-600 cursor-pointer transition-all">
+                            <input type="radio" name="storage" value="no" checked
+                                class="w-5 h-5 text-primary-600 border-gray-300 focus:ring-primary-500">
+                            <span class="text-gray-700 font-medium">No storage needed</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" data-prev-step class="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                            Back
+                        </button>
+                        <button type="button" data-next-step class="bg-accent-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md">
+                            Next
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step-6" class="step-container hidden">
+                    <h3 class="text-2xl font-bold text-primary-900 mb-2">
+                        Please share your contact details
+                    </h3>
+                    <p class="text-gray-600 mb-6">
+                        You will receive an obligation-free quote within 30 minutes
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="first-name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    First Name *
+                                </label>
+                                <input type="text" id="first-name" name="firstName" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                            
+                            <div>
+                                <label for="last-name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Last Name *
+                                </label>
+                                <input type="text" id="last-name" name="lastName" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="mobile" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Mobile *
+                            </label>
+                            <input type="tel" id="mobile" name="mobile" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="04XX XXX XXX">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Email Address *
+                            </label>
+                            <input type="email" id="email" name="email" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="your.email@example.com">
+                        </div>
+                        
+                        <div>
+                            <label for="comments" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Any Additional Comments?
+                            </label>
+                            <textarea id="comments" name="comments" rows="4"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Any special requirements or questions?"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="hear-about" class="block text-sm font-semibold text-gray-700 mb-2">
+                                How did you hear about us?
+                            </label>
+                            <select id="hear-about" name="hearAbout"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <option value="">Select an option</option>
+                                <option value="google">Google Search</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="referral">Friend/Family Referral</option>
+                                <option value="repeat">Previous Customer</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="flex items-start space-x-3">
+                                <input type="checkbox" name="newsletter" 
+                                    class="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-1">
+                                <span class="text-sm text-gray-600">
+                                    By checking this box, you are agreeing to receive our newsletters, discounts and other marketing emails.
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" data-prev-step class="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                            Back
+                        </button>
+                        <button type="submit" id="submit-quote" class="bg-accent-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md">
+                            Send Quote Request
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
