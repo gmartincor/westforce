@@ -13,49 +13,7 @@
 </head>
 <body class="antialiased bg-gray-50">
     
-    <header id="main-header" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex items-center">
-                    <a href="/" class="flex items-center space-x-3">
-                        <img src="{% static 'images/landing/logo/Company_logo.jpeg' %}" alt="Westforce Removals Logo" class="h-12 w-auto">
-                        <span class="text-xl font-bold text-primary-900">WESTFORCE REMOVALS</span>
-                    </a>
-                </div>
-                
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="/#about" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">About</a>
-                    <a href="/#services" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">Services</a>
-                    <a href="/#locations" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">Locations</a>
-                    <a href="tel:+61892345678" class="flex items-center text-primary-900 hover:text-accent-600 font-semibold transition-colors">
-                        <i class="fas fa-phone mr-2"></i>
-                        <span>(08) 9234 5678</span>
-                    </a>
-                    <a href="/#quote" class="bg-accent-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md hover:shadow-lg">
-                        Get a Quote
-                    </a>
-                </nav>
-                
-                <button id="mobile-menu-btn" class="md:hidden text-gray-700 hover:text-primary-900">
-                    <i class="fas fa-bars text-2xl"></i>
-                </button>
-            </div>
-        </div>
-        
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
-            <div class="px-4 py-4 space-y-3">
-                <a href="/#about" class="block text-gray-700 hover:text-primary-900 font-medium py-2">About</a>
-                <a href="/#services" class="block text-gray-700 hover:text-primary-900 font-medium py-2">Services</a>
-                <a href="/#locations" class="block text-gray-700 hover:text-primary-900 font-medium py-2">Locations</a>
-                <a href="tel:+61892345678" class="block text-primary-900 font-semibold py-2">
-                    <i class="fas fa-phone mr-2"></i>(08) 9234 5678
-                </a>
-                <a href="/#quote" class="block bg-accent-500 text-white text-center px-6 py-3 rounded-lg font-semibold hover:bg-accent-600">
-                    Get a Quote
-                </a>
-            </div>
-        </div>
-    </header>
+    {% include 'components/landing_header.html' %}
 
     <main class="pt-20">
         <section class="py-16 md:py-24 bg-white">
@@ -72,35 +30,44 @@
                 </h1>
 
                 <div class="prose prose-lg max-w-none">
-                    <div class="bg-gray-50 border-l-4 border-primary-900 p-6 mb-8">
-                        <p class="text-gray-700 leading-relaxed">
-                            Welcome to WestForce Removals. By using our website, requesting a quote, or booking our services, you agree to the following terms and conditions, which are governed by the laws of Western Australia.
-                        </p>
-                    </div>
+                    <p class="text-gray-700 leading-relaxed mb-6">
+                        Welcome to WestForce Removals. By using our website, requesting a quote, or booking our services, you agree to the following terms and conditions, which are governed by the laws of Western Australia.
+                    </p>
 
-                    <h2 class="text-2xl font-bold text-primary-900 mt-8 mb-4">Our Services</h2>
                     <p class="text-gray-700 leading-relaxed mb-6">
                         WestForce Removals provides professional furniture removal, relocation, and transport services throughout Perth and surrounding areas. All prices and quotes are listed in Australian dollars (AUD) and are based on the information you provide at the time of booking. Changes in load size, property access, or time requirements may affect final pricing. Additional fees may apply for stairs, long walking distances, parking restrictions, or unexpected delays.
                     </p>
 
-                    <h2 class="text-2xl font-bold text-primary-900 mt-8 mb-4">Bookings and Cancellations</h2>
                     <p class="text-gray-700 leading-relaxed mb-6">
                         Bookings are confirmed once we receive your acceptance by phone, email, or message. If you need to cancel or reschedule, we kindly ask for at least 24 hours' notice. Late cancellations may incur a call-out charge to cover allocated time and resources.
                     </p>
 
-                    <h2 class="text-2xl font-bold text-primary-900 mt-8 mb-4">Client Responsibilities</h2>
                     <p class="text-gray-700 leading-relaxed mb-6">
                         Clients are responsible for ensuring that access to both pickup and delivery addresses is safe and that all items are packed appropriately for transport if they did not select our professional packing service. Fragile, high-value, or bulky items should be clearly identified prior to loading. Our team takes every reasonable precaution to ensure your belongings are handled with care, using safe manual-handling techniques, protective equipment, and professional loading methods to minimise the risk of damage.
                     </p>
 
-                    <h2 class="text-2xl font-bold text-primary-900 mt-8 mb-4">Liability and Insurance</h2>
                     <p class="text-gray-700 leading-relaxed mb-6">
                         All services are provided under the Australian Consumer Law (ACL). In the rare event of damage or service faults, customers are entitled to repair, replacement, or refund as required by law. Liability is limited to the value of the affected goods or the cost of re-service, whichever is less. Optional transit insurance can be arranged upon request prior to the move.
                     </p>
 
-                    <h2 class="text-2xl font-bold text-primary-900 mt-8 mb-4">Payment Terms</h2>
                     <p class="text-gray-700 leading-relaxed mb-6">
-                        Payment is due upon completion of the job unless otherwise agreed. We accept bank transfer, cash, or approved electronic payment methods. All invoices and receipts include our registered ABN: <strong>83 541 053 716</strong>.
+                        Payment is due upon completion of the job unless otherwise agreed. We accept bank transfer, cash, or approved electronic payment methods. All invoices and receipts include our registered ABN: 83 541 053 716.
+                    </p>
+
+                    <p class="text-gray-700 leading-relaxed mb-6">
+                        We operate under the Work Health and Safety Act 2020 (WA) and follow applicable Codes of Practice for fatigue management, manual handling, and workplace safety. Unsafe environments, access issues, or hazardous items may require rescheduling or refusal of service to ensure the safety of all parties.
+                    </p>
+
+                    <p class="text-gray-700 leading-relaxed mb-6">
+                        WestForce Removals will not be held responsible for losses arising from circumstances beyond our control, such as traffic delays, extreme weather, or third-party failures.
+                    </p>
+
+                    <p class="text-gray-700 leading-relaxed mb-6">
+                        If you have any feedback or wish to make a complaint, please contact us directly at <a href="mailto:info.removalwestforce@gmail.com" class="text-primary-900 hover:text-accent-500 font-medium underline">info.removalwestforce@gmail.com</a>. We aim to resolve all matters quickly and fairly. If you remain unsatisfied, you may contact Consumer Protection WA or the Australian Competition and Consumer Commission (ACCC) for further assistance.
+                    </p>
+
+                    <p class="text-gray-700 leading-relaxed mb-6">
+                        By continuing to use our services, you acknowledge that you have read and agreed to these terms and conditions.
                     </p>
 
                     <div class="bg-accent-50 border border-accent-200 rounded-lg p-6 mt-8">
@@ -125,19 +92,7 @@
         </section>
     </main>
 
-    <footer class="bg-primary-900 text-white py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="border-t border-gray-700 pt-6">
-                <div class="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-                    <p>&copy; 2024 Westforce Removals. All rights reserved.</p>
-                    <div class="flex space-x-6 mt-4 md:mt-0">
-                        <a href="/privacy-policy/" class="hover:text-accent-400 transition-colors">Privacy Policy</a>
-                        <a href="/terms-conditions/" class="hover:text-accent-400 transition-colors">Terms & Conditions</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    {% include 'components/landing_footer.html' %}
 
     <script>
         document.getElementById('mobile-menu-btn').addEventListener('click', function() {

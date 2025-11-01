@@ -1,0 +1,44 @@
+{% load static %}
+<header id="main-header" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center space-x-3">
+                    <img src="{% static 'images/landing/logo/Company_logo.jpeg' %}" alt="Westforce Removals Logo" class="h-12 w-auto">
+                    <span class="text-xl font-bold text-primary-900">WESTFORCE REMOVALS</span>
+                </a>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="/#about" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">About</a>
+                <a href="/#services" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">Services</a>
+                <a href="/#locations" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">Locations</a>
+                <a href="tel:+61892345678" class="flex items-center text-primary-900 hover:text-accent-600 font-semibold transition-colors">
+                    <i class="fas fa-phone mr-2"></i>
+                    <span>(08) 9234 5678</span>
+                </a>
+                <a href="/#quote" class="bg-accent-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all shadow-md hover:shadow-lg">
+                    Get a Quote
+                </a>
+            </nav>
+            
+            <button id="mobile-menu-btn" class="md:hidden text-gray-700 hover:text-primary-900">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+        <div class="px-4 py-4 space-y-3">
+            <a href="/#about" class="block text-gray-700 hover:text-primary-900 font-medium py-2">About</a>
+            <a href="/#services" class="block text-gray-700 hover:text-primary-900 font-medium py-2">Services</a>
+            <a href="/#locations" class="block text-gray-700 hover:text-primary-900 font-medium py-2">Locations</a>
+            <a href="tel:+61892345678" class="block text-primary-900 font-semibold py-2">
+                <i class="fas fa-phone mr-2"></i>(08) 9234 5678
+            </a>
+            <a href="/#quote" class="block bg-accent-500 text-white text-center px-6 py-3 rounded-lg font-semibold hover:bg-accent-600">
+                Get a Quote
+            </a>
+        </div>
+    </div>
+</header>

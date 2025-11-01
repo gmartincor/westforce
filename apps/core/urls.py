@@ -1,6 +1,7 @@
 from django.urls import path
 from .views.export import export_data
-from .views import quote_request, privacy_policy, terms_conditions
+from .views import quote_request
+from .views.legal import privacy_policy, terms_conditions
 
 app_name = 'core'
 
