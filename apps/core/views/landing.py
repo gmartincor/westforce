@@ -21,3 +21,11 @@ def landing_page(request):
         'company_email': 'info@westforceremovals.com.au',
     }
     return render(request, 'landing/home.html', context)
+
+
+def privacy_policy(request):
+    return render(request, 'landing/privacy-policy.html')
+
+
+def terms_conditions(request):
+    return render(request, 'landing/terms-conditions.html')

@@ -63,30 +63,41 @@
 
     <main class="pt-20">
         
-        <section id="hero" class="relative text-white overflow-hidden">
-            <div class="absolute inset-0 z-0">
-                <img src="{% static 'images/landing/hero/View-of-Perth-City-as-seen-from-Kings-Park.jpg' %}" alt="Perth City View" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-r from-primary-900/85 via-primary-900/70 to-primary-900/85"></div>
-            </div>
-            
-            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 lg:py-40">
-                <div class="max-w-3xl">
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in-up">
-                        Perth's Trusted
-                        <span class="text-accent-400">Moving Experts</span>
-                    </h1>
-                    <p class="text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed animate-fade-in-up">
-                        Professional local and interstate removalist services across Western Australia. Safe, reliable, and stress-free moves for homes and offices.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 animate-fade-in-up">
-                        <a href="#quote" class="bg-accent-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-accent-600 transition-all shadow-lg hover:shadow-xl inline-flex items-center justify-center">
-                            <i class="fas fa-clipboard-list mr-2"></i>
-                            Get Free Quote
-                        </a>
-                        <a href="tel:+61892345678" class="bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white/20 transition-all border-2 border-white/30 inline-flex items-center justify-center">
-                            <i class="fas fa-phone mr-2"></i>
-                            Call Now
-                        </a>
+        <section id="hero" class="bg-gradient-to-br from-primary-50 via-blue-50 to-primary-100 py-16 md:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="animate-fade-in-up">
+                        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-primary-900">
+                            Perth's Trusted
+                            <span class="text-accent-500">Moving Experts</span>
+                        </h1>
+                        <p class="text-xl md:text-2xl text-gray-700 mb-8 leading-relaxed">
+                            Professional local and interstate removalist services across Western Australia. Safe, reliable, and stress-free moves for homes and offices.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="#quote" class="bg-accent-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-accent-600 transition-all shadow-lg hover:shadow-xl inline-flex items-center justify-center">
+                                <i class="fas fa-clipboard-list mr-2"></i>
+                                Get Free Quote
+                            </a>
+                            <a href="tel:+61892345678" class="bg-primary-900 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-800 transition-all shadow-lg hover:shadow-xl inline-flex items-center justify-center">
+                                <i class="fas fa-phone mr-2"></i>
+                                Call Now
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="relative animate-fade-in-up">
+                        <div class="relative rounded-2xl overflow-hidden shadow-brand-lg">
+                            <img src="{% static 'images/landing/hero/View-of-Perth-City-as-seen-from-Kings-Park.jpg' %}" alt="Perth City View from Kings Park" class="w-full h-auto object-cover">
+                        </div>
+                        <div class="absolute -bottom-6 -left-6 bg-accent-500 text-white p-6 rounded-xl shadow-xl hidden md:block">
+                            <div class="text-3xl font-bold">10+</div>
+                            <div class="text-sm">Years Experience</div>
+                        </div>
+                        <div class="absolute -top-6 -right-6 bg-primary-900 text-white p-6 rounded-xl shadow-xl hidden md:block">
+                            <div class="text-3xl font-bold">1000+</div>
+                            <div class="text-sm">Happy Clients</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -470,10 +481,10 @@
             
             <div class="border-t border-gray-700 pt-6">
                 <div class="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-                    <p>&copy; 2024 Westforce Removals. All rights reserved.</p>
+                    <p>&copy; 2024 Westforce Removals. All rights reserved. | ABN: 83 541 053 716</p>
                     <div class="flex space-x-6 mt-4 md:mt-0">
-                        <a href="#" class="hover:text-accent-400 transition-colors">Privacy Policy</a>
-                        <a href="#" class="hover:text-accent-400 transition-colors">Terms of Service</a>
+                        <a href="{% url 'core:privacy_policy' %}" class="hover:text-accent-400 transition-colors">Privacy Policy</a>
+                        <a href="{% url 'core:terms_conditions' %}" class="hover:text-accent-400 transition-colors">Terms of Service</a>
                     </div>
                 </div>
             </div>
