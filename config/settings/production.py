@@ -5,7 +5,19 @@ from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='', cast=Csv())
+allowed_hosts_raw = config('ALLOWED_HOSTS', default='')
+if isinstance(allowed_hosts_raw, str):
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_raw.split(',') if host.strip()]
+else:
+    ALLOWED_HOSTS = allowed_hosts_raw if allowed_hosts_raw else []
+
+csrf_origins_raw = config('CSRF_TRUSTED_ORIGINS', default='')
+if csrf_origins_raw and isinstance(csrf_origins_raw, str):
+    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_raw.split(',') if origin.strip()]
+elif isinstance(ALLOWED_HOSTS, list):
+    CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host]
+else:
+    CSRF_TRUSTED_ORIGINS = []
 
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 63072000
@@ -18,17 +30,18 @@ SECURE_REFERRER_POLICY = 'same-origin'
 
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 
+database_url = config('DATABASE_URL', default='')
 DATABASES = {
     'default': dj_database_url.config(
-        default=config('DATABASE_URL', cast=str, default=''),
+        default=database_url,
         conn_max_age=600,
         conn_health_checks=True,
         ssl_require=True

@@ -27,6 +27,9 @@ services:
       - key: ALLOWED_HOSTS
         value: westforce.com,www.westforce.com,westforce.onrender.com,westforce-web.onrender.com
       
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://westforce.com,https://www.westforce.com,https://westforce.onrender.com,https://westforce-web.onrender.com
+      
       - key: DATABASE_URL
         value: postgresql://westforce_user:Ol9d6aF3hzqdcqaaSGvIGCZocGkYzMQ7@dpg-d41v1rf5r7bs73e23mc0-a/westforce
       
