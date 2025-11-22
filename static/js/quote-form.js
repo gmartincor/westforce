@@ -26,6 +26,7 @@ class QuoteFormManager {
 
   init() {
     this.bindEvents();
+    this.bindInputListeners();
     this.updateProgress();
   }
 
@@ -39,11 +40,17 @@ class QuoteFormManager {
     });
 
     document.querySelectorAll('[data-bedroom]').forEach(btn => {
-      btn.addEventListener('click', (e) => this.selectBedroom(e.target.dataset.bedroom));
+      btn.addEventListener('click', (e) => {
+        const button = e.currentTarget;
+        this.selectBedroom(button.dataset.bedroom);
+      });
     });
 
     document.querySelectorAll('[data-packing]').forEach(btn => {
-      btn.addEventListener('click', (e) => this.selectPacking(e.target.dataset.packing));
+      btn.addEventListener('click', (e) => {
+        const button = e.currentTarget;
+        this.selectPacking(button.dataset.packing);
+      });
     });
 
     const form = document.getElementById('quote-form');
@@ -52,50 +59,114 @@ class QuoteFormManager {
     }
   }
 
-  selectBedroom(value) {
-    this.formData.bedrooms = value;
-    document.querySelectorAll('[data-bedroom]').forEach(btn => {
-      btn.classList.remove('selected', 'bg-primary-600', 'text-white', 'border-primary-600');
-      btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+  bindInputListeners() {
+    const inputMappings = [
+      { id: 'from-suburb', key: 'fromSuburb' },
+      { id: 'to-suburb', key: 'toSuburb' },
+      { id: 'move-date', key: 'moveDate' },
+      { id: 'start-time', key: 'startTime' },
+      { id: 'first-name', key: 'firstName' },
+      { id: 'last-name', key: 'lastName' },
+      { id: 'mobile', key: 'mobile' },
+      { id: 'email', key: 'email' },
+      { id: 'comments', key: 'comments' },
+      { id: 'hear-about', key: 'hearAbout' }
+    ];
+
+    inputMappings.forEach(({ id, key }) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener('input', (e) => {
+          this.formData[key] = e.target.value;
+        });
+      }
     });
-    const selectedBtn = document.querySelector(`[data-bedroom="${value}"]`);
-    selectedBtn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
-    selectedBtn.classList.add('selected', 'bg-primary-600', 'text-white', 'border-primary-600');
+
+    const checkboxMappings = [
+      { name: 'flexibleDates', key: 'flexibleDates' },
+      { name: 'additionalStop', key: 'additionalStop' },
+      { name: 'newsletter', key: 'newsletter' }
+    ];
+
+    checkboxMappings.forEach(({ name, key }) => {
+      const element = document.querySelector(`input[name="${name}"]`);
+      if (element) {
+        element.addEventListener('change', (e) => {
+          this.formData[key] = e.target.checked;
+        });
+      }
+    });
+
+    const radioGroups = [
+      { name: 'largeItems', key: 'largeItems' },
+      { name: 'storage', key: 'storage' }
+    ];
+
+    radioGroups.forEach(({ name, key }) => {
+      document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          this.formData[key] = e.target.value === 'yes';
+        });
+      });
+    });
+  }
+
+  selectOption(selector, value, dataKey) {
+    if (!value) return;
+    
+    this.formData[dataKey] = value;
+    
+    const selectedClasses = ['selected', 'bg-primary-600', 'text-white', 'border-primary-600'];
+    const defaultClasses = ['bg-white', 'text-gray-700', 'border-gray-300'];
+    
+    document.querySelectorAll(`[${selector}]`).forEach(btn => {
+      btn.classList.remove(...selectedClasses);
+      btn.classList.add(...defaultClasses);
+    });
+    
+    const selectedBtn = document.querySelector(`[${selector}="${value}"]`);
+    if (selectedBtn) {
+      selectedBtn.classList.remove(...defaultClasses);
+      selectedBtn.classList.add(...selectedClasses);
+    }
+  }
+
+  selectBedroom(value) {
+    this.selectOption('data-bedroom', value, 'bedrooms');
   }
 
   selectPacking(value) {
-    this.formData.packingService = value;
-    document.querySelectorAll('[data-packing]').forEach(btn => {
-      btn.classList.remove('selected', 'bg-primary-600', 'text-white', 'border-primary-600');
-      btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
-    });
-    const selectedBtn = document.querySelector(`[data-packing="${value}"]`);
-    selectedBtn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
-    selectedBtn.classList.add('selected', 'bg-primary-600', 'text-white', 'border-primary-600');
+    this.selectOption('data-packing', value, 'packingService');
   }
 
   validateStep(step) {
-    switch(step) {
-      case 1:
-        return this.formData.bedrooms !== '';
-      case 2:
-        return this.formData.fromSuburb && this.formData.toSuburb && this.formData.moveDate && this.formData.startTime;
-      case 3:
-        return true;
-      case 4:
-        return true;
-      case 5:
-        return true;
-      case 6:
-        return this.formData.firstName && this.formData.lastName && this.formData.mobile && this.formData.email;
-      default:
-        return true;
-    }
+    const validations = {
+      1: () => this.formData.bedrooms !== '',
+      2: () => {
+        const fromSuburb = document.getElementById('from-suburb')?.value.trim();
+        const toSuburb = document.getElementById('to-suburb')?.value.trim();
+        const moveDate = document.getElementById('move-date')?.value;
+        const startTime = document.getElementById('start-time')?.value;
+        return fromSuburb && toSuburb && moveDate && startTime;
+      },
+      3: () => true,
+      4: () => true,
+      5: () => true,
+      6: () => {
+        const firstName = document.getElementById('first-name')?.value.trim();
+        const lastName = document.getElementById('last-name')?.value.trim();
+        const mobile = document.getElementById('mobile')?.value.trim();
+        const email = document.getElementById('email')?.value.trim();
+        return firstName && lastName && mobile && email;
+      }
+    };
+
+    return validations[step] ? validations[step]() : true;
   }
 
   nextStep() {
     if (!this.validateStep(this.currentStep)) {
-      this.showError('Please fill in all required fields');
+      this.showValidationErrors(this.currentStep);
       return;
     }
 
@@ -105,6 +176,17 @@ class QuoteFormManager {
       this.showStep(this.currentStep);
       this.updateProgress();
     }
+  }
+
+  showValidationErrors(step) {
+    const errorMessages = {
+      1: 'Please select the number of bedrooms',
+      2: 'Please fill in all move details (suburbs, date, and time)',
+      6: 'Please fill in your contact information'
+    };
+
+    const message = errorMessages[step] || 'Please fill in all required fields';
+    this.showError(message);
   }
 
   prevStep() {
@@ -133,10 +215,16 @@ class QuoteFormManager {
   }
 
   updateProgress() {
-    const progress = (this.currentStep / this.totalSteps) * 100;
+    const progress = Math.round((this.currentStep / this.totalSteps) * 100);
+    
     const progressBar = document.getElementById('progress-bar');
     if (progressBar) {
       progressBar.style.width = `${progress}%`;
+    }
+
+    const progressPercent = document.getElementById('progress-percent');
+    if (progressPercent) {
+      progressPercent.textContent = progress;
     }
 
     const stepText = document.getElementById('step-text');
@@ -175,13 +263,47 @@ class QuoteFormManager {
   }
 
   collectFormData() {
-    const form = document.getElementById('quote-form');
-    const formData = new FormData(form);
-    
-    for (let [key, value] of formData.entries()) {
-      if (key in this.formData) {
-        this.formData[key] = value;
+    const fieldMappings = [
+      { id: 'from-suburb', key: 'fromSuburb' },
+      { id: 'to-suburb', key: 'toSuburb' },
+      { id: 'move-date', key: 'moveDate' },
+      { id: 'start-time', key: 'startTime' },
+      { id: 'first-name', key: 'firstName' },
+      { id: 'last-name', key: 'lastName' },
+      { id: 'mobile', key: 'mobile' },
+      { id: 'email', key: 'email' },
+      { id: 'comments', key: 'comments' },
+      { id: 'hear-about', key: 'hearAbout' }
+    ];
+
+    fieldMappings.forEach(({ id, key }) => {
+      const element = document.getElementById(id);
+      if (element) {
+        this.formData[key] = element.value;
       }
+    });
+
+    const checkboxMappings = [
+      { name: 'flexibleDates', key: 'flexibleDates' },
+      { name: 'additionalStop', key: 'additionalStop' },
+      { name: 'newsletter', key: 'newsletter' }
+    ];
+
+    checkboxMappings.forEach(({ name, key }) => {
+      const element = document.querySelector(`input[name="${name}"]`);
+      if (element) {
+        this.formData[key] = element.checked;
+      }
+    });
+
+    const largeItemsRadio = document.querySelector('input[name="largeItems"]:checked');
+    if (largeItemsRadio) {
+      this.formData.largeItems = largeItemsRadio.value === 'yes';
+    }
+
+    const storageRadio = document.querySelector('input[name="storage"]:checked');
+    if (storageRadio) {
+      this.formData.storage = storageRadio.value === 'yes';
     }
   }
 

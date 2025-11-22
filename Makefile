@@ -1,4 +1,4 @@
-.PHONY: help dev prod build clean test logs status restart migrate makemigrations shell superuser seed seed-flush mcp-setup deploy-logs deploy-status
+.PHONY: help dev prod build clean test logs status restart migrate makemigrations shell superuser seed seed-flush mcp-setup deploy-logs deploy-status collectstatic
 
 COMPOSE := docker-compose
 
@@ -10,6 +10,7 @@ help:
 	@echo "  build        - Rebuild images"
 	@echo "  clean        - Clean containers and volumes"
 	@echo "  restart      - Restart services"
+	@echo "  collectstatic - Collect static files"
 	@echo ""
 	@echo "RENDER MCP:"
 	@echo "  mcp-setup    - Configure Render MCP"
@@ -93,5 +94,9 @@ seed:
 seed-flush:
 	@echo "⚠️  Flushing and reseeding all data..."
 	@docker exec westforce-web python manage.py seed_dev_data --flush
+
+collectstatic:
+	@echo "📦 Collecting static files..."
+	@docker exec westforce-web python manage.py collectstatic --noinput
 
 .DEFAULT_GOAL := help
