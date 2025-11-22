@@ -68,6 +68,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.core.context_processors.analytics_context',
+                'apps.core.context_processors.company_context',
+                'apps.core.context_processors.seo_context',
             ],
         },
     },
@@ -147,8 +149,23 @@ LOGIN_URL = 'authentication:login'
 LOGIN_REDIRECT_URL = 'dashboard:home'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
-COMPANY_NAME = config('COMPANY_NAME', default='Westforce Removals Company')
+COMPANY_NAME = config('COMPANY_NAME', default='Westforce Removals')
 COMPANY_TAGLINE = config('COMPANY_TAGLINE', default='Professional Australian Removals Company Management System')
+COMPANY_PHONE = config('COMPANY_PHONE', default='+61-8-9234-5678')
+COMPANY_PHONE_DISPLAY = config('COMPANY_PHONE_DISPLAY', default='(08) 9234 5678')
+COMPANY_EMAIL = config('COMPANY_EMAIL', default='info@westforceremovals.com.au')
+COMPANY_ADDRESS_CITY = config('COMPANY_ADDRESS_CITY', default='Perth')
+COMPANY_ADDRESS_STATE = config('COMPANY_ADDRESS_STATE', default='WA')
+COMPANY_ADDRESS_COUNTRY = config('COMPANY_ADDRESS_COUNTRY', default='AU')
+COMPANY_LATITUDE = config('COMPANY_LATITUDE', default='-31.9505')
+COMPANY_LONGITUDE = config('COMPANY_LONGITUDE', default='115.8605')
+COMPANY_RATING = config('COMPANY_RATING', default='4.8')
+COMPANY_REVIEW_COUNT = config('COMPANY_REVIEW_COUNT', default='127')
+COMPANY_ESTABLISHED_YEAR = config('COMPANY_ESTABLISHED_YEAR', default='2020')
+
+SEO_META_TITLE = config('SEO_META_TITLE', default='Westforce Removals - Professional Moving Services Perth | Local & Interstate Movers')
+SEO_META_DESCRIPTION = config('SEO_META_DESCRIPTION', default='Professional moving and removalist services in Perth, Western Australia. Local and interstate relocations with expert care. Get your free quote today.')
+SEO_OG_IMAGE_PATH = config('SEO_OG_IMAGE_PATH', default='images/landing/hero/View-of-Perth-City-as-seen-from-Kings-Park.jpg')
 
 GOOGLE_ANALYTICS_ID = config('GOOGLE_ANALYTICS_ID', default='')
 GOOGLE_TAG_MANAGER_ID = config('GOOGLE_TAG_MANAGER_ID', default='')

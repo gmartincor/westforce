@@ -2,28 +2,32 @@
 <!DOCTYPE html>
 <html lang="en-AU">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional moving and removalist services in Perth, Western Australia. Local and interstate relocations with expert care. Get your free quote today.">
-    <meta name="keywords" content="movers Perth, removalists Perth, moving company Perth, furniture removals, interstate movers WA">
+    {% include 'components/analytics/gtm.html' %}
+    {% include 'components/seo/meta.html' %}
     
-    <title>Westforce Removals - Professional Moving Services Perth | Local & Interstate Movers</title>
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://www.google-analytics.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {% include 'components/analytics/gtag.html' %}
+    {% include 'components/analytics/schema.html' %}
 </head>
 <body class="antialiased bg-white">
+    {% include 'components/analytics/gtm_noscript.html' %}
     
     <header id="main-header" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center">
                     <a href="/" class="flex items-center gap-3">
-                        <img src="{% static 'images/landing/logo/Company_logo.jpeg' %}" alt="Westforce Removals Logo" class="h-12 w-auto">
-                        <span class="text-xl font-bold text-primary-900">WESTFORCE REMOVALS</span>
+                        <img src="{% static 'images/landing/logo/Company_logo.jpeg' %}" alt="{{ company_name }} Logo" class="h-12 w-auto" width="48" height="48">
+                        <span class="text-xl font-bold text-primary-900">{{ company_name|upper }}</span>
                     </a>
                 </div>
                 
@@ -31,9 +35,9 @@
                     <a href="#about" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">About</a>
                     <a href="#services" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">Services</a>
                     <a href="#locations" class="text-gray-700 hover:text-primary-900 font-medium transition-colors">Locations</a>
-                    <a href="tel:+61892345678" class="flex items-center text-primary-900 hover:text-accent-600 font-semibold transition-colors">
+                    <a href="tel:{{ company_phone }}" onclick="trackPhoneClick()" class="flex items-center text-primary-900 hover:text-accent-600 font-semibold transition-colors">
                         <i class="fas fa-phone mr-2"></i>
-                        <span>(08) 9234 5678</span>
+                        <span>{{ company_phone_display }}</span>
                     </a>
                     <a href="#quote" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors font-semibold">
                         Get a Quote
@@ -51,8 +55,8 @@
                 <a href="#about" class="block text-gray-700 hover:text-primary-900 font-medium py-2">About</a>
                 <a href="#services" class="block text-gray-700 hover:text-primary-900 font-medium py-2">Services</a>
                 <a href="#locations" class="block text-gray-700 hover:text-primary-900 font-medium py-2">Locations</a>
-                <a href="tel:+61892345678" class="block text-primary-900 font-semibold py-2">
-                    <i class="fas fa-phone mr-2"></i>(08) 9234 5678
+                <a href="tel:{{ company_phone }}" onclick="trackPhoneClick()" class="block text-primary-900 font-semibold py-2">
+                    <i class="fas fa-phone mr-2"></i>{{ company_phone_display }}
                 </a>
                 <a href="#quote" class="block bg-gray-100 text-gray-700 text-center px-4 py-2 rounded-md hover:bg-gray-200 transition-colors font-semibold">
                     Get a Quote
@@ -79,7 +83,7 @@
                                 <i class="fas fa-clipboard-list mr-2"></i>
                                 Get Free Quote
                             </a>
-                            <a href="tel:+61892345678" class="bg-primary-900 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-800 transition-all shadow-lg hover:shadow-xl inline-flex items-center justify-center">
+                            <a href="tel:{{ company_phone }}" onclick="trackPhoneClick()" class="bg-primary-900 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-800 transition-all shadow-lg hover:shadow-xl inline-flex items-center justify-center">
                                 <i class="fas fa-phone mr-2"></i>
                                 Call Now
                             </a>
@@ -88,7 +92,7 @@
                     
                     <div class="relative animate-fade-in-up">
                         <div class="relative rounded-2xl overflow-hidden shadow-brand-lg">
-                            <img src="{% static 'images/landing/hero/View-of-Perth-City-as-seen-from-Kings-Park.jpg' %}" alt="Perth City View from Kings Park" class="w-full h-auto object-cover">
+                            <img src="{% static 'images/landing/hero/View-of-Perth-City-as-seen-from-Kings-Park.jpg' %}" alt="Perth City View from Kings Park - Professional Removalist Services" class="w-full h-auto object-cover" width="600" height="400" loading="eager">
                         </div>
                     </div>
                 </div>
@@ -398,9 +402,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-4 gap-8 mb-8">
                 <div>
-                    <img src="{% static 'images/landing/logo/Company_logo.jpeg' %}" alt="Westforce Removals" class="h-12 mb-4 brightness-0 invert">
+                    <img src="{% static 'images/landing/logo/Company_logo.jpeg' %}" alt="{{ company_name }}" class="h-12 mb-4 brightness-0 invert">
                     <p class="text-gray-300 mb-4">
-                        Perth's trusted removalist service for professional, reliable moves.
+                        {{ company_address_city }}'s trusted removalist service for professional, reliable moves.
                     </p>
                     <div class="flex space-x-4">
                         <a href="#" class="text-gray-300 hover:text-accent-400 transition-colors">
@@ -442,15 +446,15 @@
                     <ul class="space-y-3 text-gray-300">
                         <li class="flex items-start">
                             <i class="fas fa-phone mt-1 mr-3 text-accent-400"></i>
-                            <a href="tel:+61892345678" class="hover:text-accent-400 transition-colors">(08) 9234 5678</a>
+                            <a href="tel:{{ company_phone }}" onclick="trackPhoneClick()" class="hover:text-accent-400 transition-colors">{{ company_phone_display }}</a>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-envelope mt-1 mr-3 text-accent-400"></i>
-                            <a href="mailto:info@westforceremovals.com.au" class="hover:text-accent-400 transition-colors">info@westforceremovals.com.au</a>
+                            <a href="mailto:{{ company_email }}" onclick="trackEmailClick()" class="hover:text-accent-400 transition-colors">{{ company_email }}</a>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-map-marker-alt mt-1 mr-3 text-accent-400"></i>
-                            <span>Perth, Western Australia</span>
+                            <span>{{ company_address_city }}, {{ company_address_state }}</span>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-clock mt-1 mr-3 text-accent-400"></i>
@@ -462,7 +466,7 @@
             
             <div class="border-t border-gray-700 pt-6">
                 <div class="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-                    <p>&copy; 2024 Westforce Removals. All rights reserved. | ABN: 83 541 053 716</p>
+                    <p>&copy; {% now "Y" %} {{ company_name }}. All rights reserved. | ABN: 83 541 053 716</p>
                     <div class="flex space-x-6 mt-4 md:mt-0">
                         <a href="{% url 'core:privacy_policy' %}" class="hover:text-accent-400 transition-colors">Privacy Policy</a>
                         <a href="{% url 'core:terms_conditions' %}" class="hover:text-accent-400 transition-colors">Terms of Service</a>
@@ -472,7 +476,9 @@
         </div>
     </footer>
 
-    <script src="{% static 'js/quote-form.js' %}"></script>
+    {% include 'components/analytics/conversion_events.html' %}
+    
+    <script src="{% static 'js/quote-form.js' %}" defer></script>
     <script>
         document.getElementById('mobile-menu-btn').addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');

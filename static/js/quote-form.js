@@ -211,7 +211,19 @@ class QuoteFormManager {
       });
 
       if (response.ok) {
+        const estimatedValue = this.calculateEstimatedValue();
+        
+        if (typeof window.trackQuoteRequest === 'function') {
+          window.trackQuoteRequest({
+            estimatedValue: estimatedValue,
+            transactionId: `QUOTE-${Date.now()}`,
+            bedrooms: this.formData.bedrooms,
+            serviceType: this.formData.packingService
+          });
+        }
+
         this.showSuccess('Quote request sent successfully! We\'ll contact you within 30 minutes.');
+        
         setTimeout(() => {
           window.location.reload();
         }, 2000);
@@ -223,6 +235,26 @@ class QuoteFormManager {
       submitBtn.disabled = false;
       submitBtn.textContent = originalText;
     }
+  }
+
+  calculateEstimatedValue() {
+    let baseValue = 0;
+    
+    switch(this.formData.bedrooms) {
+      case '1': baseValue = 80; break;
+      case '2': baseValue = 120; break;
+      case '3': baseValue = 150; break;
+      case '4': baseValue = 200; break;
+      case '5+': baseValue = 250; break;
+      default: baseValue = 100;
+    }
+    
+    if (this.formData.packingService === 'full-pack') baseValue += 50;
+    if (this.formData.packingService === 'partial-pack') baseValue += 25;
+    if (this.formData.storage) baseValue += 30;
+    if (this.formData.largeItems) baseValue += 20;
+    
+    return baseValue;
   }
 
   getCookie(name) {

@@ -1,5 +1,7 @@
 <script>
 {% if GOOGLE_ANALYTICS_ID or GOOGLE_TAG_MANAGER_ID %}
+window.dataLayer = window.dataLayer || [];
+
 window.trackConversion = function(action, category, label, value) {
   if (typeof gtag !== 'undefined') {
     gtag('event', action, {
@@ -8,35 +10,71 @@ window.trackConversion = function(action, category, label, value) {
       'value': value
     });
   }
+  
+  if (window.dataLayer) {
+    window.dataLayer.push({
+      'event': action,
+      'eventCategory': category,
+      'eventLabel': label,
+      'eventValue': value
+    });
+  }
 };
 
 window.trackPhoneClick = function() {
-  trackConversion('phone_click', 'engagement', 'Phone Call CTA', 1);
+  trackConversion('phone_click', 'engagement', 'Phone Call CTA', 50);
+  
   {% if GOOGLE_ADS_CONVERSION_ID and GOOGLE_ADS_PHONE_CONVERSION_LABEL %}
-  gtag('event', 'conversion', {
-    'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_PHONE_CONVERSION_LABEL }}'
-  });
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'conversion', {
+      'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_PHONE_CONVERSION_LABEL }}',
+      'value': 50.0,
+      'currency': 'AUD'
+    });
+  }
   {% endif %}
+  
+  return true;
 };
 
 window.trackEmailClick = function() {
-  trackConversion('email_click', 'engagement', 'Email CTA', 1);
+  trackConversion('email_click', 'engagement', 'Email CTA', 25);
+  
   {% if GOOGLE_ADS_CONVERSION_ID and GOOGLE_ADS_EMAIL_CONVERSION_LABEL %}
-  gtag('event', 'conversion', {
-    'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_EMAIL_CONVERSION_LABEL }}'
-  });
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'conversion', {
+      'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_EMAIL_CONVERSION_LABEL }}',
+      'value': 25.0,
+      'currency': 'AUD'
+    });
+  }
   {% endif %}
+  
+  return true;
 };
 
-window.trackQuoteRequest = function() {
-  trackConversion('quote_request', 'lead', 'Quote Form Submission', 10);
+window.trackQuoteRequest = function(formData) {
+  const value = formData?.estimatedValue || 100;
+  
+  trackConversion('quote_request', 'lead', 'Quote Form Submission', value);
+  
   {% if GOOGLE_ADS_CONVERSION_ID and GOOGLE_ADS_QUOTE_CONVERSION_LABEL %}
-  gtag('event', 'conversion', {
-    'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_QUOTE_CONVERSION_LABEL }}',
-    'value': 10.0,
-    'currency': 'AUD'
-  });
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'conversion', {
+      'send_to': '{{ GOOGLE_ADS_CONVERSION_ID }}/{{ GOOGLE_ADS_QUOTE_CONVERSION_LABEL }}',
+      'value': value,
+      'currency': 'AUD',
+      'transaction_id': formData?.transactionId || Date.now().toString()
+    });
+    
+    gtag('event', 'generate_lead', {
+      'currency': 'AUD',
+      'value': value
+    });
+  }
   {% endif %}
+  
+  return true;
 };
 
 window.trackScroll = function(depth) {
@@ -44,12 +82,26 @@ window.trackScroll = function(depth) {
     gtag('event', 'scroll', {
       'event_category': 'engagement',
       'event_label': depth + '%',
-      'value': depth
+      'value': depth,
+      'non_interaction': true
+    });
+  }
+};
+
+window.trackTimeOnPage = function(seconds) {
+  if (typeof gtag !== 'undefined' && seconds % 30 === 0) {
+    gtag('event', 'time_on_page', {
+      'event_category': 'engagement',
+      'event_label': seconds + ' seconds',
+      'value': seconds,
+      'non_interaction': true
     });
   }
 };
 
 let scrollTracked = {25: false, 50: false, 75: false, 100: false};
+let timeOnPageSeconds = 0;
+
 window.addEventListener('scroll', function() {
   const scrollPercent = Math.round((window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
   Object.keys(scrollTracked).forEach(function(depth) {
@@ -58,6 +110,24 @@ window.addEventListener('scroll', function() {
       trackScroll(depth);
     }
   });
+}, {passive: true});
+
+setInterval(function() {
+  timeOnPageSeconds += 10;
+  if (timeOnPageSeconds % 30 === 0) {
+    trackTimeOnPage(timeOnPageSeconds);
+  }
+}, 10000);
+
+window.addEventListener('beforeunload', function() {
+  if (typeof gtag !== 'undefined' && timeOnPageSeconds > 0) {
+    gtag('event', 'session_end', {
+      'event_category': 'engagement',
+      'event_label': 'Time on site',
+      'value': timeOnPageSeconds,
+      'non_interaction': true
+    });
+  }
 });
 {% endif %}
 </script>
