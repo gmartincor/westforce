@@ -21,6 +21,7 @@ openpyxl==3.1.2
 # Producción (versiones estables)
 gunicorn==21.2.0
 whitenoise[brotli]==6.5.0
+resend==2.4.0
 
 # Comentadas para evitar complejidad innecesaria
 # django-redis==5.3.0  # No usar a menos que sea crítico

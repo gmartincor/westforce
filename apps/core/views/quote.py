@@ -1,89 +1,53 @@
 import json
+import logging
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.core.mail import send_mail
-from django.conf import settings
-from django.utils import timezone
+from apps.core.services.email_service import get_email_service
+
+logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["POST"])
 def quote_request(request):
     try:
         data = json.loads(request.body)
+        logger.info(f"Quote request received: {data.get('firstName')} {data.get('lastName')}")
         
-        bedrooms = data.get('bedrooms', '')
-        from_suburb = data.get('fromSuburb', '')
-        to_suburb = data.get('toSuburb', '')
-        move_date = data.get('moveDate', '')
-        flexible_dates = data.get('flexibleDates', False)
-        start_time = data.get('startTime', '')
-        additional_stop = data.get('additionalStop', False)
-        large_items = data.get('largeItems', False)
-        packing_service = data.get('packingService', 'not-required')
-        storage = data.get('storage', False)
-        first_name = data.get('firstName', '')
-        last_name = data.get('lastName', '')
-        mobile = data.get('mobile', '')
-        email = data.get('email', '')
-        comments = data.get('comments', '')
-        hear_about = data.get('hearAbout', '')
-        newsletter = data.get('newsletter', False)
+        required_fields = ['bedrooms', 'fromSuburb', 'toSuburb', 'moveDate', 'startTime', 
+                          'firstName', 'lastName', 'mobile', 'email']
         
-        email_subject = f'New Quote Request - {first_name} {last_name}'
-        email_body = f"""
-New Quote Request Received
-
-CONTACT DETAILS:
-Name: {first_name} {last_name}
-Mobile: {mobile}
-Email: {email}
-
-MOVE DETAILS:
-Property Size: {bedrooms} bedroom(s)
-From: {from_suburb}
-To: {to_suburb}
-Move Date: {move_date}
-Flexible Dates: {'Yes' if flexible_dates else 'No'}
-Preferred Start Time: {start_time}
-Additional Stop: {'Yes' if additional_stop else 'No'}
-
-SERVICES:
-Large/Heavy Items: {'Yes' if large_items else 'No'}
-Packing Service: {packing_service}
-Storage Required: {'Yes' if storage else 'No'}
-
-ADDITIONAL INFO:
-How they heard about us: {hear_about}
-Newsletter Subscription: {'Yes' if newsletter else 'No'}
-Comments: {comments if comments else 'None'}
-
----
-Submitted: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}
-        """
+        for field in required_fields:
+            if not data.get(field):
+                logger.warning(f"Missing required field: {field}")
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }, status=400)
         
         try:
-            send_mail(
-                email_subject,
-                email_body,
-                settings.DEFAULT_FROM_EMAIL,
-                [settings.DEFAULT_FROM_EMAIL],
-                fail_silently=False,
-            )
+            email_service = get_email_service()
+            result = email_service.send_quote_notification(data)
+            logger.info(f"Quote email sent successfully: {result}")
         except Exception as e:
-            pass
+            logger.error(f"Failed to send quote email: {str(e)}", exc_info=True)
+            return JsonResponse({
+                'success': False,
+                'error': 'Failed to send email notification'
+            }, status=500)
         
         return JsonResponse({
             'success': True,
             'message': 'Quote request received successfully'
         })
         
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON: {str(e)}")
         return JsonResponse({
             'success': False,
             'error': 'Invalid request data'
         }, status=400)
     except Exception as e:
+        logger.error(f"Quote request error: {str(e)}", exc_info=True)
         return JsonResponse({
             'success': False,
             'error': 'An error occurred processing your request'

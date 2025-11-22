@@ -163,6 +163,10 @@ COMPANY_RATING = config('COMPANY_RATING', default='4.8')
 COMPANY_REVIEW_COUNT = config('COMPANY_REVIEW_COUNT', default='127')
 COMPANY_ESTABLISHED_YEAR = config('COMPANY_ESTABLISHED_YEAR', default='2020')
 
+RESEND_API_KEY = config('RESEND_API_KEY', default='')
+RESEND_FROM_EMAIL = config('RESEND_FROM_EMAIL', default='onboarding@resend.dev')
+QUOTE_RECIPIENT_EMAIL = config('QUOTE_RECIPIENT_EMAIL', default=COMPANY_EMAIL)
+
 SEO_META_TITLE = config('SEO_META_TITLE', default='Westforce Removals - Professional Moving Services Perth | Local & Interstate Movers')
 SEO_META_DESCRIPTION = config('SEO_META_DESCRIPTION', default='Professional moving and removalist services in Perth, Western Australia. Local and interstate relocations with expert care. Get your free quote today.')
 SEO_OG_IMAGE_PATH = config('SEO_OG_IMAGE_PATH', default='images/landing/hero/View-of-Perth-City-as-seen-from-Kings-Park.jpg')

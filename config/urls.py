@@ -6,6 +6,8 @@ from django.contrib.sitemaps.views import sitemap
 from apps.core.views.health import health_check
 from apps.core.views.landing import landing_page
 from apps.core.views.seo import robots_txt
+from apps.core.views.quote import quote_request
+from apps.core.views.legal import privacy_policy, terms_conditions
 from apps.core.sitemaps import StaticViewSitemap
 
 sitemaps = {
@@ -17,6 +19,9 @@ urlpatterns = [
     path('health/', health_check, name='health_check'),
     path('robots.txt', robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('quote/', quote_request, name='quote_request'),
+    path('privacy-policy/', privacy_policy, name='privacy_policy'),
+    path('terms-conditions/', terms_conditions, name='terms_conditions'),
     path('auth/', include('apps.authentication.urls')),
     path('core/', include('apps.core.urls')),
     path('dashboard/', include('apps.dashboard.urls')),
