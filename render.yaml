@@ -39,14 +39,23 @@ services:
       - key: COMPANY_TAGLINE
         value: Professional Australian Removals Company Management System
       
+      - key: RESEND_API_KEY
+        sync: false
+      
+      - key: RESEND_FROM_EMAIL
+        value: onboarding@resend.dev
+      
+      - key: QUOTE_RECIPIENT_EMAIL
+        value: info@westforceremovals.com.au
+      
       - key: EMAIL_HOST
         value: smtp.gmail.com
       
       - key: EMAIL_PORT
-        value: 587
+        value: "587"
       
       - key: EMAIL_USE_TLS
-        value: true
+        value: "true"
       
       - key: EMAIL_HOST_USER
         value: ""
