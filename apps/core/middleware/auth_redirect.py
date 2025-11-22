@@ -10,7 +10,6 @@ class AuthRedirectMiddleware(MiddlewareMixin):
         '/media/',
         '/admin/jsi18n/',
         '/health/',
-        '/favicon.ico',
         '/auth/',
     ]
     
