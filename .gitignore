@@ -39,6 +39,7 @@ venv.bak/
 .env.local
 .env.*.local
 !.env.example
+!.env.hetzner.example
 venv.bak/
 
 # Environment variables

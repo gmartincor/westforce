@@ -1,5 +1,4 @@
 import os
-import dj_database_url
 from decouple import config, Csv
 from .base import *
 
@@ -38,14 +37,21 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 
-database_url = config('DATABASE_URL', default='')
+# Configuración de base de datos PostgreSQL (Docker interno)
 DATABASES = {
-    'default': dj_database_url.config(
-        default=database_url,
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', default='westforce_removals'),
+        'USER': config('DB_USER', default='westforce'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='postgres'),
+        'PORT': config('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,
+        'CONN_HEALTH_CHECKS': True,
+        'OPTIONS': {
+            'connect_timeout': 10,
+        }
+    }
 }
 
 CACHES = {

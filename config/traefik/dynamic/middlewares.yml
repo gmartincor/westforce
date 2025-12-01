@@ -1,0 +1,43 @@
+# =============================================================================
+# Configuración dinámica de Traefik - Middlewares y configuración adicional
+# =============================================================================
+
+http:
+  middlewares:
+    # Rate limiting para protección contra DDoS
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 200
+        period: 1s
+    
+    # Compresión gzip
+    compress:
+      compress:
+        excludedContentTypes:
+          - text/event-stream
+    
+    # Security headers adicionales
+    security-headers:
+      headers:
+        customResponseHeaders:
+          X-Robots-Tag: "index, follow"
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "DENY"
+          X-XSS-Protection: "1; mode=block"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+          Permissions-Policy: "geolocation=(), microphone=(), camera=()"
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        frameDeny: true
+
+  # Servicio para archivos estáticos (opcional si sirves estáticos por separado)
+  # services:
+  #   static-files:
+  #     loadBalancer:
+  #       servers:
+  #         - url: "http://web:8000"

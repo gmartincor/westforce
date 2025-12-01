@@ -1,0 +1,68 @@
+# =============================================================================
+# Configuración de Traefik para Westforce en Hetzner
+# =============================================================================
+
+# API y Dashboard
+api:
+  dashboard: true
+  insecure: false
+
+# Logs
+log:
+  level: INFO
+  format: json
+
+accessLog:
+  format: json
+  filters:
+    statusCodes:
+      - "400-599"
+
+# Entrypoints
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt
+    # Rate limiting global
+    http2:
+      maxConcurrentStreams: 250
+    transport:
+      respondingTimeouts:
+        readTimeout: 60s
+        writeTimeout: 60s
+        idleTimeout: 180s
+
+# Ping para healthcheck
+ping:
+  entryPoint: websecure
+
+# Proveedores
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: westforce_web
+  file:
+    directory: "/etc/traefik/dynamic"
+    watch: true
+
+# Certificados SSL con Let's Encrypt
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "${ACME_EMAIL}"
+      storage: "/letsencrypt/acme.json"
+      httpChallenge:
+        entryPoint: web
+      # Descomentar para staging (testing) - evita rate limits
+      # caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"

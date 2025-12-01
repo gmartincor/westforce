@@ -1,76 +1,90 @@
-.PHONY: help dev prod build clean test logs status restart migrate makemigrations shell superuser seed seed-flush mcp-setup deploy-logs deploy-status collectstatic
+.PHONY: help dev build clean test logs status restart migrate makemigrations shell superuser seed seed-flush collectstatic setup deploy prod-logs prod-status backup rollback
 
-COMPOSE := docker-compose
+COMPOSE_DEV := docker compose
+COMPOSE_PROD := docker compose -f docker-compose.prod.yml
 
 help:
 	@echo "🐳 Westforce Commands:"
 	@echo ""
 	@echo "DEVELOPMENT:"
-	@echo "  dev          - Start development environment"
-	@echo "  build        - Rebuild images"
-	@echo "  clean        - Clean containers and volumes"
-	@echo "  restart      - Restart services"
-	@echo "  collectstatic - Collect static files"
+	@echo "  dev           - Start development environment"
+	@echo "  build         - Rebuild images"
+	@echo "  clean         - Clean containers and volumes"
+	@echo "  restart       - Restart services"
+	@echo "  logs          - Show development logs"
+	@echo "  status        - Show container status"
 	@echo ""
-	@echo "RENDER MCP:"
-	@echo "  mcp-setup    - Configure Render MCP"
-	@echo "  deploy-logs  - View latest deploy logs"
-	@echo "  deploy-status - Service status"
+	@echo "PRODUCTION (Hetzner):"
+	@echo "  setup         - Interactive server setup"
+	@echo "  deploy        - Deploy to production"
+	@echo "  prod-logs     - View production logs"
+	@echo "  prod-status   - Check production status"
+	@echo "  backup        - Manual backup"
+	@echo "  rollback      - Rollback production"
 	@echo ""
 	@echo "DATABASE:"
-	@echo "  migrate      - Run migrations"
+	@echo "  migrate       - Run migrations"
 	@echo "  makemigrations - Create new migrations"
-	@echo "  shell        - Open Django shell"
-	@echo "  superuser    - Create superuser"
-	@echo "  seed         - Seed development data (manual)"
-	@echo "  seed-flush   - Flush and reseed all data"
+	@echo "  shell         - Open Django shell"
+	@echo "  superuser     - Create superuser"
+	@echo "  seed          - Seed development data"
+	@echo "  seed-flush    - Flush and reseed all data"
 	@echo ""
-	@echo "UTILS:"
-	@echo "  test         - Run tests"
-	@echo "  logs         - Show logs"
-	@echo "  status       - Show container status"
+	@echo "OTHER:"
+	@echo "  test          - Run tests"
+	@echo "  collectstatic - Collect static files"
 	@echo ""
 
+# === DEVELOPMENT ===
 dev:
 	@echo "🚀 Starting development environment..."
-	@$(COMPOSE) up --remove-orphans
-
-prod:
-	@echo "🏭 Starting production environment..."
-	@DJANGO_SETTINGS_MODULE=config.settings.production $(COMPOSE) up --remove-orphans
+	@$(COMPOSE_DEV) up --remove-orphans
 
 build:
 	@echo "🔨 Rebuilding images..."
-	@$(COMPOSE) build --no-cache
+	@$(COMPOSE_DEV) build --no-cache
 
 clean:
 	@echo "🧹 Cleaning containers and volumes..."
-	@$(COMPOSE) down -v --remove-orphans
+	@$(COMPOSE_DEV) down -v --remove-orphans
 	@docker system prune -f
 
 restart:
 	@echo "🔄 Restarting services..."
-	@$(COMPOSE) restart
-
-test:
-	@echo "🧪 Running tests..."
-	@$(COMPOSE) exec web python manage.py test
+	@$(COMPOSE_DEV) restart
 
 logs:
-	@$(COMPOSE) logs -f web
+	@$(COMPOSE_DEV) logs -f web
 
 status:
-	@$(COMPOSE) ps
+	@$(COMPOSE_DEV) ps
 
-mcp-setup:
-	@./scripts/setup-mcp.sh
+# === PRODUCTION (HETZNER) ===
+setup:
+	@echo "🚀 Starting server setup..."
+	@./scripts/hetzner/00-interactive-setup.sh
 
-deploy-logs:
-	@./scripts/render-deploy-logs.sh
+deploy:
+	@echo "🚀 Deploying to production..."
+	@./scripts/hetzner/02-deploy.sh
 
-deploy-status:
-	@./scripts/render-service-status.sh
+prod-logs:
+	@echo "📋 Production logs..."
+	@$(COMPOSE_PROD) logs -f
 
+prod-status:
+	@echo "📊 Production status..."
+	@$(COMPOSE_PROD) ps
+
+backup:
+	@echo "💾 Running backup..."
+	@$(COMPOSE_PROD) --profile backup run --rm db-backup
+
+rollback:
+	@echo "⏪ Starting rollback..."
+	@./scripts/hetzner/rollback.sh
+
+# === DATABASE ===
 migrate:
 	@echo "🔄 Running migrations..."
 	@docker exec westforce-web python manage.py migrate --verbosity=2
@@ -94,6 +108,11 @@ seed:
 seed-flush:
 	@echo "⚠️  Flushing and reseeding all data..."
 	@docker exec westforce-web python manage.py seed_dev_data --flush
+
+# === OTHER ===
+test:
+	@echo "🧪 Running tests..."
+	@$(COMPOSE_DEV) exec web python manage.py test
 
 collectstatic:
 	@echo "📦 Collecting static files..."
