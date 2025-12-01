@@ -201,3 +201,4 @@ temp_diagnostics/
 scripts/*-original.sh.backup
 scripts/diagnose_*.py
 scripts/fix_*.sh
+docs/HETZNER_DEPLOYMENT_PLAN.md

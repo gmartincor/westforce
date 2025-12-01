@@ -10,7 +10,28 @@
 | **Stack** | Django 4.2 LTS + PostgreSQL 15 + Traefik 3 + Gunicorn |
 | **SSL** | Let's Encrypt (automático via Traefik) |
 | **CI/CD** | GitHub Actions |
-| **Monitorización** | Healthchecks.io |
+| **Monitorización** | Healthchecks.io (guillermomc007@gmail.com) |
+| **Mantenimiento** | 🤖 **CERO** - Todo automatizado |
+
+---
+
+## 🤖 Características de CERO MANTENIMIENTO
+
+Este despliegue está configurado para funcionar sin intervención manual:
+
+| Característica | Implementación | Frecuencia |
+|----------------|----------------|------------|
+| **Auto-reinicio de contenedores** | Docker `restart: unless-stopped` | Automático |
+| **Auto-recovery de la app** | Script healthcheck con reinicio tras 3 fallos | Cada 1 min |
+| **Watchdog de Docker** | Monitorea y reinicia contenedores caídos | Cada 2 min |
+| **Auto-reinicio del demonio Docker** | Systemd service override | Automático |
+| **Alertas de recursos** | Pings a healthchecks.io cuando CPU/RAM/Disco alto | Cada 5 min |
+| **Alertas de escalado** | Notifica cuando considerar upgrade del plan | Umbral 75%+ |
+| **Backups automáticos** | Base de datos + media files | Diario 3:00 AM |
+| **Limpieza de disco** | Elimina cache/logs antiguos si disco >80% | Diario 4:00 AM |
+| **Limpieza Docker** | Prune de imágenes/contenedores antiguos | Semanal |
+| **Actualizaciones seguridad** | Unattended-upgrades | Automático |
+| **Rotación de logs** | Logrotate para todos los logs | Diario |
 
 ---
 
@@ -262,39 +283,64 @@ docker exec -it westforce-web python manage.py createsuperuser
 ---
 
 ### **FASE 5: Configuración de Monitorización** ⏱️ 15 min
-*Estado: ⏳ Pendiente*
+*Estado: ✅ Cuenta creada - Configurar checks*
 
-#### 5.1 Crear cuenta en Healthchecks.io
+#### 5.1 Tu cuenta de Healthchecks.io
 
-1. Ir a https://healthchecks.io
-2. Crear cuenta gratuita
-3. Crear proyecto: `Westforce`
+✅ **Cuenta ya creada**: guillermomc007@gmail.com
+- Dashboard: https://healthchecks.io/projects/
+- Check existente: "My First Check"
+- URL: `https://hc-ping.com/94648cf3-09f9-4934-8c59-c8190064bb1c`
 
-#### 5.2 Crear checks
+#### 5.2 Configurar integraciones de alerta
 
-| Check | Schedule | Grace |
-|-------|----------|-------|
-| `westforce-heartbeat` | `* * * * *` (cada minuto) | 5 min |
-| `westforce-resources` | `*/5 * * * *` (cada 5 min) | 10 min |
-| `westforce-backup` | `0 3 * * *` (3am diario) | 1 hora |
+1. Ve a https://healthchecks.io → **Integrations**
+2. Añade **Email** → guillermomc007@gmail.com
+3. (Opcional) Añade **Telegram** o **Slack** para alertas móviles
 
-#### 5.3 Configurar URLs en .env
+#### 5.3 Renombrar y configurar el check existente
 
-```bash
-# Editar .env con las URLs de Healthchecks.io
-nano /opt/westforce/app/.env
+1. Ve a https://healthchecks.io/checks/
+2. Click en "My First Check" → Edit
+3. Configura:
+   - **Name**: `westforce-heartbeat`
+   - **Schedule**: `* * * * *` (Simple → Every 1 minute)
+   - **Grace Time**: 5 minutes
+   - **Tags**: `westforce, production, health`
 
-# Añadir:
-HEALTHCHECK_HEARTBEAT_URL=https://hc-ping.com/tu-uuid-heartbeat
-HEALTHCHECK_FAILURE_URL=https://hc-ping.com/tu-uuid-heartbeat/fail
+#### 5.4 (Opcional) Crear checks adicionales
+
+Para monitoreo más granular, crea estos checks adicionales:
+
+| Check | Schedule | Grace | URL a usar |
+|-------|----------|-------|------------|
+| `westforce-backup` | `0 3 * * *` | 1 hora | Nueva URL |
+| `westforce-resources` | `*/5 * * * *` | 10 min | Nueva URL |
+
+#### 5.5 El .env ya está pre-configurado
+
+El archivo `.env.hetzner.example` ya tiene tu URL de healthchecks.io:
+
+```env
+# Ya incluido en .env.hetzner.example
+HEALTHCHECK_HEARTBEAT_URL=https://hc-ping.com/94648cf3-09f9-4934-8c59-c8190064bb1c
+HEALTHCHECK_FAILURE_URL=https://hc-ping.com/94648cf3-09f9-4934-8c59-c8190064bb1c/fail
 ```
 
-#### 5.4 Activar scripts de monitorización
+#### 5.6 Activar scripts de monitorización
 
 ```bash
-# Como root
+# Como root en el servidor
 sudo /opt/westforce/app/scripts/hetzner/03-setup-monitoring.sh
 ```
+
+Esto instalará:
+- ✅ Healthcheck cada 1 minuto (con auto-recovery)
+- ✅ Monitoreo de recursos cada 5 minutos
+- ✅ Watchdog de Docker cada 2 minutos
+- ✅ Backups diarios a las 3:00 AM
+- ✅ Limpieza de disco diaria a las 4:00 AM
+- ✅ Actualizaciones de seguridad automáticas
 
 ---
 
