@@ -10,6 +10,9 @@ if isinstance(allowed_hosts_raw, str):
 else:
     ALLOWED_HOSTS = allowed_hosts_raw if allowed_hosts_raw else []
 
+
+ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+
 csrf_origins_raw = config('CSRF_TRUSTED_ORIGINS', default='')
 if csrf_origins_raw and isinstance(csrf_origins_raw, str):
     CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_raw.split(',') if origin.strip()]
