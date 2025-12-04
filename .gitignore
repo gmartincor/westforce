@@ -34,13 +34,12 @@ ENV/
 env.bak/
 venv.bak/
 
-# Environment files (excluir .env pero incluir examples)
+# Environment files
 .env
 .env.local
 .env.*.local
 !.env.example
-!.env.hetzner.example
-venv.bak/
+!.env.hostinger.example
 
 # Environment variables
 .env
@@ -202,3 +201,5 @@ scripts/*-original.sh.backup
 scripts/diagnose_*.py
 scripts/fix_*.sh
 docs/HETZNER_DEPLOYMENT_PLAN.md
+docs/HETZNER_COPILOT_INSTRUCTIONS.md
+docs/HOSTINGER_DEPLOYMENT_GUIDE.md

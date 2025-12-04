@@ -14,7 +14,7 @@ help:
 	@echo "  logs          - Show development logs"
 	@echo "  status        - Show container status"
 	@echo ""
-	@echo "PRODUCTION (Hetzner):"
+	@echo "PRODUCTION (Hostinger VPS):"
 	@echo "  setup         - Interactive server setup"
 	@echo "  deploy        - Deploy to production"
 	@echo "  prod-logs     - View production logs"
@@ -59,14 +59,14 @@ logs:
 status:
 	@$(COMPOSE_DEV) ps
 
-# === PRODUCTION (HETZNER) ===
+# === PRODUCTION (HOSTINGER VPS) ===
 setup:
 	@echo "🚀 Starting server setup..."
-	@./scripts/hetzner/00-interactive-setup.sh
+	@./scripts/deploy/setup.sh
 
 deploy:
 	@echo "🚀 Deploying to production..."
-	@./scripts/hetzner/02-deploy.sh
+	@./scripts/deploy/deploy.sh
 
 prod-logs:
 	@echo "📋 Production logs..."
@@ -82,7 +82,7 @@ backup:
 
 rollback:
 	@echo "⏪ Starting rollback..."
-	@./scripts/hetzner/rollback.sh
+	@./scripts/deploy/rollback.sh
 
 # === DATABASE ===
 migrate:

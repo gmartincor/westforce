@@ -1,10 +1,9 @@
-name: Deploy to Hetzner
+name: Deploy to Production
 
 on:
   push:
     branches:
       - main
-      - hetzner
   workflow_dispatch:
     inputs:
       environment:
@@ -80,16 +79,13 @@ jobs:
           echo "**Digest:** \`${{ steps.build.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
 
   # ===========================================
-  # JOB 2: Deploy a Hetzner
+  # JOB 2: Deploy to Production
   # ===========================================
   deploy:
-    name: Deploy to Hetzner
+    name: Deploy to Production
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/hetzner'
-    environment:
-      name: production
-      url: https://westforceremovals.com
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout repository
@@ -98,21 +94,21 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.HETZNER_SSH_KEY }}" | base64 -d > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to server
         env:
-          HOST: ${{ secrets.HETZNER_HOST }}
-          USER: ${{ secrets.HETZNER_USER }}
+          HOST: ${{ secrets.SERVER_HOST }}
+          USER: ${{ secrets.SERVER_USER }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           ssh -o StrictHostKeyChecking=no $USER@$HOST << 'DEPLOY_SCRIPT'
             set -e
             
             # Variables
-            APP_DIR="/opt/westforce/app"
+            APP_DIR="/opt/projects/westforce"
             COMPOSE_FILE="docker-compose.prod.yml"
             
             echo "🚀 Iniciando despliegue..."
@@ -126,7 +122,13 @@ jobs:
             
             # Actualizar imagen
             echo "🐳 Descargando nueva imagen..."
-            docker compose -f $COMPOSE_FILE pull web
+            docker compose -f $COMPOSE_FILE pull web 2>/dev/null || true
+            
+            # Construir si no hay imagen remota
+            if ! docker compose -f $COMPOSE_FILE pull web 2>/dev/null; then
+              echo "🔨 Construyendo imagen localmente..."
+              docker compose -f $COMPOSE_FILE build web
+            fi
             
             # Desplegar con zero-downtime
             echo "🔄 Desplegando..."
@@ -134,7 +136,7 @@ jobs:
             
             # Esperar a que la aplicación esté lista
             echo "⏳ Esperando a que la aplicación esté lista..."
-            sleep 10
+            sleep 15
             
             # Verificar salud
             MAX_RETRIES=30
@@ -205,3 +207,8 @@ jobs:
       - name: Check SSL certificate
         run: |
           echo | openssl s_client -servername westforceremovals.com -connect westforceremovals.com:443 2>/dev/null | openssl x509 -noout -dates
+
+      - name: Ping Healthchecks.io
+        if: success()
+        run: |
+          curl -fsS --retry 3 https://hc-ping.com/94648cf3-09f9-4934-8c59-c8190064bb1c || true

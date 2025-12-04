@@ -1,45 +1,6 @@
 name: westforce-production
-# =============================================================================
-# Production Docker Compose - Optimized for Hetzner CX23
-# Server: 2 vCPU, 4GB RAM, 40GB SSD - €0.0056/hour (~€4.08/month)
-# =============================================================================
 
 services:
-  traefik:
-    image: traefik:v3.2
-    container_name: westforce-traefik
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      - ACME_EMAIL=${ACME_EMAIL:-admin@westforceremovals.com}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - traefik_data:/letsencrypt
-      - ./config/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./config/traefik/dynamic:/etc/traefik/dynamic:ro
-    networks:
-      - web
-      - internal
-    labels:
-      - "traefik.enable=true"
-      # Dashboard (opcional, desactivar en producción si no se necesita)
-      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN:-westforceremovals.com}`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH:-}"
-    healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
-
   postgres:
     image: postgres:15-alpine
     container_name: westforce-postgres
@@ -63,15 +24,19 @@ services:
     deploy:
       resources:
         limits:
-          memory: 384M  # Optimized for CX23 (4GB total)
+          memory: 256M
         reservations:
-          memory: 192M
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/${GITHUB_REPOSITORY:-gmartincor/westforce}:${IMAGE_TAG:-latest}
     container_name: westforce-web
     restart: unless-stopped
     environment:
@@ -84,11 +49,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
       DB_HOST: postgres
       DB_PORT: "5432"
-      DATABASE_URL: postgresql://${DB_USER:-westforce}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-westforce_removals}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-westforceremovals.com,www.westforceremovals.com}
       CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-https://westforceremovals.com,https://www.westforceremovals.com}
       PORT: "8000"
-      # Company
       COMPANY_NAME: ${COMPANY_NAME:-Westforce Removals Company}
       COMPANY_TAGLINE: ${COMPANY_TAGLINE:-Professional Australian Removals Company Management System}
       COMPANY_EMAIL: ${COMPANY_EMAIL:-westforce.analytics@gmail.com}
@@ -102,11 +65,9 @@ services:
       COMPANY_RATING: ${COMPANY_RATING:-4.8}
       COMPANY_REVIEW_COUNT: ${COMPANY_REVIEW_COUNT:-127}
       COMPANY_ESTABLISHED_YEAR: ${COMPANY_ESTABLISHED_YEAR:-2020}
-      # Email
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-onboarding@resend.dev}
       QUOTE_RECIPIENT_EMAIL: ${QUOTE_RECIPIENT_EMAIL:-westforce.analytics@gmail.com}
-      # Analytics
       GOOGLE_ANALYTICS_ID: ${GOOGLE_ANALYTICS_ID:-}
       GOOGLE_TAG_MANAGER_ID: ${GOOGLE_TAG_MANAGER_ID:-}
     volumes:
@@ -115,38 +76,33 @@ services:
       - ./logs:/app/logs
     networks:
       - internal
-      - web
+      - traefik-public
     depends_on:
       postgres:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      # HTTP -> HTTPS redirect
-      - "traefik.http.routers.web-http.rule=Host(`${DOMAIN:-westforceremovals.com}`) || Host(`www.${DOMAIN:-westforceremovals.com}`)"
-      - "traefik.http.routers.web-http.entrypoints=web"
-      - "traefik.http.routers.web-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.westforce-http.rule=Host(`${DOMAIN:-westforceremovals.com}`) || Host(`www.${DOMAIN:-westforceremovals.com}`)"
+      - "traefik.http.routers.westforce-http.entrypoints=web"
+      - "traefik.http.routers.westforce-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
-      # HTTPS
-      - "traefik.http.routers.web-secure.rule=Host(`${DOMAIN:-westforceremovals.com}`) || Host(`www.${DOMAIN:-westforceremovals.com}`)"
-      - "traefik.http.routers.web-secure.entrypoints=websecure"
-      - "traefik.http.routers.web-secure.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.web-secure.middlewares=secure-headers,www-redirect"
-      # WWW -> non-WWW redirect
-      - "traefik.http.middlewares.www-redirect.redirectregex.regex=^https://www\\.(.+)"
-      - "traefik.http.middlewares.www-redirect.redirectregex.replacement=https://$${1}"
-      - "traefik.http.middlewares.www-redirect.redirectregex.permanent=true"
-      # Security headers
-      - "traefik.http.middlewares.secure-headers.headers.stsSeconds=63072000"
-      - "traefik.http.middlewares.secure-headers.headers.stsIncludeSubdomains=true"
-      - "traefik.http.middlewares.secure-headers.headers.stsPreload=true"
-      - "traefik.http.middlewares.secure-headers.headers.forceSTSHeader=true"
-      - "traefik.http.middlewares.secure-headers.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.secure-headers.headers.browserXssFilter=true"
-      - "traefik.http.middlewares.secure-headers.headers.frameDeny=true"
-      - "traefik.http.middlewares.secure-headers.headers.referrerPolicy=same-origin"
-      # Service
-      - "traefik.http.services.web.loadbalancer.server.port=8000"
+      - "traefik.http.routers.westforce-secure.rule=Host(`${DOMAIN:-westforceremovals.com}`) || Host(`www.${DOMAIN:-westforceremovals.com}`)"
+      - "traefik.http.routers.westforce-secure.entrypoints=websecure"
+      - "traefik.http.routers.westforce-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.westforce-secure.middlewares=westforce-headers,westforce-www-redirect"
+      - "traefik.http.middlewares.westforce-www-redirect.redirectregex.regex=^https://www\\.(.+)"
+      - "traefik.http.middlewares.westforce-www-redirect.redirectregex.replacement=https://$${1}"
+      - "traefik.http.middlewares.westforce-www-redirect.redirectregex.permanent=true"
+      - "traefik.http.middlewares.westforce-headers.headers.stsSeconds=63072000"
+      - "traefik.http.middlewares.westforce-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.westforce-headers.headers.stsPreload=true"
+      - "traefik.http.middlewares.westforce-headers.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.westforce-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.westforce-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.westforce-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.westforce-headers.headers.referrerPolicy=same-origin"
+      - "traefik.http.services.westforce.loadbalancer.server.port=8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -156,11 +112,15 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1536M  # Optimized for CX23: allows 3 gunicorn workers
+          memory: 512M
         reservations:
-          memory: 768M
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
-  # Backup automático de la base de datos (ejecuta diariamente)
   db-backup:
     image: postgres:15-alpine
     container_name: westforce-db-backup
@@ -181,28 +141,21 @@ services:
     command: >
       -c "pg_dump -Fc > /backups/westforce_$$(date +%Y%m%d_%H%M%S).dump && 
           find /backups -name '*.dump' -mtime +7 -delete && 
-          echo 'Backup completed successfully'"
+          echo 'Backup completed'"
     profiles:
       - backup
 
 volumes:
   postgres_data:
-    name: westforce_prod_postgres_data
-    driver: local
+    name: westforce_postgres
   media_data:
-    name: westforce_prod_media_data
-    driver: local
+    name: westforce_media
   static_data:
-    name: westforce_prod_static_data
-    driver: local
-  traefik_data:
-    name: westforce_prod_traefik_data
-    driver: local
+    name: westforce_static
 
 networks:
-  web:
-    name: westforce_web
-    driver: bridge
+  traefik-public:
+    external: true
   internal:
     name: westforce_internal
     driver: bridge
